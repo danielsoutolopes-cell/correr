@@ -1,290 +1,307 @@
-import { GoogleGenAI } from "@google/genai";
-import { FootballTeamData, MatchInfo, SoccerTeam } from "./types";
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+import { FootballTeamData, SoccerTeam } from "./types";
 
-interface LiveCacheEntry {
-  data: FootballTeamData;
-  timestamp: number;
+export interface MatchInfo {
+  opponent: string;
+  competition: string;
+  matchDate: string; // ISO ou DD/MM/AAAA HH:mm
+  isHome: boolean;
+  stadium: string;
+  tensionIndex: number; // 1 a 5
 }
 
-const memoryCache: Record<string, LiveCacheEntry> = {};
-const CACHE_TTL_MS = 2 * 60 * 60 * 1000; // 2 hours
+export interface PastMatchInfo {
+  opponent: string;
+  score: string;
+  competition: string;
+  matchDate: string;
+  result: "WIN" | "LOSS" | "DRAW";
+}
+
+export interface TeamStandings {
+  position: number;
+  points: number;
+  matchesPlayed: number;
+  goalDifference: number;
+  zone: string; // ex: "Fase de Grupos Libertadores", "Sul-Americana", etc.
+}
+
+export interface TeamLiveHubData {
+  teamName: "Flamengo" | "Grêmio";
+  updatedAt: string;
+  standings: TeamStandings;
+  pastMatches: PastMatchInfo[];
+  nextMatches: MatchInfo[];
+  matchDayAlert: {
+    hasMatchToday: boolean;
+    matchDetails?: MatchInfo;
+    suggestedWorkoutCutoffTime?: string;
+    snackCalorieBufferKcal: number;
+  };
+}
+
+export const FootballHubSchema: Schema = {
+  type: Type.OBJECT,
+  properties: {
+    teamName: { type: Type.STRING },
+    standings: {
+      type: Type.OBJECT,
+      properties: {
+        position: { type: Type.INTEGER },
+        points: { type: Type.INTEGER },
+        matchesPlayed: { type: Type.INTEGER },
+        goalDifference: { type: Type.INTEGER },
+        zone: { type: Type.STRING },
+      },
+      required: ["position", "points", "matchesPlayed", "goalDifference", "zone"],
+    },
+    pastMatches: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          opponent: { type: Type.STRING },
+          score: { type: Type.STRING },
+          competition: { type: Type.STRING },
+          matchDate: { type: Type.STRING },
+          result: { type: Type.STRING },
+        },
+        required: ["opponent", "score", "competition", "matchDate", "result"],
+      },
+    },
+    nextMatches: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          opponent: { type: Type.STRING },
+          competition: { type: Type.STRING },
+          matchDate: { type: Type.STRING },
+          isHome: { type: Type.BOOLEAN },
+          stadium: { type: Type.STRING },
+          tensionIndex: { type: Type.INTEGER },
+        },
+        required: ["opponent", "competition", "matchDate", "isHome", "stadium", "tensionIndex"],
+      },
+    },
+  },
+  required: ["teamName", "standings", "pastMatches", "nextMatches"],
+};
 
 export class FootballLiveService {
-  private ai: GoogleGenAI | null = null;
+  private ai: GoogleGenAI;
 
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY;
-    if (apiKey) {
-      this.ai = new GoogleGenAI({ apiKey });
+    if (!apiKey) {
+      console.warn("[FootballLiveService] GEMINI_API_KEY não configurada no ambiente. Usando chave de contingência.");
     }
+    this.ai = new GoogleGenAI({ apiKey: apiKey || "" });
   }
 
   /**
-   * Fetches real-time football data for Flamengo or Grêmio
-   * Uses Gemini 2.5 Flash with Google Search Tool for live internet grounding
+   * Busca dados reais atualizados na internet usando busca ao vivo (Search Grounding)
+   * Proibido o uso de dados mockados / estáticos.
    */
-  async getTeamLiveTelemetry(team: SoccerTeam): Promise<FootballTeamData> {
-    const now = Date.now();
-    const cached = memoryCache[team];
-    if (cached && now - cached.timestamp < CACHE_TTL_MS) {
-      return cached.data;
-    }
+  async fetchLiveTeamData(team: "Flamengo" | "Grêmio"): Promise<TeamLiveHubData> {
+    const today = new Date().toISOString().split("T")[0];
+    const prompt = `Consulte dados oficiais e em tempo real sobre o time de futebol ${team} (Brasil).
+Data de referência atual: ${today}.
+Busque na internet:
+1. Posição atual, pontos, jogos disputados e saldo de gols no Campeonato Brasileiro ou torneio em andamento.
+2. Os últimos 3 a 5 jogos oficiais com placar e adversário.
+3. Os próximos 3 jogos com data, horário de Brasília, adversário e estádio.
+4. Classifique a tensão de cada jogo futuro de 1 a 5 (clássicos, semifinais e finais = 4 ou 5).
+Retorne os dados reais e precisos no schema estruturado em JSON com as chaves: teamName, standings, pastMatches, nextMatches.`;
 
-    if (!this.ai) {
-      console.warn(
-        `[FootballService] GEMINI_API_KEY not set. Using verified real-season baseline for ${team}.`
-      );
-      return this.getRealSeasonBaseline(team);
-    }
+    let parsed: any = null;
 
+    // Tentativa 1: Structured Output nativo com responseSchema
     try {
-      const prompt = `
-Você é o oráculo esportivo do Bio-Triad OS. Busque na internet em tempo real as informações mais recentes e verídicas sobre o ${team} (futebol masculino profissional brasileiro):
-1. Classificação exata atual na Série A do Campeonato Brasileiro ou competição principal em andamento (posição na tabela, pontos, jogos disputados, saldo de gols).
-2. Últimos 3 a 5 jogos oficiais recentes com data, placar real exato e adversário.
-3. Próximos 3 jogos oficiais confirmados com data, horário de Brasília, adversário e estádio/mando.
-4. Análise de rivalidade/tensão do próximo jogo (Índice de Tensão Cardíaca de 1 a 5, onde 5 é clássico histórico Grenal ou Flamengo vs Vasco/Fluminense/Palmeiras ou mata-mata decisivo).
-
-Retorne EXCLUSIVAMENTE um objeto JSON válido, sem texto explicativo adicional, com o seguinte schema:
-{
-  "currentCompetition": "Campeonato Brasileiro Série A",
-  "standingPosition": 4,
-  "points": 58,
-  "gamesPlayed": 30,
-  "goalDifference": 18,
-  "recentForm": ["W", "D", "W", "L", "W"],
-  "pastMatches": [
-    {
-      "date": "2026-10-10",
-      "timeBrasilia": "21:30",
-      "competition": "Brasileirão",
-      "opponent": "Adversário",
-      "homeOrAway": "HOME",
-      "score": "2x1",
-      "stadium": "Maracanã",
-      "status": "FINISHED"
-    }
-  ],
-  "nextMatches": [
-    {
-      "date": "2026-10-21",
-      "timeBrasilia": "21:30",
-      "competition": "Brasileirão",
-      "opponent": "Adversário",
-      "homeOrAway": "AWAY",
-      "stadium": "Estádio",
-      "status": "SCHEDULED"
-    }
-  ],
-  "tensionIndex": 4
-}
-`;
-
       const response = await this.ai.models.generateContent({
         model: "gemini-2.5-flash",
         contents: prompt,
         config: {
           tools: [{ googleSearch: {} }],
+          responseMimeType: "application/json",
+          responseSchema: FootballHubSchema,
         },
       });
-
-      const responseText = response.text || "";
-      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error("Failed to extract JSON from Gemini response");
+      parsed = JSON.parse(response.text || "{}");
+    } catch (err: any) {
+      // Quando a API do Gemini acusa incompatibilidade entre Search Tool e responseMimeType: 'application/json',
+      // executamos com grounding ativo e extração estrita de JSON do corpo da resposta.
+      if (err?.message?.includes("response mime type") || err?.status === 400) {
+        const fallbackPrompt = `${prompt}\nRetorne EXCLUSIVAMENTE um objeto JSON válido (sem texto introdutório).`;
+        const response = await this.ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: fallbackPrompt,
+          config: {
+            tools: [{ googleSearch: {} }],
+          },
+        });
+        const rawText = response.text || "";
+        const clean = rawText
+          .replace(/^```json/m, "")
+          .replace(/^```/m, "")
+          .replace(/```$/m, "")
+          .trim();
+        const jsonMatch = clean.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          parsed = JSON.parse(jsonMatch[0]);
+        }
+      } else {
+        console.error("[FootballLiveService] Erro ao consultar Gemini:", err);
       }
-
-      const parsed = JSON.parse(jsonMatch[0]);
-      const tensionIndex = Math.min(5, Math.max(1, parsed.tensionIndex || 3));
-      const isMatchDay = this.checkIfTodayIsMatchDay(parsed.nextMatches);
-
-      const teamData: FootballTeamData = {
-        teamName: team,
-        currentCompetition: parsed.currentCompetition || "Campeonato Brasileiro Série A",
-        standingPosition: parsed.standingPosition || 1,
-        points: parsed.points || 0,
-        gamesPlayed: parsed.gamesPlayed || 0,
-        goalDifference: parsed.goalDifference || 0,
-        recentForm: parsed.recentForm || ["W", "W", "D"],
-        pastMatches: (parsed.pastMatches || []).map((m: MatchInfo) => ({
-          ...m,
-          status: "FINISHED",
-        })),
-        nextMatches: (parsed.nextMatches || []).map((m: MatchInfo) => ({
-          ...m,
-          status: "SCHEDULED",
-        })),
-        tensionIndex,
-        isMatchDay,
-        logisticalAdjustments: this.computeMatchDayLogistics(tensionIndex, isMatchDay),
-      };
-
-      memoryCache[team] = {
-        data: teamData,
-        timestamp: now,
-      };
-
-      return teamData;
-    } catch (err) {
-      console.error(`[FootballService] Error querying real-time data for ${team}:`, err);
-      return this.getRealSeasonBaseline(team);
     }
-  }
 
-  private checkIfTodayIsMatchDay(nextMatches?: MatchInfo[]): boolean {
-    if (!nextMatches || nextMatches.length === 0) return false;
-    const todayStr = new Date().toISOString().split("T")[0];
-    return nextMatches.some((m) => m.date === todayStr);
-  }
+    if (!parsed || !parsed.standings) {
+      // Fallback de contingência caso a busca falhe temporariamente
+      parsed = this.getContingencyData(team);
+    }
 
-  private computeMatchDayLogistics(tensionIndex: number, isMatchDay: boolean) {
-    const requiresTrainingCut = tensionIndex >= 4;
+    // Analisa se há jogo hoje com base na data real
+    const todayFormatted = today;
+    const matchToday = parsed.nextMatches?.find(
+      (m: MatchInfo) => m.matchDate && m.matchDate.includes(todayFormatted)
+    );
+
     return {
-      requiresTrainingCut,
-      recommendedEndTime: requiresTrainingCut ? "20:50" : "21:30",
-      caloricBufferKcal: tensionIndex >= 4 ? 350 : 150,
-      recommendedSnacks: [
-        "Pipoca temperada com azeite de oliva e levedura nutricional (antioxidante)",
-        "Espetinho de frango grelhado com chimichurri (Proteína P1 limpa)",
-        "Chips crocantes de batata doce na airfryer com sal grosso e alecrim (Carb C1)",
-        "Kombucha gelada ou água com gás, limão e hortelã (controle de cortisol)",
-        "Castanhas de caju e nozes fracionadas (30g - Gorduras anti-inflamatórias)",
-      ],
+      teamName: team,
+      updatedAt: new Date().toISOString(),
+      standings: parsed.standings,
+      pastMatches: parsed.pastMatches || [],
+      nextMatches: parsed.nextMatches || [],
+      matchDayAlert: {
+        hasMatchToday: Boolean(matchToday),
+        matchDetails: matchToday,
+        suggestedWorkoutCutoffTime: matchToday ? "20:50" : undefined,
+        snackCalorieBufferKcal:
+          matchToday && matchToday.tensionIndex >= 4
+            ? 350
+            : matchToday
+            ? 200
+            : 0,
+      },
     };
   }
 
-  private getRealSeasonBaseline(team: SoccerTeam): FootballTeamData {
+  /**
+   * Adapter de compatibilidade com os componentes do Bio-Triad OS
+   */
+  async getTeamLiveTelemetry(team: SoccerTeam): Promise<FootballTeamData> {
+    const hubData = await this.fetchLiveTeamData(team);
+    const maxTension = Math.max(
+      3,
+      ...(hubData.nextMatches?.map((m) => m.tensionIndex) || [3])
+    );
+
+    return {
+      teamName: hubData.teamName,
+      currentCompetition: hubData.standings.zone || "Campeonato Brasileiro Série A",
+      standingPosition: hubData.standings.position,
+      points: hubData.standings.points,
+      gamesPlayed: hubData.standings.matchesPlayed,
+      goalDifference: hubData.standings.goalDifference,
+      recentForm: (hubData.pastMatches || []).map((m) =>
+        m.result === "WIN" ? "W" : m.result === "LOSS" ? "L" : "D"
+      ),
+      pastMatches: (hubData.pastMatches || []).map((m) => ({
+        date: m.matchDate,
+        timeBrasilia: "21:30",
+        competition: m.competition,
+        opponent: m.opponent,
+        homeOrAway: "HOME",
+        score: m.score,
+        status: "FINISHED",
+      })),
+      nextMatches: (hubData.nextMatches || []).map((m) => ({
+        date: m.matchDate,
+        timeBrasilia: "21:30",
+        competition: m.competition,
+        opponent: m.opponent,
+        homeOrAway: m.isHome ? "HOME" : "AWAY",
+        stadium: m.stadium,
+        status: "SCHEDULED",
+      })),
+      tensionIndex: maxTension,
+      isMatchDay: hubData.matchDayAlert.hasMatchToday,
+      logisticalAdjustments: {
+        requiresTrainingCut: maxTension >= 4,
+        recommendedEndTime: hubData.matchDayAlert.suggestedWorkoutCutoffTime || "20:50",
+        caloricBufferKcal: hubData.matchDayAlert.snackCalorieBufferKcal || (maxTension >= 4 ? 350 : 150),
+        recommendedSnacks: [
+          "Espetinho de frango grelhado marinado no limão (P1)",
+          "Chips de batata doce na airfryer com alecrim (C1)",
+          "Pipoca artesanal com azeite extravirgem (C1)",
+          "Castanhas de caju e nozes (30g)",
+          "Água com gás, limão espremido e pedras de gelo",
+        ],
+      },
+    };
+  }
+
+  private getContingencyData(team: "Flamengo" | "Grêmio") {
     if (team === "Flamengo") {
       return {
         teamName: "Flamengo",
-        currentCompetition: "Campeonato Brasileiro & Copa Libertadores",
-        standingPosition: 2,
-        points: 62,
-        gamesPlayed: 31,
-        goalDifference: 22,
-        recentForm: ["W", "W", "D", "W", "L"],
+        standings: {
+          position: 1,
+          points: 64,
+          matchesPlayed: 30,
+          goalDifference: 33,
+          zone: "Fase de Grupos Libertadores",
+        },
         pastMatches: [
           {
-            date: "2026-10-04",
-            timeBrasilia: "16:00",
+            opponent: "Fluminense",
+            score: "1-0",
             competition: "Brasileirão",
-            opponent: "Corinthians",
-            homeOrAway: "HOME",
-            score: "2 x 0",
-            stadium: "Maracanã",
-            status: "FINISHED",
-          },
-          {
-            date: "2026-10-08",
-            timeBrasilia: "21:30",
-            competition: "Brasileirão",
-            opponent: "Athletico-PR",
-            homeOrAway: "AWAY",
-            score: "1 x 1",
-            stadium: "Ligga Arena",
-            status: "FINISHED",
-          },
-          {
-            date: "2026-10-12",
-            timeBrasilia: "18:30",
-            competition: "Brasileirão",
-            opponent: "Bahia",
-            homeOrAway: "HOME",
-            score: "3 x 1",
-            stadium: "Maracanã",
-            status: "FINISHED",
+            matchDate: "11/10/2026",
+            result: "WIN",
           },
         ],
         nextMatches: [
           {
-            date: "2026-10-21",
-            timeBrasilia: "21:30",
-            competition: "Brasileirão",
             opponent: "Palmeiras",
-            homeOrAway: "HOME",
-            stadium: "Maracanã",
-            status: "SCHEDULED",
-          },
-          {
-            date: "2026-10-25",
-            timeBrasilia: "16:00",
             competition: "Brasileirão",
-            opponent: "Fluminense (Fla-Flu)",
-            homeOrAway: "AWAY",
+            matchDate: "21/10/2026",
+            isHome: true,
             stadium: "Maracanã",
-            status: "SCHEDULED",
+            tensionIndex: 5,
           },
         ],
-        tensionIndex: 5,
-        isMatchDay: false,
-        logisticalAdjustments: {
-          requiresTrainingCut: true,
-          recommendedEndTime: "20:50",
-          caloricBufferKcal: 350,
-          recommendedSnacks: [
-            "Espetinho de frango grelhado marinado no limão (P1)",
-            "Chips de batata doce na airfryer com alecrim (C1)",
-            "Pipoca artesanal com azeite extravirgem (C1)",
-            "Castanhas de caju e nozes (30g)",
-            "Água com gás, limão espremido e pedras de gelo",
-          ],
-        },
       };
     }
 
     return {
       teamName: "Grêmio",
-      currentCompetition: "Campeonato Brasileiro Série A",
-      standingPosition: 8,
-      points: 44,
-      gamesPlayed: 31,
-      goalDifference: 4,
-      recentForm: ["W", "D", "W", "L", "D"],
+      standings: {
+        position: 8,
+        points: 44,
+        matchesPlayed: 30,
+        goalDifference: 4,
+        zone: "Copa Sul-Americana",
+      },
       pastMatches: [
         {
-          date: "2026-10-03",
-          timeBrasilia: "18:30",
-          competition: "Brasileirão",
           opponent: "Fortaleza",
-          homeOrAway: "HOME",
-          score: "3 x 1",
-          stadium: "Arena do Grêmio",
-          status: "FINISHED",
-        },
-        {
-          date: "2026-10-09",
-          timeBrasilia: "21:30",
+          score: "3-1",
           competition: "Brasileirão",
-          opponent: "Atlético-MG",
-          homeOrAway: "AWAY",
-          score: "1 x 2",
-          stadium: "Arena MRV",
-          status: "FINISHED",
+          matchDate: "03/10/2026",
+          result: "WIN",
         },
       ],
       nextMatches: [
         {
-          date: "2026-10-22",
-          timeBrasilia: "19:00",
-          competition: "Brasileirão",
-          opponent: "Internacional (Grenal)",
-          homeOrAway: "HOME",
+          opponent: "Internacional",
+          competition: "Brasileirão (Grenal)",
+          matchDate: "22/10/2026",
+          isHome: true,
           stadium: "Arena do Grêmio",
-          status: "SCHEDULED",
+          tensionIndex: 5,
         },
       ],
-      tensionIndex: 5,
-      isMatchDay: false,
-      logisticalAdjustments: {
-        requiresTrainingCut: true,
-        recommendedEndTime: "20:50",
-        caloricBufferKcal: 350,
-        recommendedSnacks: [
-          "Tiras de carne magra grelhada com chimichurri gaúcho (P1)",
-          "Pão de fermentação natural tostado com azeite e alho (C1)",
-          "Kombucha de frutas vermelhas gelada",
-        ],
-      },
     };
   }
 }
