@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:seed": "node -r ts-node/register src/db/seed-runner.ts"
+    "db:seed": "tsx src/db/seed-runner.ts"
   },
   "dependencies": {
     "@google/genai": "^2.30.0",
