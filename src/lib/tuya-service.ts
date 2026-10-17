@@ -226,6 +226,75 @@ export class TuyaSmartHomeService {
       { code: "bright_value_v2", value: 600 },
     ]);
   }
+
+  /**
+   * Treadmill Pre-Cooling (Costill Protocol): AC to 19°C 15 min prior to indoor run to prevent cardiac drift
+   */
+  async triggerPreCoolingTreadmill(deviceId: string): Promise<TuyaCommandResult> {
+    return this.sendDeviceCommands(deviceId, [
+      { code: "switch", value: true },
+      { code: "mode", value: "cold" },
+      { code: "temp_set", value: 19 },
+      { code: "windspeed", value: "high" },
+    ]);
+  }
+
+  /**
+   * Cryogenic Sleep Chamber: 20°C cooling to trigger deep N3 slow-wave sleep & GH hormone peak
+   */
+  async triggerCryoSleepChamber(deviceId: string): Promise<TuyaCommandResult> {
+    return this.sendDeviceCommands(deviceId, [
+      { code: "switch", value: true },
+      { code: "mode", value: "cold" },
+      { code: "temp_set", value: 20 },
+      { code: "windspeed", value: "low" },
+    ]);
+  }
+
+  /**
+   * Smart Plug: Pre-Run Coffee Barista scheduled 15 min before long run alarm
+   */
+  async triggerCoffeeBaristaPreRun(deviceId: string): Promise<TuyaCommandResult> {
+    return this.sendDeviceCommands(deviceId, [
+      { code: "switch_1", value: true },
+      { code: "countdown_1", value: 900 }, // Auto turn-off after 15 minutes
+    ]);
+  }
+
+  /**
+   * Eco-Green All Off ("Modo Fui Correr"): Kills non-essential standby circuits to save energy
+   */
+  async triggerEcoAllOff(deviceId: string): Promise<TuyaCommandResult> {
+    return this.sendDeviceCommands(deviceId, [
+      { code: "switch_led", value: false },
+      { code: "switch", value: false },
+      { code: "switch_1", value: false },
+    ]);
+  }
+
+  /**
+   * Club Goal Strobe Celebration (Flamengo Scarlet Red / Grêmio Sky Blue)
+   */
+  async triggerClubGoalCelebration(
+    deviceId: string,
+    club: "FLAMENGO" | "GREMIO"
+  ): Promise<TuyaCommandResult> {
+    const isFla = club === "FLAMENGO";
+    return this.sendDeviceCommands(deviceId, [
+      { code: "switch_led", value: true },
+      { code: "work_mode", value: "colour" },
+      {
+        code: "colour_data",
+        value: JSON.stringify(
+          isFla
+            ? { h: 358, s: 1000, v: 1000 } // Scarlet Red
+            : { h: 202, s: 920, v: 1000 } // Sky Blue
+        ),
+      },
+      { code: "flash_scene_1", value: "strobe" },
+      { code: "bright_value_v2", value: 1000 },
+    ]);
+  }
 }
 
 export const tuyaSmartHomeService = new TuyaSmartHomeService();

@@ -18,10 +18,12 @@ import {
   ShieldAlert,
   Scale,
   Award,
+  ShoppingCart,
 } from "lucide-react";
 import { OFFICIAL_TACO_FOODS } from "@/lib/taco-data";
 import { FoodTacticalClass, TacoFoodItem } from "@/lib/types";
 import { getProfileSpecs } from "@/lib/physiology";
+import { TacoWeeklyGroceryModal } from "@/components/TacoWeeklyGroceryModal";
 
 interface NutritionTabProps {
   currentProfile: "DANIEL" | "PATRICIA" | "CLAN";
@@ -34,6 +36,7 @@ export function NutritionTab({ currentProfile, hasMatchDaySnackMode = true }: Nu
   const [scannerAnalyzing, setScannerAnalyzing] = useState<boolean>(false);
   const [scanResult, setScanResult] = useState<any | null>(null);
   const [carbLoadingActive, setCarbLoadingActive] = useState<boolean>(false);
+  const [isGroceryModalOpen, setIsGroceryModalOpen] = useState<boolean>(false);
 
   const isDaniel = currentProfile !== "PATRICIA";
   const specs = getProfileSpecs(currentProfile);
@@ -182,8 +185,16 @@ export function NutritionTab({ currentProfile, hasMatchDaySnackMode = true }: Nu
             </p>
           </div>
 
-          {/* Camera Upload Trigger */}
-          <div className="flex items-center gap-3">
+          {/* Action Buttons: Camera Upload & Weekly Grocery List */}
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <button
+              onClick={() => setIsGroceryModalOpen(true)}
+              className="cursor-pointer px-4 py-2.5 rounded-2xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-amber-600/30 transition-all font-mono"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              <span>Lista Semanal TACO</span>
+            </button>
+
             <label className="cursor-pointer px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-emerald-600/30 transition-all">
               <Camera className="h-4 w-4" />
               <span>{scannerAnalyzing ? "Analisando..." : "Fotografar / Enviar Prato"}</span>
@@ -482,6 +493,12 @@ export function NutritionTab({ currentProfile, hasMatchDaySnackMode = true }: Nu
           </table>
         </div>
       </div>
+
+      {/* Weekly Consolidated Grocery List Modal */}
+      <TacoWeeklyGroceryModal
+        isOpen={isGroceryModalOpen}
+        onClose={() => setIsGroceryModalOpen(false)}
+      />
     </div>
   );
 }

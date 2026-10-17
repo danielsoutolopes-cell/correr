@@ -35,6 +35,9 @@ import {
 } from "@/lib/types";
 import { WeatherPacingData } from "@/lib/weather-service";
 import { getProfileSpecs, evaluateRaceCalendar } from "@/lib/physiology";
+import { PatriciaMorningCheckin } from "@/components/PatriciaMorningCheckin";
+import { TuyaManifestoModal } from "@/components/TuyaManifestoModal";
+import { Snowflake, Leaf } from "lucide-react";
 
 interface CockpitTabProps {
   currentProfile: "DANIEL" | "PATRICIA" | "CLAN";
@@ -64,6 +67,7 @@ export function CockpitTab({
     isDaniel ? "SHOULDER" : "PELVIS"
   );
   const [showTbdDrawer, setShowTbdDrawer] = useState<boolean>(false);
+  const [showTuyaManifesto, setShowTuyaManifesto] = useState<boolean>(false);
   const [tuyaNotification, setTuyaNotification] = useState<string | null>(null);
 
   const teamData = isDaniel ? footballData.flamengo : footballData.gremio;
@@ -217,6 +221,9 @@ export function CockpitTab({
           </div>
         </div>
       </div>
+
+      {/* Patricia Morning Check-in Card (Subjective Readiness without Galaxy Watch) */}
+      {!isDaniel && <PatriciaMorningCheckin />}
 
       {/* Hero Section: Digital Twin + Daily Telemetry */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -614,20 +621,29 @@ export function CockpitTab({
 
           {/* Quick Smart Home Tuya Control Strip */}
           <div className="rounded-3xl bg-gradient-to-b from-[#0F1420] to-[#0A0D15] border border-white/10 p-4 shadow-xl">
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
               <div className="flex items-center gap-2">
                 <Lightbulb className="h-4 w-4 text-amber-400" />
                 <h4 className="text-xs font-bold uppercase tracking-wider text-white">
                   Controle Residencial Tuya Smart Home
                 </h4>
               </div>
-              <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1 font-mono">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                Nuvem OpenAPI Ativa
-              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowTuyaManifesto(true)}
+                  className="px-2.5 py-1 rounded-xl bg-purple-950/60 border border-purple-500/40 text-purple-300 hover:text-white hover:bg-purple-900/50 text-[10px] font-mono font-bold transition-all flex items-center gap-1 shadow-md shadow-purple-500/10"
+                >
+                  <Sparkles className="h-3 w-3 text-purple-400" />
+                  Manifesto & Automações
+                </button>
+                <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1 font-mono">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                  Nuvem OpenAPI Ativa
+                </span>
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
               <button
                 onClick={() =>
                   handleSceneClick(
@@ -669,6 +685,18 @@ export function CockpitTab({
 
               <button
                 onClick={() =>
+                  handleSceneClick("PRE_COOLING_TREADMILL", "Pré-Resfriamento Esteira 19°C")
+                }
+                className="p-2.5 rounded-2xl bg-cyan-950/20 border border-cyan-500/40 hover:bg-cyan-900/30 text-cyan-300 text-left transition-all shadow-md shadow-cyan-500/10"
+              >
+                <span className="text-xs font-bold block flex items-center gap-1">
+                  <Snowflake className="h-3 w-3" /> AC 19°C
+                </span>
+                <span className="text-[10px] opacity-75">Costill Esteira</span>
+              </button>
+
+              <button
+                onClick={() =>
                   handleSceneClick("SUNRISE_LONG_RUN", "Simulação Amanhecer 06h30")
                 }
                 className="p-2.5 rounded-2xl bg-amber-950/20 border border-amber-500/40 hover:bg-amber-900/30 text-amber-300 text-left transition-all shadow-md shadow-amber-500/10"
@@ -676,8 +704,28 @@ export function CockpitTab({
                 <span className="text-xs font-bold block">🌅 Sol Longão</span>
                 <span className="text-[10px] opacity-75">Despertar Suave</span>
               </button>
+
+              <button
+                onClick={() =>
+                  handleSceneClick("ECO_ALL_OFF", "Modo Fui Correr (Eco-Green All Off)")
+                }
+                className="p-2.5 rounded-2xl bg-emerald-950/20 border border-emerald-500/40 hover:bg-emerald-900/30 text-emerald-300 text-left transition-all shadow-md shadow-emerald-500/10"
+              >
+                <span className="text-xs font-bold block flex items-center gap-1">
+                  <Leaf className="h-3 w-3" /> Eco Off
+                </span>
+                <span className="text-[10px] opacity-75">Fui Correr</span>
+              </button>
             </div>
           </div>
+
+          {/* Interactive Tuya Manifesto Modal */}
+          <TuyaManifestoModal
+            isOpen={showTuyaManifesto}
+            onClose={() => setShowTuyaManifesto(false)}
+            onTriggerScene={handleSceneClick}
+            currentProfile={currentProfile}
+          />
 
           {/* Real-time Weather-Pacing & Telegram Proactive Hub */}
           {weatherData && (

@@ -116,14 +116,24 @@ Para correrem juntos sem que Daniel fique lento demais ou Patrícia entre em est
 
 ---
 
-## 💡 7. AUTOMAÇÃO RESIDENCIAL TUYA IOT (CENAS CIRCADIANAS)
+## 💡 7. AUTOMAÇÃO RESIDENCIAL TUYA IOT & MANIFESTO OFICIAL
 
-O sistema controla a iluminação inteligente da casa através da API oficial da Tuya (`openapi.tuyaus.com` com assinatura HMAC-SHA256):
-- ⚡ **Foco Pré-Treino 18h30 (`PRE_WORKOUT_FOCUS`):** Luz fria 6500K com 100% de brilho para estímulo de dopamina e foco pré-corrida.
-- 🌙 **Freio Térmico 20h30 (`PARASYMPATHETIC_NIGHT`):** Luz âmbar suave 2200K com 20% de brilho, bloqueando telas azuis e ativando a melatonina para um sono profundo.
-- 🔴 **Modo Mengão (`FLAMENGO_MATCH`):** Iluminação temática rubro-negra para os jogos do Flamengo no Maracanã.
-- 🔵 **Modo Grêmio (`GREMIO_MATCH`):** Iluminação temática azul celeste e branca para os jogos do Grêmio na Arena.
-- 🌅 **Sol Longão (`SUNRISE_LONG_RUN`):** Simulação de amanhecer suave às 06h30 para os treinos de sábado/domingo.
+O sistema controla o ecossistema doméstico através da API oficial da Tuya (`openapi.tuyaus.com` com autenticação OAuth 2.0 e assinatura criptográfica HMAC-SHA256).
+
+> [!NOTE]
+> Consulte o documento oficial completo [MANIFESTO_AUTOMACAO_TUYA.md](file:///c:/Correr/MANIFESTO_AUTOMACAO_TUYA.md) na raiz do projeto ou abra o **"Manifesto Tuya"** interativo no topo da barra Tuya no Cockpit.
+
+### As 10 Automações Ativas:
+1. 🌅 **Aurora Solar Gradual (`SUNRISE_LONG_RUN`):** Despertar suave às 06h00 com rampa de luz quente para inibir melatonina sem taquicardia.
+2. ⚡ **Foco Pré-Treino 18h30 (`PRE_WORKOUT_FOCUS`):** Luz fria 6500K a 100% de brilho para estímulo dopaminérgico e prontidão neuromuscular.
+3. 🌙 **Freio Térmico 20h30 (`PARASYMPATHETIC_NIGHT`):** Luz âmbar 2200K a 20% de intensidade com corte de luz azul para proteção do sono N3.
+4. ❄️ **AC Esteira 19°C (`PRE_COOLING_TREADMILL`):** Pré-resfriamento térmico (Protocolo Costill) 15 min antes da esteira para mitigar deriva cardíaca (economiza 12-15 bpm).
+5. 🛏️ **Sono Criogênico 20°C (`CRYO_SLEEP`):** Ar-condicionado ajustado para induzir hipotermia distal e amplificar o pico de GH na primeira metade da noite.
+6. ☕ **Cafeteira Barista Pré-Longão (`COFFEE_PRE_RUN`):** Smart Plug aciona a cafeteira 15 min antes do alarme para dosagem de 3mg/kg de cafeína.
+7. 🌿 **Modo "Fui Correr" Eco All-Off (`ECO_ALL_OFF`):** Desliga TVs, monitores e circuitos em standby ao trancar a porta ("Tudo pelo meio ambiente").
+8. 🚪 **Chegada Triunfante:** Abertura da porta aciona fita LED verde eucalipto e ventilação suave para retorno vagal pós-treino.
+9. 🔴 **Match Day Mengão (`FLAMENGO_MATCH` & `FLAMENGO_GOAL`):** Iluminação temática rubro-negra e piscar estroboscópico de Gol para o Daniel.
+10. 🔵 **Match Day Grêmio (`GREMIO_MATCH` & `GREMIO_GOAL`):** Iluminação temática azul celeste e piscar de Gol para a Patrícia.
 
 ---
 

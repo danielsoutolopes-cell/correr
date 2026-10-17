@@ -26,6 +26,8 @@ import {
   ChevronRight,
   Zap,
   BookOpen,
+  Award,
+  Target,
 } from "lucide-react";
 import { getProfileSpecs } from "@/lib/physiology";
 
@@ -447,6 +449,173 @@ export function ClanTab({
             <p className="text-[10px] text-gray-400 pt-1">
               * Protege a prótese de ombro do Daniel e promove queima lipídica contínua para ambos.
             </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Quadro de Metas Semanais & Medalheiro Virtual Haute Horlogerie */}
+      <div className="rounded-3xl bg-gradient-to-br from-[#101726] via-[#141C30] to-[#0D121F] border border-amber-500/30 p-5 shadow-2xl relative overflow-hidden space-y-5">
+        <div className="absolute top-0 right-0 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-white/10 relative z-10">
+          <div className="flex items-center gap-2.5">
+            <div className="h-10 w-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 p-[1.5px] shadow-lg shadow-amber-500/20">
+              <div className="h-full w-full bg-[#070A11] rounded-[14px] flex items-center justify-center">
+                <Trophy className="h-5 w-5 text-amber-400" />
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-black text-white tracking-wide">
+                  Quadro de Conquistas &amp; Metas Conjuntas
+                </h3>
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800">
+                  Clã Lopes Duo
+                </span>
+              </div>
+              <p className="text-xs text-gray-400 font-mono">
+                Sinergia do Casal: Km Somados, Consistência na Balança e Medalhas de Grife
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono font-bold px-3 py-1 rounded-xl bg-amber-950/60 text-amber-300 border border-amber-800/80">
+              🏆 5 Insígnias Ativas
+            </span>
+          </div>
+        </div>
+
+        {/* Weekly Combined Metas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 relative z-10 font-mono text-xs">
+          {/* Km Somados */}
+          <div className="p-4 rounded-2xl bg-[#07090E]/90 border border-white/10 space-y-2 shadow-inner">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400 text-[11px] flex items-center gap-1.5">
+                <Target className="h-3.5 w-3.5 text-blue-400" />
+                Km Somados na Semana:
+              </span>
+              <span className="font-bold text-white text-sm">29.5 / 43.0 km</span>
+            </div>
+            {/* Split Progress bar: Red Daniel + Sky Patricia */}
+            <div className="w-full h-2.5 bg-gray-800 rounded-full overflow-hidden flex">
+              <div style={{ width: "40%" }} className="bg-red-500 h-full" title="Daniel: 17.5 km" />
+              <div style={{ width: "28%" }} className="bg-sky-400 h-full" title="Patrícia: 12.0 km" />
+            </div>
+            <div className="flex justify-between text-[10px] text-gray-400">
+              <span className="text-red-400">🔴 Daniel: 17.5k</span>
+              <span className="text-sky-400">🔵 Patrícia: 12.0k</span>
+              <span className="text-emerald-400 font-bold">68% atingido</span>
+            </div>
+          </div>
+
+          {/* Aderência à Panela TACO */}
+          <div className="p-4 rounded-2xl bg-[#07090E]/90 border border-white/10 space-y-2 shadow-inner">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400 text-[11px] flex items-center gap-1.5">
+                <Scale className="h-3.5 w-3.5 text-amber-400" />
+                Aderência Panela (58%/42%):
+              </span>
+              <span className="font-bold text-amber-400 text-sm">11 / 14 Refeições</span>
+            </div>
+            <div className="w-full h-2.5 bg-gray-800 rounded-full overflow-hidden">
+              <div style={{ width: "78%" }} className="bg-gradient-to-r from-amber-500 to-emerald-400 h-full" />
+            </div>
+            <div className="flex justify-between text-[10px] text-gray-400">
+              <span>Proporção de Ouro</span>
+              <span className="text-emerald-400 font-bold">78% de precisão</span>
+            </div>
+          </div>
+
+          {/* Pedal de Domingo */}
+          <div className="p-4 rounded-2xl bg-[#07090E]/90 border border-white/10 space-y-2 shadow-inner">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400 text-[11px] flex items-center gap-1.5">
+                <Bike className="h-3.5 w-3.5 text-emerald-400" />
+                Pedal Familiar de Domingo:
+              </span>
+              <span className="font-bold text-emerald-400 text-sm">28.4 km</span>
+            </div>
+            <div className="w-full h-2.5 bg-gray-800 rounded-full overflow-hidden">
+              <div style={{ width: "100%" }} className="bg-emerald-500 h-full" />
+            </div>
+            <div className="flex justify-between text-[10px] text-gray-400">
+              <span>Ciclofaixa / Ibirapuera</span>
+              <span className="text-emerald-400 font-bold">100% Concluído</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Medalheiro Virtual Haute Horlogerie (6 Insígnias de Grife) */}
+        <div className="space-y-3 relative z-10">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-black tracking-widest uppercase text-white font-mono flex items-center gap-1.5">
+              <Award className="h-4 w-4 text-amber-400" />
+              MEDALHEIRO DE GRIFE DO CASAL
+            </span>
+            <span className="text-[10px] text-gray-400 font-mono">Inspirado em Horlogerie &amp; Porsche Design</span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 text-xs font-mono">
+            {/* Medal 1 */}
+            <div className="p-3 rounded-2xl bg-[#07090E] border border-sky-500/40 text-center space-y-1.5 shadow-md hover:border-sky-400 transition-all">
+              <div className="text-2xl">🥇</div>
+              <span className="font-bold text-sky-300 block text-[11px]">Sub-1h00 10K</span>
+              <span className="text-[9px] text-gray-400 block font-sans">Patrícia • Estações</span>
+              <span className="text-[9px] px-1.5 py-0.2 rounded bg-sky-950 text-sky-200 border border-sky-800 inline-block font-mono">
+                Pace 6:00 Alvo
+              </span>
+            </div>
+
+            {/* Medal 2 */}
+            <div className="p-3 rounded-2xl bg-[#07090E] border border-red-500/40 text-center space-y-1.5 shadow-md hover:border-red-400 transition-all">
+              <div className="text-2xl">🥇</div>
+              <span className="font-bold text-red-300 block text-[11px]">Sub-1h55 21K</span>
+              <span className="text-[9px] text-gray-400 block font-sans">Daniel • SP 2027</span>
+              <span className="text-[9px] px-1.5 py-0.2 rounded bg-red-950 text-red-200 border border-red-800 inline-block font-mono">
+                Pace 5:27 Alvo
+              </span>
+            </div>
+
+            {/* Medal 3 */}
+            <div className="p-3 rounded-2xl bg-[#07090E] border border-amber-500/40 text-center space-y-1.5 shadow-md hover:border-amber-400 transition-all">
+              <div className="text-2xl">🛡️</div>
+              <span className="font-bold text-amber-300 block text-[11px]">Ombro Blindado</span>
+              <span className="text-[9px] text-gray-400 block font-sans">Daniel • Zero Dor</span>
+              <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-950 text-amber-200 border border-amber-800 inline-block font-mono">
+                45 Dias Limpo
+              </span>
+            </div>
+
+            {/* Medal 4 */}
+            <div className="p-3 rounded-2xl bg-[#07090E] border border-emerald-500/40 text-center space-y-1.5 shadow-md hover:border-emerald-400 transition-all">
+              <div className="text-2xl">🦵</div>
+              <span className="font-bold text-emerald-300 block text-[11px]">Valgo Zero</span>
+              <span className="text-[9px] text-gray-400 block font-sans">Patrícia • Glúteos</span>
+              <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-200 border border-emerald-800 inline-block font-mono">
+                6 Semanas Consist.
+              </span>
+            </div>
+
+            {/* Medal 5 */}
+            <div className="p-3 rounded-2xl bg-[#07090E] border border-purple-500/40 text-center space-y-1.5 shadow-md hover:border-purple-400 transition-all">
+              <div className="text-2xl">🚴</div>
+              <span className="font-bold text-purple-300 block text-[11px]">Duo Ciclofaixa</span>
+              <span className="text-[9px] text-gray-400 block font-sans">Família Lopes</span>
+              <span className="text-[9px] px-1.5 py-0.2 rounded bg-purple-950 text-purple-200 border border-purple-800 inline-block font-mono">
+                28.4km Feitos
+              </span>
+            </div>
+
+            {/* Medal 6 */}
+            <div className="p-3 rounded-2xl bg-[#07090E] border border-cyan-500/40 text-center space-y-1.5 shadow-md hover:border-cyan-400 transition-all">
+              <div className="text-2xl">⚽</div>
+              <span className="font-bold text-cyan-300 block text-[11px]">Dueto Invicto</span>
+              <span className="text-[9px] text-gray-400 block font-sans">Mengão &amp; Grêmio</span>
+              <span className="text-[9px] px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-200 border border-cyan-800 inline-block font-mono">
+                Paz no Lar 🔴🔵
+              </span>
+            </div>
           </div>
         </div>
       </div>

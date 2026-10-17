@@ -404,6 +404,33 @@ export function HelpManualModal({ isOpen, onClose, currentProfile }: HelpManualM
                       Iluminação azul celeste e branca para as partidas do Imortal Tricolor da Patrícia.
                     </p>
                   </div>
+
+                  <div className="p-3.5 rounded-2xl bg-[#090D16] border border-cyan-500/30 space-y-1">
+                    <span className="font-bold text-cyan-400 flex items-center gap-1.5">
+                      <CloudSun className="h-4 w-4" />
+                      5. AC Esteira 19°C (Costill)
+                    </span>
+                    <p className="text-gray-300">
+                      Pré-resfriamento térmico via Tuya IR 15 min antes da esteira para mitigar deriva cardíaca (economiza 12-15 bpm no mesmo ritmo).
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-[#090D16] border border-emerald-500/30 space-y-1">
+                    <span className="font-bold text-emerald-400 flex items-center gap-1.5">
+                      <Zap className="h-4 w-4" />
+                      6. Modo "Fui Correr" Eco Off
+                    </span>
+                    <p className="text-gray-300">
+                      Corte geral de consumo fantasma (TVs, displays, ar-condicionado) ao trancar a porta. Filosofia "Tudo pelo meio ambiente".
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-purple-950/20 border border-purple-500/30 text-xs text-gray-300 space-y-1">
+                  <span className="font-bold text-purple-300 block">Manifesto de Automações Completo:</span>
+                  <p className="text-gray-400">
+                    O documento oficial <code className="text-purple-300">MANIFESTO_AUTOMACAO_TUYA.md</code> contém todas as 10 automações detalhadas com Datapoint Codes e justificativa fisiológica. Abra o modal interativo pelo botão <strong>"Manifesto & Automações"</strong> na aba Cockpit.
+                  </p>
                 </div>
               </div>
             )}

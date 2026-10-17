@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#07090E"/>
+    </radialGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="50%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <linearGradient id="flaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EF4444"/>
+      <stop offset="100%" stop-color="#991B1B"/>
+    </linearGradient>
+    <linearGradient id="greGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284C7"/>
+      <stop offset="100%" stop-color="#0369A1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Bezel -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)"/>
+  <rect width="496" height="496" x="8" y="8" rx="120" fill="none" stroke="url(#ringGrad)" stroke-width="6" opacity="0.6"/>
+
+  <!-- Outer Haute Horlogerie Watch Tick Marks -->
+  <circle cx="256" cy="256" r="210" fill="none" stroke="#334155" stroke-width="2" stroke-dasharray="4 16"/>
+
+  <!-- Triad Shield Symbol -->
+  <!-- Left Side: Flamengo Crimson -->
+  <path d="M256,110 L160,160 L180,310 L256,380 Z" fill="url(#flaGrad)" opacity="0.9"/>
+  <!-- Right Side: Grêmio Sky Blue -->
+  <path d="M256,110 L352,160 L332,310 L256,380 Z" fill="url(#greGrad)" opacity="0.9"/>
+
+  <!-- Center Heartbeat / Pulse Line (Emerald Green) -->
+  <path d="M170,260 L210,260 L230,210 L256,320 L280,230 L300,260 L342,260" fill="none" stroke="#10B981" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Outer Pulse Glow Ring -->
+  <circle cx="256" cy="256" r="160" fill="none" stroke="#10B981" stroke-width="3" stroke-dasharray="12 12" opacity="0.4"/>
+
+  <!-- Text BIO-TRIAD -->
+  <text x="256" y="430" font-family="-apple-system, system-ui, sans-serif" font-weight="900" font-size="34" fill="#F3F4F6" letter-spacing="8" text-anchor="middle">BIO-TRIAD</text>
+  <text x="256" y="465" font-family="-apple-system, system-ui, sans-serif" font-weight="700" font-size="18" fill="#10B981" letter-spacing="6" text-anchor="middle">HAUTE SPORTS</text>
+</svg>

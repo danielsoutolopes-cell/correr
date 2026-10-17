@@ -23,6 +23,24 @@ export async function POST(request: Request) {
       case "SUNRISE_LONG_RUN":
         result = await tuyaSmartHomeService.triggerSunriseForLongRun(deviceId);
         break;
+      case "PRE_COOLING_TREADMILL":
+        result = await tuyaSmartHomeService.triggerPreCoolingTreadmill(deviceId);
+        break;
+      case "CRYO_SLEEP":
+        result = await tuyaSmartHomeService.triggerCryoSleepChamber(deviceId);
+        break;
+      case "COFFEE_PRE_RUN":
+        result = await tuyaSmartHomeService.triggerCoffeeBaristaPreRun(deviceId);
+        break;
+      case "ECO_ALL_OFF":
+        result = await tuyaSmartHomeService.triggerEcoAllOff(deviceId);
+        break;
+      case "FLAMENGO_GOAL":
+        result = await tuyaSmartHomeService.triggerClubGoalCelebration(deviceId, "FLAMENGO");
+        break;
+      case "GREMIO_GOAL":
+        result = await tuyaSmartHomeService.triggerClubGoalCelebration(deviceId, "GREMIO");
+        break;
       case "CUSTOM":
         if (!commands || !Array.isArray(commands)) {
           return NextResponse.json(

@@ -33,6 +33,7 @@ import {
   convertPaceToTreadmill,
   getProfileSpecs,
 } from "@/lib/physiology";
+import { ActiveWorkoutModal } from "@/components/ActiveWorkoutModal";
 
 interface CoachTabProps {
   currentProfile: "DANIEL" | "PATRICIA" | "CLAN";
@@ -44,6 +45,7 @@ export function CoachTab({ currentProfile, onTriggerTuyaScene }: CoachTabProps) 
   const [selectedDayIndex, setSelectedDayIndex] = useState<number>(1); // Tuesday by default
   const [activeFicha, setActiveFicha] = useState<"A" | "B" | "C">("A");
   const [showComparison, setShowComparison] = useState<boolean>(false);
+  const [isActiveWorkoutOpen, setIsActiveWorkoutOpen] = useState<boolean>(false);
 
   const isDaniel = currentProfile !== "PATRICIA";
   const spec = getProfileSpecs(currentProfile);
@@ -107,8 +109,16 @@ export function CoachTab({ currentProfile, onTriggerTuyaScene }: CoachTabProps) 
             </p>
           </div>
 
-          {/* Quick Dual Profile Comparison Trigger */}
-          <div className="flex items-center gap-2">
+          {/* Action Triggers */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => setIsActiveWorkoutOpen(true)}
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-emerald-600/30 font-mono"
+            >
+              <Dumbbell className="h-3.5 w-3.5 text-white animate-pulse" />
+              <span>Iniciar Treino na Academia</span>
+            </button>
+
             <button
               onClick={() => setShowComparison(!showComparison)}
               className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white text-xs font-bold flex items-center gap-2 transition-all shadow-md backdrop-blur-md"
@@ -498,6 +508,14 @@ export function CoachTab({ currentProfile, onTriggerTuyaScene }: CoachTabProps) 
           </div>
         </div>
       </div>
+
+      {/* Active Workout Modal */}
+      <ActiveWorkoutModal
+        isOpen={isActiveWorkoutOpen}
+        onClose={() => setIsActiveWorkoutOpen(false)}
+        currentProfile={currentProfile}
+        initialFicha={activeFicha}
+      />
     </div>
   );
 }
