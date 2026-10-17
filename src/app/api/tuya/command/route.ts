@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { tuyaSmartHomeService } from "@/lib/tuya-service";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
