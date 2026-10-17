@@ -1,0 +1,38 @@
+{
+  "name": "Bio-Triad OS",
+  "short_name": "BioTriad",
+  "description": "Sistema Operacional Unificado de Performance Híbrida, Nutrição TACO e Neuro-Descompressão",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090D16",
+  "theme_color": "#111827",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "share_target": {
+    "action": "/?tab=nutrition&action=share_photo",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "dish_photo",
+          "accept": ["image/*"]
+        }
+      ]
+    }
+  }
+}

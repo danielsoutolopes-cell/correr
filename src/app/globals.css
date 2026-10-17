@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-sports: #090D16;
+  --card-sports: #111827;
+  --card-light: #161F33;
+  --border-sports: #1F2937;
+  --neon-blue: #3B82F6;
+  --neon-green: #10B981;
+  --neon-purple: #8B5CF6;
+  --neon-red: #EF4444;
+  --neon-gremio: #0D80BF;
+  --neon-gold: #F59E0B;
+}
+
+body {
+  background-color: var(--bg-sports);
+  color: #F3F4F6;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #090D16;
+}
+::-webkit-scrollbar-thumb {
+  background: #1F2937;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #374151;
+}
+
+/* Glassmorphism & Neon Glow Utilities */
+.glass-panel {
+  background: rgba(17, 24, 39, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-elevated {
+  background: rgba(22, 31, 51, 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.glow-blue {
+  box-shadow: 0 0 20px -3px rgba(59, 130, 246, 0.35);
+}
+
+.glow-green {
+  box-shadow: 0 0 20px -3px rgba(16, 185, 129, 0.35);
+}
+
+.glow-red {
+  box-shadow: 0 0 20px -3px rgba(239, 68, 68, 0.4);
+}
+
+.glow-gremio {
+  box-shadow: 0 0 20px -3px rgba(13, 128, 191, 0.4);
+}
+
+.glow-purple {
+  box-shadow: 0 0 20px -3px rgba(139, 92, 246, 0.35);
+}
+
+.glow-gold {
+  box-shadow: 0 0 20px -3px rgba(245, 158, 11, 0.4);
+}
+
+/* Breathing animation for SOS station */
+@keyframes breathingGuide {
+  0% { transform: scale(1); opacity: 0.8; }
+  35% { transform: scale(1.35); opacity: 1; }
+  60% { transform: scale(1.35); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+.animate-breathe {
+  animation: breathingGuide 19s ease-in-out infinite;
+}

@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/sync/galaxy-watch",
+      "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/football/live",
+      "schedule": "0 12,18,22 * * *"
+    }
+  ]
+}
