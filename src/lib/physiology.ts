@@ -110,14 +110,199 @@ export function convertPaceToTreadmill(
  * - Strictly NO extreme external rotation or deep behind-the-neck movements
  * - Replaced with scapular-neutral chest press, cable neutral rows, and controlled lateral raises
  */
+/**
+ * Generates Structured Strength Workout (Fichas A, B, C)
+ * INDIVIDUALIZADO POR ATLETA (Anti-Mock & Alta Precisão):
+ * - DANIEL: Prótese Reversa de Ombro Direito (Reverse Shoulder Prosthesis).
+ *   Zero overhead presses, zero supino reto barra, foco em empurrar neutro 45°, elevação no plano escapular e tríceps.
+ * - PATRÍCIA: Biomecânica feminina completa.
+ *   Foco em hipertrofia de glúteos e posteriores, postura torácica, deltoides desenhados e core funcional.
+ */
 export function getStrengthFicha(
   ficha: "A" | "B" | "C",
-  hasShoulderRestriction: boolean = true
+  profileOrRestriction: "DANIEL" | "PATRICIA" | "CLAN" | boolean = "DANIEL"
 ): StrengthPrescription {
+  const isPatricia = profileOrRestriction === "PATRICIA";
+  const hasShoulderRestriction =
+    typeof profileOrRestriction === "boolean"
+      ? profileOrRestriction
+      : profileOrRestriction !== "PATRICIA";
+
+  // === FICHAS PATRÍCIA (Alta Performance Feminina, Glúteos & Postura) ===
+  if (isPatricia) {
+    if (ficha === "A") {
+      return {
+        ficha: "A",
+        focus: "Membros Inferiores: Glúteos, Posteriores & Força de Passada",
+        warmupMinutes: 8,
+        recoveryProtocolMinutes: 5,
+        exercises: [
+          {
+            name: "Elevação Pélvica com Barra (Pausa 2s no Topo)",
+            targetMuscle: "Glúteo Maior & Core",
+            sets: 4,
+            reps: "10-12",
+            rpe: 8.5,
+            shoulderSafe: true,
+            instructions: "Pico de contração de 2 segundos no ponto mais alto. Essencial para estabilidade pélvica.",
+          },
+          {
+            name: "Agachamento Búlgaro com Halteres",
+            targetMuscle: "Glúteos & Quadríceps Unilateral",
+            sets: 3,
+            reps: "10 cada perna",
+            rpe: 8,
+            shoulderSafe: true,
+            instructions: "Tronco levemente inclinado à frente para máxima ativação de glúteo.",
+          },
+          {
+            name: "Stiff com Halteres (Pés na Largura do Quadril)",
+            targetMuscle: "Isquiotibiais & Glúteo",
+            sets: 4,
+            reps: "12",
+            rpe: 8,
+            shoulderSafe: true,
+            instructions: "Coluna neutra e joelhos semiflexionados. Sinta o alongamento dos posteriores.",
+          },
+          {
+            name: "Cadeira Flexora (Drop-Set na Última Série)",
+            targetMuscle: "Isquiotibiais",
+            sets: 3,
+            reps: "12-15",
+            rpe: 8.5,
+            shoulderSafe: true,
+            instructions: "Controle da fase excêntrica da passada.",
+          },
+          {
+            name: "Panturrilha em Pé na Máquina",
+            targetMuscle: "Gastrocnêmio & Sóleo",
+            sets: 4,
+            reps: "15-20",
+            rpe: 8,
+            shoulderSafe: true,
+            instructions: "Alongamento completo na descida para proteção do tendão de Aquiles.",
+          },
+        ],
+      };
+    }
+
+    if (ficha === "B") {
+      return {
+        ficha: "B",
+        focus: "Membros Superiores: Costas Posturais, Deltoides & Braços Firmes",
+        warmupMinutes: 8,
+        recoveryProtocolMinutes: 5,
+        exercises: [
+          {
+            name: "Puxada Frontal Aberta na Polia",
+            targetMuscle: "Grande Dorsal & Romboides",
+            sets: 4,
+            reps: "12",
+            rpe: 7.5,
+            shoulderSafe: true,
+            instructions: "Foco em abrir o peito e retrair as escápulas, corrigindo postura de corrida.",
+          },
+          {
+            name: "Remada Unilateral com Halter (Serrote)",
+            targetMuscle: "Dorsais & Core",
+            sets: 3,
+            reps: "12 cada lado",
+            rpe: 8,
+            shoulderSafe: true,
+            instructions: "Puxar o halter em direção ao quadril mantendo o tronco estável.",
+          },
+          {
+            name: "Elevação Lateral com Halteres (Controle)",
+            targetMuscle: "Deltoide Lateral",
+            sets: 3,
+            reps: "15",
+            rpe: 7.5,
+            shoulderSafe: true,
+            instructions: "Elevar até a linha do ombro sem impulsos com o tronco.",
+          },
+          {
+            name: "Tríceps Corda na Polia Alta",
+            targetMuscle: "Tríceps Braquial",
+            sets: 3,
+            reps: "12-15",
+            rpe: 8,
+            shoulderSafe: true,
+            instructions: "Abrir a corda no final do movimento para contração máxima.",
+          },
+          {
+            name: "Prancha Abdominal com Toque no Ombro",
+            targetMuscle: "Core & Anti-Rotação",
+            sets: 3,
+            reps: "45 segundos",
+            rpe: 8,
+            shoulderSafe: true,
+            instructions: "Evite balançar os quadris durante a transição dos braços.",
+          },
+        ],
+      };
+    }
+
+    // Ficha C Patrícia
+    return {
+      ficha: "C",
+      focus: "Inferiores & Core: Quadríceps, Glúteo Médio & Recomposição",
+      warmupMinutes: 8,
+      recoveryProtocolMinutes: 5,
+      exercises: [
+        {
+          name: "Leg Press 45° com Pés Afastados",
+          targetMuscle: "Quadríceps & Glúteos",
+          sets: 4,
+          reps: "12",
+          rpe: 8,
+          shoulderSafe: true,
+          instructions: "Descer até 90 graus mantendo a pelve colada no encosto.",
+        },
+        {
+          name: "Agachamento Sumô com Kettlebell",
+          targetMuscle: "Adutores & Glúteos",
+          sets: 3,
+          reps: "12-15",
+          rpe: 8,
+          shoulderSafe: true,
+          instructions: "Joelhos apontados na mesma direção das pontas dos pés.",
+        },
+        {
+          name: "Cadeira Extensora com Isometria de 2s",
+          targetMuscle: "Quadríceps (Vasto Medial)",
+          sets: 3,
+          reps: "12",
+          rpe: 8,
+          shoulderSafe: true,
+          instructions: "Fortalecimento do tendão patelar para suporte aos impactos do asfalto.",
+        },
+        {
+          name: "Cadeira Abdutora 45°",
+          targetMuscle: "Glúteo Médio & Mínimo",
+          sets: 4,
+          reps: "15-20",
+          rpe: 8.5,
+          shoulderSafe: true,
+          instructions: "Estabilizador primordial para o alinhamento de quadril e joelhos na corrida.",
+        },
+        {
+          name: "Abdominal Infra no Solo ou Banco Declinado",
+          targetMuscle: "Reto Abdominal Inferior",
+          sets: 3,
+          reps: "15",
+          rpe: 7.5,
+          shoulderSafe: true,
+          instructions: "Subida lenta e descida controlada sem arquear a lombar.",
+        },
+      ],
+    };
+  }
+
+  // === FICHAS DANIEL (Prótese Reversa de Ombro Direito / Meia Maratona 2027) ===
   if (ficha === "A") {
     return {
       ficha: "A",
-      focus: "Membros Superiores: Empurrar & Estabilidade Escapular",
+      focus: "Membros Superiores: Empurrar Seguro & Estabilidade Escapular",
       warmupMinutes: 8,
       recoveryProtocolMinutes: 5,
       exercises: [
@@ -132,7 +317,7 @@ export function getStrengthFicha(
           shoulderSafe: true,
           substituteFor: hasShoulderRestriction ? "Supino com Barra Reta" : undefined,
           instructions:
-            "Cotovelos a 45 graus do tronco para descompressão subacromial da prótese.",
+            "Cotovelos a 45 graus do tronco para descompressão subacromial da prótese reversa.",
         },
         {
           name: hasShoulderRestriction
@@ -225,7 +410,7 @@ export function getStrengthFicha(
     };
   }
 
-  // Ficha C - Pernas & Glúteos (Potência de Corrida)
+  // Ficha C Daniel
   return {
     ficha: "C",
     focus: "Membros Inferiores: Potência Propulsiva, Glúteos & Joelhos",
@@ -472,12 +657,30 @@ export function buildWeeklyScheduleTemplate(params: {
   weekendMode: WeekendLayoutMode;
   weekPhase?: WeekPhase;
   hasShoulderRestriction?: boolean;
+  profile?: "DANIEL" | "PATRICIA" | "CLAN";
 }) {
   const {
     weekendMode = "CLASSIC_SUNDAY_LONG",
     weekPhase = "BASE",
     hasShoulderRestriction = true,
+    profile = "DANIEL",
   } = params;
+
+  const isPatricia = profile === "PATRICIA";
+
+  // Individualized running and treadmill targets
+  const tuesSpeed = isPatricia ? 8.5 : 9.5;
+  const tuesOutdoorDist = isPatricia ? 6.0 : 8.5;
+  const tuesOutdoorPace = isPatricia ? "6:45" : "6:15";
+
+  const thursSpeed = isPatricia ? 8.8 : 9.8;
+  const thursOutdoorDist = isPatricia ? 5.5 : 8.0;
+  const thursOutdoorPace = isPatricia ? "6:20" : "5:50";
+
+  const longDist = isPatricia ? 11.0 : 16.0;
+  const longPace = isPatricia ? "6:50" : "6:10";
+  const satShortDist = isPatricia ? 5.0 : 8.0;
+  const satShortPace = isPatricia ? "6:40" : "6:00";
 
   return [
     {
@@ -495,29 +698,35 @@ export function buildWeeklyScheduleTemplate(params: {
       dayNamePt: "Terça-feira",
       isWeekday: true,
       modality: "RUN",
-      title: "Corrida Contínua Z2 (Dual-Mode: Rua vs Esteira)",
+      title: isPatricia
+        ? "Corrida Contínua Z2 Patrícia (6.0 km | Dual-Mode)"
+        : "Corrida Contínua Z2 Daniel (8.5 km | Dual-Mode)",
       allowedEnvironments: "DUAL_OUTDOOR_TREADMILL",
       durationMin: 55, // <= 60 min cap
-      runPrescriptionTreadmill: buildTreadmillSession("Z2_BASE", 9.5),
+      runPrescriptionTreadmill: buildTreadmillSession("Z2_BASE", tuesSpeed),
       runPrescriptionOutdoor: {
-        totalDistanceKm: 8.5,
-        targetPaceMinKm: "6:15",
-        warmupKm: 1.5,
-        mainSetDescription: "Bloco estável em Zona 2 (110 a 127 bpm)",
+        totalDistanceKm: tuesOutdoorDist,
+        targetPaceMinKm: tuesOutdoorPace,
+        warmupKm: 1.0,
+        mainSetDescription: isPatricia
+          ? "Bloco estável em Zona 2 Feminina (131 a 148 bpm)"
+          : "Bloco estável em Zona 2 Masculina (126 a 142 bpm)",
         cooldownKm: 1.0,
         targetZones: ["Z2"],
       },
-      strengthPrescription: getStrengthFicha("A", hasShoulderRestriction),
+      strengthPrescription: getStrengthFicha("A", profile),
     },
     {
       dayOfWeek: "WEDNESDAY",
       dayNamePt: "Quarta-feira",
       isWeekday: true,
       modality: "STRENGTH",
-      title: "Musculação Ficha B (Costas & Core) + Bike Regenerativa",
+      title: isPatricia
+        ? "Musculação Ficha B (Costas Posturais & Deltoides) + Bike Regenerativa"
+        : "Musculação Ficha B (Costas & Core Neutro) + Bike Regenerativa",
       allowedEnvironments: "GYM",
       durationMin: 60,
-      strengthPrescription: getStrengthFicha("B", hasShoulderRestriction),
+      strengthPrescription: getStrengthFicha("B", profile),
       bikePrescription: {
         durationMin: 25,
         targetCadenceRpm: 85,
@@ -531,19 +740,23 @@ export function buildWeeklyScheduleTemplate(params: {
       dayNamePt: "Quinta-feira",
       isWeekday: true,
       modality: "RUN",
-      title: "Treino de Ritmo Progressivo (Dual-Mode <= 60 min)",
+      title: isPatricia
+        ? "Treino de Ritmo Progressivo Patrícia (5.5 km | Dual-Mode)"
+        : "Treino de Ritmo Progressivo Daniel (8.0 km | Dual-Mode)",
       allowedEnvironments: "DUAL_OUTDOOR_TREADMILL",
       durationMin: 50, // <= 60 min cap
-      runPrescriptionTreadmill: buildTreadmillSession("PROGRESSION", 9.8),
+      runPrescriptionTreadmill: buildTreadmillSession("PROGRESSION", thursSpeed),
       runPrescriptionOutdoor: {
-        totalDistanceKm: 8.0,
-        targetPaceMinKm: "5:50",
-        warmupKm: 1.5,
-        mainSetDescription: "Progresso gradual de Z2 para Z3 (ritmo meia-maratona)",
+        totalDistanceKm: thursOutdoorDist,
+        targetPaceMinKm: thursOutdoorPace,
+        warmupKm: 1.0,
+        mainSetDescription: isPatricia
+          ? "Progresso gradual de Z2 para Z3 (149 a 162 bpm - Ritmo 10K)"
+          : "Progresso gradual de Z2 para Z3 (ritmo meia-maratona 2027)",
         cooldownKm: 1.0,
         targetZones: ["Z2", "Z3"],
       },
-      strengthPrescription: getStrengthFicha("C", hasShoulderRestriction),
+      strengthPrescription: getStrengthFicha("C", profile),
     },
     {
       dayOfWeek: "FRIDAY",
@@ -563,24 +776,25 @@ export function buildWeeklyScheduleTemplate(params: {
       modality: weekendMode === "SATURDAY_LONG_SUNDAY_FAMILY_BIKE" ? "RUN" : "RUN",
       title:
         weekendMode === "SATURDAY_LONG_SUNDAY_FAMILY_BIKE"
-          ? "LONGÃO DE SÁBADO (16-18 km Asfalto)"
-          : "Corrida de Manutenção (8 km Asfalto) + Musculação",
+          ? `LONGÃO DE SÁBADO (${longDist} km Asfalto - ${profile})`
+          : `Corrida de Manutenção (${satShortDist} km Asfalto) + Musculação`,
       allowedEnvironments: "OUTDOOR_STREET_ONLY",
-      durationMin: weekendMode === "SATURDAY_LONG_SUNDAY_FAMILY_BIKE" ? 105 : 50,
+      durationMin: weekendMode === "SATURDAY_LONG_SUNDAY_FAMILY_BIKE" ? 90 : 45,
       runPrescriptionOutdoor:
         weekendMode === "SATURDAY_LONG_SUNDAY_FAMILY_BIKE"
           ? {
-              totalDistanceKm: 16.0,
-              targetPaceMinKm: "6:10",
-              warmupKm: 2.0,
-              mainSetDescription:
-                "Longão de resistência aeróbia na rua com hidratação a cada 3km e carbogel nos km 7 e 12.",
+              totalDistanceKm: longDist,
+              targetPaceMinKm: longPace,
+              warmupKm: 1.5,
+              mainSetDescription: isPatricia
+                ? "Longão aeróbio de rua com hidratação a cada 2.5km e cadência leve e constante."
+                : "Longão de resistência aeróbia na rua com hidratação a cada 3km e carbogel nos km 7 e 12.",
               cooldownKm: 1.0,
               targetZones: ["Z2"],
             }
           : {
-              totalDistanceKm: 8.0,
-              targetPaceMinKm: "6:00",
+              totalDistanceKm: satShortDist,
+              targetPaceMinKm: satShortPace,
               warmupKm: 1.0,
               mainSetDescription: "Rodagem leve na rua mantendo cadência acima de 170 spm.",
               cooldownKm: 1.0,
@@ -595,12 +809,12 @@ export function buildWeeklyScheduleTemplate(params: {
       title:
         weekendMode === "SATURDAY_LONG_SUNDAY_FAMILY_BIKE"
           ? "Pedal em Família (Daniel & Patrícia)"
-          : "LONGÃO DE DOMINGO (16-18 km Asfalto)",
+          : `LONGÃO DE DOMINGO (${longDist} km Asfalto - ${profile})`,
       allowedEnvironments:
         weekendMode === "SATURDAY_LONG_SUNDAY_FAMILY_BIKE"
           ? "INDOOR_OUTDOOR_BIKE"
           : "OUTDOOR_STREET_ONLY",
-      durationMin: weekendMode === "SATURDAY_LONG_SUNDAY_FAMILY_BIKE" ? 75 : 105,
+      durationMin: weekendMode === "SATURDAY_LONG_SUNDAY_FAMILY_BIKE" ? 75 : 95,
       bikePrescription:
         weekendMode === "SATURDAY_LONG_SUNDAY_FAMILY_BIKE"
           ? {
@@ -615,11 +829,12 @@ export function buildWeeklyScheduleTemplate(params: {
       runPrescriptionOutdoor:
         weekendMode === "CLASSIC_SUNDAY_LONG"
           ? {
-              totalDistanceKm: 16.0,
-              targetPaceMinKm: "6:10",
-              warmupKm: 2.0,
-              mainSetDescription:
-                "Longão de Domingo tradicional. Foco em sustentação de ritmo constante e teste de nutrição intra-treino.",
+              totalDistanceKm: longDist,
+              targetPaceMinKm: longPace,
+              warmupKm: 1.5,
+              mainSetDescription: isPatricia
+                ? "Longão feminino de base aeróbia na rua com hidratação a cada 2.5km."
+                : "Longão de resistência para Meia Maratona 2027 com hidratação e carbogel.",
               cooldownKm: 1.0,
               targetZones: ["Z2"],
             }
@@ -630,50 +845,100 @@ export function buildWeeklyScheduleTemplate(params: {
 
 /**
  * 2027 Target Race Season Evaluation & Tapering Engine
+ * INDIVIDUALIZADO PARA DANIEL vs PATRÍCIA:
+ * - Daniel: Meia Maratona SP 2027, Nike SP City 21k, Meia Praia Grande
+ * - Patrícia: Circuito das Estações 10K, Meia Revezamento Casal 21k, Desafio Noturno 5K
  */
-export function evaluateRaceCalendar(currentDateStr: string = "2026-10-17") {
-  const races = [
-    {
-      id: "race-sp-inter-2027",
-      name: "Maratona Internacional de São Paulo 2027 (21k)",
-      priority: "P1_TARGET" as const,
-      distanceKm: 21.097,
-      date: "2027-04-11",
-      isTbd: false,
-      location: "São Paulo, SP - Ibirapuera",
-      targetPaceMinKm: "5:30",
-      targetFinishTime: "01:55:59",
-      taperingWeeks: 3,
-      carbLoadingDays: 3,
-    },
-    {
-      id: "race-nike-sp-city-2027",
-      name: "Nike SP City Marathon 2027 (21k)",
-      priority: "P1_TARGET" as const,
-      distanceKm: 21.097,
-      date: "2027-07-25",
-      isTbd: false,
-      location: "São Paulo, SP - Pacaembu / Jockey",
-      targetPaceMinKm: "5:25",
-      targetFinishTime: "01:54:15",
-      taperingWeeks: 3,
-      carbLoadingDays: 3,
-    },
-    {
-      id: "race-praia-grande-tbd-2027",
-      name: "Meia Maratona de Praia Grande 2027 (21k)",
-      priority: "P2_PREP" as const,
-      distanceKm: 21.097,
-      date: null,
-      isTbd: true,
-      estimatedWindowMonth: "Set/Out 2027",
-      location: "Praia Grande, SP - Litoral",
-      targetPaceMinKm: "5:35",
-      targetFinishTime: "01:57:45",
-      taperingWeeks: 2,
-      carbLoadingDays: 2,
-    },
-  ];
+export function evaluateRaceCalendar(
+  currentDateStr: string = "2026-10-17",
+  profile: "DANIEL" | "PATRICIA" = "DANIEL"
+) {
+  const isPatricia = profile === "PATRICIA";
+
+  const races = isPatricia
+    ? [
+        {
+          id: "race-patricia-estacoes-10k-2027",
+          name: "Circuito das Estações SP 2027 (10k)",
+          priority: "P1_TARGET" as const,
+          distanceKm: 10.0,
+          date: "2027-05-23",
+          isTbd: false,
+          location: "São Paulo, SP - Pacaembu",
+          targetPaceMinKm: "6:00",
+          targetFinishTime: "01:00:00",
+          taperingWeeks: 2,
+          carbLoadingDays: 2,
+        },
+        {
+          id: "race-patricia-revezamento-2027",
+          name: "SP City Marathon - Revezamento em Casal (10.5k)",
+          priority: "P1_TARGET" as const,
+          distanceKm: 10.55,
+          date: "2027-07-25",
+          isTbd: false,
+          location: "São Paulo, SP - Jockey Club",
+          targetPaceMinKm: "5:55",
+          targetFinishTime: "01:02:27",
+          taperingWeeks: 2,
+          carbLoadingDays: 2,
+        },
+        {
+          id: "race-patricia-desafio-5k-2027",
+          name: "Desafio Noturno de Verão (5k)",
+          priority: "P2_PREP" as const,
+          distanceKm: 5.0,
+          date: "2027-03-20",
+          isTbd: false,
+          location: "São Paulo, SP - USP",
+          targetPaceMinKm: "5:35",
+          targetFinishTime: "00:27:55",
+          taperingWeeks: 1,
+          carbLoadingDays: 1,
+        },
+      ]
+    : [
+        {
+          id: "race-sp-inter-2027",
+          name: "Maratona Internacional de São Paulo 2027 (21k)",
+          priority: "P1_TARGET" as const,
+          distanceKm: 21.097,
+          date: "2027-04-11",
+          isTbd: false,
+          location: "São Paulo, SP - Ibirapuera",
+          targetPaceMinKm: "5:30",
+          targetFinishTime: "01:55:59",
+          taperingWeeks: 3,
+          carbLoadingDays: 3,
+        },
+        {
+          id: "race-nike-sp-city-2027",
+          name: "Nike SP City Marathon 2027 (21k)",
+          priority: "P1_TARGET" as const,
+          distanceKm: 21.097,
+          date: "2027-07-25",
+          isTbd: false,
+          location: "São Paulo, SP - Pacaembu / Jockey",
+          targetPaceMinKm: "5:25",
+          targetFinishTime: "01:54:15",
+          taperingWeeks: 3,
+          carbLoadingDays: 3,
+        },
+        {
+          id: "race-praia-grande-tbd-2027",
+          name: "Meia Maratona de Praia Grande 2027 (21k)",
+          priority: "P2_PREP" as const,
+          distanceKm: 21.097,
+          date: null,
+          isTbd: true,
+          estimatedWindowMonth: "Set/Out 2027",
+          location: "Praia Grande, SP - Litoral",
+          targetPaceMinKm: "5:35",
+          targetFinishTime: "01:57:45",
+          taperingWeeks: 2,
+          carbLoadingDays: 2,
+        },
+      ];
 
   const now = new Date(currentDateStr);
   const evaluated = races.map((race) => {
@@ -716,4 +981,148 @@ export function evaluateRaceCalendar(currentDateStr: string = "2026-10-17") {
   });
 
   return evaluated;
+}
+
+/**
+ * Retorna as especificações de Grife e Telemetria para cada Atleta do Clã
+ */
+export function getProfileSpecs(profile: "DANIEL" | "PATRICIA" | "CLAN") {
+  if (profile === "PATRICIA") {
+    return {
+      id: "PATRICIA" as const,
+      name: "Patrícia Lopes",
+      tagline: "Atleta de Alta Performance Feminina & Recomposição",
+      club: "Grêmio" as const,
+      clubName: "Grêmio Foot-Ball Porto Alegrense",
+      clubBadge: "Imortal Tricolor 🔵⚪⚫",
+      clubStadium: "Arena do Grêmio (Porto Alegre)",
+      clubColors: {
+        accent: "sky",
+        border: "border-sky-500/40",
+        bgBadge: "bg-sky-950/40",
+        text: "text-sky-400",
+        gradient: "from-sky-600 via-blue-500 to-cyan-400",
+        shadow: "shadow-sky-500/20",
+        glow: "rgba(14, 165, 233, 0.25)",
+      },
+      weightKg: 58.0,
+      heightCm: 162,
+      bodyFatPct: 22.8,
+      hrZones: {
+        z1: { min: 115, max: 130, label: "Z1 Regenerativo" },
+        z2: { min: 131, max: 148, label: "Z2 Base Aeróbia / Queima Lipídica" },
+        z3: { min: 149, max: 162, label: "Z3 Ritmo Prova 10K" },
+        z4: { min: 163, max: 174, label: "Z4 Limiar Anaeróbio / Tiros" },
+        z5: { min: 175, max: 190, label: "Z5 VO2 Max Máximo" },
+      },
+      paces: {
+        z1Recovery: "7:30 - 8:15 min/km",
+        z2Base: "6:30 - 7:15 min/km",
+        z3Tempo: "5:55 - 6:25 min/km",
+        z4Threshold: "5:20 - 5:50 min/km",
+        treadmillZ2Speed: "8.3 - 9.2 km/h (1.0% inclinação)",
+      },
+      primaryRace: {
+        name: "Circuito das Estações SP 2027 (10K)",
+        date: "23/05/2027",
+        distance: "10.0 km",
+        targetPace: "6:00 min/km",
+        targetFinish: "Sub-1h00",
+        location: "Pacaembu, São Paulo",
+      },
+      secondaryRace: {
+        name: "SP City Marathon (Revezamento em Casal 10.5k)",
+        date: "25/07/2027",
+        distance: "10.55 km",
+        targetPace: "5:55 min/km",
+      },
+      hardware: {
+        device: "Smartwatch Patrícia",
+        stravaAthlete: "Patrícia Lopes (Strava Pro)",
+        intervalsId: "PATRICIA_WATCH",
+      },
+      nutritionTaco: {
+        caloricTargetKcal: 1780,
+        proteinG: 120,
+        carbsG: 185,
+        fatsG: 48,
+        familyPlateSharePct: 42,
+        familyPlateShareText: "42% da Panela Familiar",
+      },
+      clinicalSafe: {
+        hasProsthesis: false,
+        shoulderSafe: false,
+        notes: "Membros superiores e ombros 100% livres para amplitude máxima.",
+      },
+    };
+  }
+
+  // DANIEL
+  return {
+    id: "DANIEL" as const,
+    name: "Daniel Souto Lopes",
+    tagline: "Maratonista Híbrido 21k & Prótese Reversa de Ombro",
+    club: "Flamengo" as const,
+    clubName: "Clube de Regatas do Flamengo",
+    clubBadge: "Mengão Rubro-Negro 🔴⚫",
+    clubStadium: "Maracanã (Rio de Janeiro)",
+    clubColors: {
+      accent: "red",
+      border: "border-red-500/40",
+      bgBadge: "bg-red-950/40",
+      text: "text-red-400",
+      gradient: "from-red-600 via-rose-600 to-amber-600",
+      shadow: "shadow-red-500/20",
+      glow: "rgba(239, 68, 68, 0.25)",
+    },
+    weightKg: 80.0,
+    heightCm: 170,
+    bodyFatPct: 18.5,
+    hrZones: {
+      z1: { min: 110, max: 125, label: "Z1 Recuperação Ativa" },
+      z2: { min: 126, max: 142, label: "Z2 Base Aeróbia / Mitocondrial" },
+      z3: { min: 143, max: 155, label: "Z3 Ritmo Alvo Meia Maratona" },
+      z4: { min: 156, max: 168, label: "Z4 Limiar de Lactato" },
+      z5: { min: 169, max: 185, label: "Z5 Capacidade Anaeróbia" },
+    },
+    paces: {
+      z1Recovery: "6:45 - 7:15 min/km",
+      z2Base: "5:50 - 6:20 min/km",
+      z3Tempo: "5:15 - 5:45 min/km",
+      z4Threshold: "4:40 - 5:10 min/km",
+      treadmillZ2Speed: "9.7 - 10.3 km/h (1.0% inclinação)",
+    },
+    primaryRace: {
+      name: "Maratona Internacional de SP 2027 (21k)",
+      date: "11/04/2027",
+      distance: "21.097 km",
+      targetPace: "5:27 min/km",
+      targetFinish: "Sub-1h55",
+      location: "Ibirapuera, São Paulo",
+    },
+    secondaryRace: {
+      name: "Nike SP City Marathon 2027 (21k)",
+      date: "25/07/2027",
+      distance: "21.097 km",
+      targetPace: "5:12 min/km",
+    },
+    hardware: {
+      device: "Galaxy Watch Ultra (47mm Titanium)",
+      stravaAthlete: "Daniel Souto Lopes (ID: 203901)",
+      intervalsId: "I753639",
+    },
+    nutritionTaco: {
+      caloricTargetKcal: 2350,
+      proteinG: 165,
+      carbsG: 260,
+      fatsG: 65,
+      familyPlateSharePct: 58,
+      familyPlateShareText: "58% da Panela Familiar",
+    },
+    clinicalSafe: {
+      hasProsthesis: true,
+      shoulderSide: "RIGHT",
+      notes: "Prótese reversa glenoumeral no ombro direito. Zero sobrecargas overhead e zero supino reto barra.",
+    },
+  };
 }

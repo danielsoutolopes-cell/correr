@@ -121,7 +121,7 @@ export default function BioTriadApp() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090D16] text-[#F3F4F6] flex flex-col justify-between selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-[#07090E] text-[#F3F4F6] flex flex-col justify-between selection:bg-blue-600 selection:text-white">
       {/* 1. Global Top Bar */}
       <TopBarGlobal
         currentProfile={currentProfile}
@@ -177,67 +177,82 @@ export default function BioTriadApp() {
         )}
       </main>
 
-      {/* 3. Sticky Bottom Navigation Bar */}
-      <nav className="sticky bottom-0 z-50 w-full border-t border-[#1F2937] bg-[#090D16]/95 backdrop-blur-md px-3 sm:px-6 py-2 shadow-2xl">
-        <div className="max-w-md mx-auto grid grid-cols-5 gap-1">
+      {/* 3. Sticky Bottom Navigation Bar - Haute Horlogerie Luxury Design */}
+      <nav className="sticky bottom-0 z-50 w-full border-t border-white/10 bg-[#07090E]/90 backdrop-blur-2xl px-3 sm:px-6 py-2 shadow-[0_-8px_32px_rgba(0,0,0,0.7)]">
+        <div className="max-w-md mx-auto grid grid-cols-5 gap-1.5 font-mono">
           <button
             onClick={() => setActiveTab("COCKPIT")}
-            className={`flex flex-col items-center py-1.5 px-1 rounded-xl transition-all ${
+            className={`flex flex-col items-center py-2 px-1 rounded-2xl transition-all relative ${
               activeTab === "COCKPIT"
-                ? "text-blue-400 font-bold bg-blue-950/40"
-                : "text-gray-400 hover:text-white"
+                ? "text-blue-400 font-bold bg-blue-950/60 border border-blue-500/40 shadow-lg shadow-blue-500/20"
+                : "text-gray-400 hover:text-white hover:bg-white/5"
             }`}
           >
-            <Activity className="h-5 w-5 mb-1" />
-            <span className="text-[10px]">Cockpit</span>
+            <Activity className="h-4.5 w-4.5 mb-1" />
+            <span className="text-[10px] tracking-wider uppercase font-semibold">Cockpit</span>
+            {activeTab === "COCKPIT" && (
+              <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-blue-400"></span>
+            )}
           </button>
 
           <button
             onClick={() => setActiveTab("COACH")}
-            className={`flex flex-col items-center py-1.5 px-1 rounded-xl transition-all ${
+            className={`flex flex-col items-center py-2 px-1 rounded-2xl transition-all relative ${
               activeTab === "COACH"
-                ? "text-blue-400 font-bold bg-blue-950/40"
-                : "text-gray-400 hover:text-white"
+                ? "text-cyan-400 font-bold bg-cyan-950/60 border border-cyan-500/40 shadow-lg shadow-cyan-500/20"
+                : "text-gray-400 hover:text-white hover:bg-white/5"
             }`}
           >
-            <Compass className="h-5 w-5 mb-1" />
-            <span className="text-[10px]">Treinador</span>
+            <Compass className="h-4.5 w-4.5 mb-1" />
+            <span className="text-[10px] tracking-wider uppercase font-semibold">Treinador</span>
+            {activeTab === "COACH" && (
+              <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-cyan-400"></span>
+            )}
           </button>
 
           <button
             onClick={() => setActiveTab("NUTRITION")}
-            className={`flex flex-col items-center py-1.5 px-1 rounded-xl transition-all ${
+            className={`flex flex-col items-center py-2 px-1 rounded-2xl transition-all relative ${
               activeTab === "NUTRITION"
-                ? "text-emerald-400 font-bold bg-emerald-950/40"
-                : "text-gray-400 hover:text-white"
+                ? "text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/40 shadow-lg shadow-emerald-500/20"
+                : "text-gray-400 hover:text-white hover:bg-white/5"
             }`}
           >
-            <Utensils className="h-5 w-5 mb-1" />
-            <span className="text-[10px]">Nutrição</span>
+            <Utensils className="h-4.5 w-4.5 mb-1" />
+            <span className="text-[10px] tracking-wider uppercase font-semibold">Nutrição</span>
+            {activeTab === "NUTRITION" && (
+              <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-emerald-400"></span>
+            )}
           </button>
 
           <button
             onClick={() => setActiveTab("MENTAL")}
-            className={`flex flex-col items-center py-1.5 px-1 rounded-xl transition-all ${
+            className={`flex flex-col items-center py-2 px-1 rounded-2xl transition-all relative ${
               activeTab === "MENTAL"
-                ? "text-purple-400 font-bold bg-purple-950/40"
-                : "text-gray-400 hover:text-white"
+                ? "text-purple-400 font-bold bg-purple-950/60 border border-purple-500/40 shadow-lg shadow-purple-500/20"
+                : "text-gray-400 hover:text-white hover:bg-white/5"
             }`}
           >
-            <Brain className="h-5 w-5 mb-1" />
-            <span className="text-[10px]">Mental</span>
+            <Brain className="h-4.5 w-4.5 mb-1" />
+            <span className="text-[10px] tracking-wider uppercase font-semibold">Mental</span>
+            {activeTab === "MENTAL" && (
+              <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-purple-400"></span>
+            )}
           </button>
 
           <button
             onClick={() => setActiveTab("CLAN")}
-            className={`flex flex-col items-center py-1.5 px-1 rounded-xl transition-all ${
+            className={`flex flex-col items-center py-2 px-1 rounded-2xl transition-all relative ${
               activeTab === "CLAN"
-                ? "text-amber-400 font-bold bg-amber-950/40"
-                : "text-gray-400 hover:text-white"
+                ? "text-amber-400 font-bold bg-amber-950/60 border border-amber-500/40 shadow-lg shadow-amber-500/20"
+                : "text-gray-400 hover:text-white hover:bg-white/5"
             }`}
           >
-            <Users className="h-5 w-5 mb-1" />
-            <span className="text-[10px]">Clã</span>
+            <Users className="h-4.5 w-4.5 mb-1" />
+            <span className="text-[10px] tracking-wider uppercase font-semibold">Clã</span>
+            {activeTab === "CLAN" && (
+              <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-amber-400"></span>
+            )}
           </button>
         </div>
       </nav>
