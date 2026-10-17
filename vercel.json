@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/football/live",
-      "schedule": "0 12,18,22 * * *"
+      "schedule": "0 12 * * *"
     }
   ]
 }
