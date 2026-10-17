@@ -23,7 +23,7 @@ export interface TeamStandings {
   points: number;
   matchesPlayed: number;
   goalDifference: number;
-  zone: string; // ex: "Fase de Grupos Libertadores", "Sul-Americana", etc.
+  zone: string;
 }
 
 export interface TeamLiveHubData {
@@ -88,22 +88,38 @@ export const FootballHubSchema: Schema = {
   required: ["teamName", "standings", "pastMatches", "nextMatches"],
 };
 
+// Cache de 6 horas em memória (Anti-Mock Rule: Cache de dados reais da internet)
+interface CacheEntry {
+  data: TeamLiveHubData;
+  expiresAt: number;
+}
+const realDataCache: Record<string, CacheEntry> = {};
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 horas
+
 export class FootballLiveService {
   private ai: GoogleGenAI;
 
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      console.warn("[FootballLiveService] GEMINI_API_KEY não configurada no ambiente. Usando chave de contingência.");
+      throw new Error(
+        "[FootballLiveService] GEMINI_API_KEY não configurada. Defina a chave no .env para permitir a busca em tempo real na internet."
+      );
     }
-    this.ai = new GoogleGenAI({ apiKey: apiKey || "" });
+    this.ai = new GoogleGenAI({ apiKey });
   }
 
   /**
-   * Busca dados reais atualizados na internet usando busca ao vivo (Search Grounding)
-   * Proibido o uso de dados mockados / estáticos.
+   * Executa consulta REAL via Gemini 2.5 Flash com Search Grounding na internet.
+   * Política Anti-Mock: Zero dados estáticos de mentira ou arrays fabricados.
    */
   async fetchLiveTeamData(team: "Flamengo" | "Grêmio"): Promise<TeamLiveHubData> {
+    const now = Date.now();
+    const cached = realDataCache[team];
+    if (cached && cached.expiresAt > now) {
+      return cached.data;
+    }
+
     const today = new Date().toISOString().split("T")[0];
     const prompt = `Consulte dados oficiais e em tempo real sobre o time de futebol ${team} (Brasil).
 Data de referência atual: ${today}.
@@ -112,52 +128,42 @@ Busque na internet:
 2. Os últimos 3 a 5 jogos oficiais com placar e adversário.
 3. Os próximos 3 jogos com data, horário de Brasília, adversário e estádio.
 4. Classifique a tensão de cada jogo futuro de 1 a 5 (clássicos, semifinais e finais = 4 ou 5).
-Retorne os dados reais e precisos no schema estruturado em JSON com as chaves: teamName, standings, pastMatches, nextMatches.`;
+Retorne os dados reais e precisos no schema estruturado em JSON com as chaves: teamName, standings, pastMatches, nextMatches. Não inclua texto explicativo fora do JSON.`;
 
     let parsed: any = null;
 
-    // Tentativa 1: Structured Output nativo com responseSchema
     try {
       const response = await this.ai.models.generateContent({
         model: "gemini-2.5-flash",
         contents: prompt,
         config: {
           tools: [{ googleSearch: {} }],
-          responseMimeType: "application/json",
-          responseSchema: FootballHubSchema,
         },
       });
-      parsed = JSON.parse(response.text || "{}");
-    } catch (err: any) {
-      // Quando a API do Gemini acusa incompatibilidade entre Search Tool e responseMimeType: 'application/json',
-      // executamos com grounding ativo e extração estrita de JSON do corpo da resposta.
-      if (err?.message?.includes("response mime type") || err?.status === 400) {
-        const fallbackPrompt = `${prompt}\nRetorne EXCLUSIVAMENTE um objeto JSON válido (sem texto introdutório).`;
-        const response = await this.ai.models.generateContent({
-          model: "gemini-2.5-flash",
-          contents: fallbackPrompt,
-          config: {
-            tools: [{ googleSearch: {} }],
-          },
-        });
-        const rawText = response.text || "";
-        const clean = rawText
-          .replace(/^```json/m, "")
-          .replace(/^```/m, "")
-          .replace(/```$/m, "")
-          .trim();
-        const jsonMatch = clean.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          parsed = JSON.parse(jsonMatch[0]);
-        }
-      } else {
-        console.error("[FootballLiveService] Erro ao consultar Gemini:", err);
-      }
-    }
 
-    if (!parsed || !parsed.standings) {
-      // Fallback de contingência caso a busca falhe temporariamente
-      parsed = this.getContingencyData(team);
+      const rawText = response.text || "";
+      const clean = rawText
+        .replace(/^```json/m, "")
+        .replace(/^```/m, "")
+        .replace(/```$/m, "")
+        .trim();
+
+      const jsonMatch = clean.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error(
+          `[FootballLiveService] Falha ao extrair JSON da busca em tempo real para o ${team}. Resposta bruta: ${rawText.substring(0, 150)}`
+        );
+      }
+
+      parsed = JSON.parse(jsonMatch[0]);
+    } catch (err) {
+      console.error(`[FootballLiveService] Erro ao consultar internet via Gemini para ${team}:`, err);
+      // Se houver cache prévio válido (mesmo expirado), mantém os dados reais em vez de inventar
+      if (cached) {
+        console.warn(`[FootballLiveService] Servindo último cache real para ${team}`);
+        return cached.data;
+      }
+      throw err;
     }
 
     // Analisa se há jogo hoje com base na data real
@@ -166,12 +172,18 @@ Retorne os dados reais e precisos no schema estruturado em JSON com as chaves: t
       (m: MatchInfo) => m.matchDate && m.matchDate.includes(todayFormatted)
     );
 
-    return {
+    const liveData: TeamLiveHubData = {
       teamName: team,
       updatedAt: new Date().toISOString(),
-      standings: parsed.standings,
-      pastMatches: parsed.pastMatches || [],
-      nextMatches: parsed.nextMatches || [],
+      standings: {
+        position: parsed.standings?.position ?? 1,
+        points: parsed.standings?.points ?? 0,
+        matchesPlayed: parsed.standings?.matchesPlayed ?? 0,
+        goalDifference: parsed.standings?.goalDifference ?? 0,
+        zone: parsed.standings?.zone ?? "Campeonato Brasileiro Série A",
+      },
+      pastMatches: Array.isArray(parsed.pastMatches) ? parsed.pastMatches : [],
+      nextMatches: Array.isArray(parsed.nextMatches) ? parsed.nextMatches : [],
       matchDayAlert: {
         hasMatchToday: Boolean(matchToday),
         matchDetails: matchToday,
@@ -184,6 +196,14 @@ Retorne os dados reais e precisos no schema estruturado em JSON com as chaves: t
             : 0,
       },
     };
+
+    // Salva no cache com TTL de 6 horas
+    realDataCache[team] = {
+      data: liveData,
+      expiresAt: now + CACHE_TTL_MS,
+    };
+
+    return liveData;
   }
 
   /**
@@ -238,70 +258,6 @@ Retorne os dados reais e precisos no schema estruturado em JSON com as chaves: t
           "Água com gás, limão espremido e pedras de gelo",
         ],
       },
-    };
-  }
-
-  private getContingencyData(team: "Flamengo" | "Grêmio") {
-    if (team === "Flamengo") {
-      return {
-        teamName: "Flamengo",
-        standings: {
-          position: 1,
-          points: 64,
-          matchesPlayed: 30,
-          goalDifference: 33,
-          zone: "Fase de Grupos Libertadores",
-        },
-        pastMatches: [
-          {
-            opponent: "Fluminense",
-            score: "1-0",
-            competition: "Brasileirão",
-            matchDate: "11/10/2026",
-            result: "WIN",
-          },
-        ],
-        nextMatches: [
-          {
-            opponent: "Palmeiras",
-            competition: "Brasileirão",
-            matchDate: "21/10/2026",
-            isHome: true,
-            stadium: "Maracanã",
-            tensionIndex: 5,
-          },
-        ],
-      };
-    }
-
-    return {
-      teamName: "Grêmio",
-      standings: {
-        position: 8,
-        points: 44,
-        matchesPlayed: 30,
-        goalDifference: 4,
-        zone: "Copa Sul-Americana",
-      },
-      pastMatches: [
-        {
-          opponent: "Fortaleza",
-          score: "3-1",
-          competition: "Brasileirão",
-          matchDate: "03/10/2026",
-          result: "WIN",
-        },
-      ],
-      nextMatches: [
-        {
-          opponent: "Internacional",
-          competition: "Brasileirão (Grenal)",
-          matchDate: "22/10/2026",
-          isHome: true,
-          stadium: "Arena do Grêmio",
-          tensionIndex: 5,
-        },
-      ],
     };
   }
 }

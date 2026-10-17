@@ -108,9 +108,9 @@ export class TuyaSmartHomeService {
 
     if (!this.clientId || !this.clientSecret) {
       return {
-        success: true,
+        success: false,
         t: Number(timestamp),
-        msg: `[Simulação Ativa] Hardware não conectado: Comandos [${commands.map((c) => c.code).join(", ")}] enviados ao buffer virtual para dispositivo ${deviceId}.`,
+        msg: "Erro: TUYA_CLIENT_ID e TUYA_CLIENT_SECRET são obrigatórios para despachar comandos reais.",
       };
     }
 
@@ -119,7 +119,7 @@ export class TuyaSmartHomeService {
       return {
         success: false,
         t: Number(timestamp),
-        msg: "Falha na autenticação Tuya: Credenciais inválidas ou serviço indisponível.",
+        msg: "Falha na autenticação Tuya OpenAPI (https://openapi.tuyaus.com): Token OAuth 2.0 não obtido.",
       };
     }
 
