@@ -17,6 +17,7 @@ import { CoachTab } from "@/components/tabs/CoachTab";
 import { NutritionTab } from "@/components/tabs/NutritionTab";
 import { MentalHealthTab } from "@/components/tabs/MentalHealthTab";
 import { ClanTab } from "@/components/tabs/ClanTab";
+import { HelpManualModal } from "@/components/HelpManualModal";
 import { BodyMetrics, FootballTeamData, GalaxyWatchTelemetry } from "@/lib/types";
 import { calculateBodyMetrics } from "@/lib/physiology";
 
@@ -28,6 +29,7 @@ export default function BioTriadApp() {
   const [currentProfile, setCurrentProfile] = useState<"DANIEL" | "PATRICIA" | "CLAN">(
     "DANIEL"
   );
+  const [isManualOpen, setIsManualOpen] = useState<boolean>(false);
 
   // Real-time football telemetry state
   const [footballData, setFootballData] = useState<{
@@ -128,6 +130,7 @@ export default function BioTriadApp() {
         onSelectProfile={setCurrentProfile}
         footballData={footballData}
         onRefreshData={() => refreshLiveDataForProfile(currentProfile, true)}
+        onOpenManual={() => setIsManualOpen(true)}
       />
 
       {/* 2. Main Content Area */}
@@ -173,6 +176,7 @@ export default function BioTriadApp() {
             currentProfile={currentProfile}
             onSelectProfile={setCurrentProfile}
             onRefreshData={() => refreshLiveDataForProfile(currentProfile, true)}
+            onOpenManual={() => setIsManualOpen(true)}
           />
         )}
       </main>
@@ -256,6 +260,13 @@ export default function BioTriadApp() {
           </button>
         </div>
       </nav>
+
+      {/* 4. Interactive In-App Help & Operation Manual */}
+      <HelpManualModal
+        isOpen={isManualOpen}
+        onClose={() => setIsManualOpen(false)}
+        currentProfile={currentProfile}
+      />
     </div>
   );
 }

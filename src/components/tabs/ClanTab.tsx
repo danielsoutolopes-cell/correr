@@ -25,6 +25,7 @@ import {
   Heart,
   ChevronRight,
   Zap,
+  BookOpen,
 } from "lucide-react";
 import { getProfileSpecs } from "@/lib/physiology";
 
@@ -32,9 +33,15 @@ interface ClanTabProps {
   currentProfile: "DANIEL" | "PATRICIA" | "CLAN";
   onSelectProfile: (profile: "DANIEL" | "PATRICIA" | "CLAN") => void;
   onRefreshData?: () => void;
+  onOpenManual?: () => void;
 }
 
-export function ClanTab({ currentProfile, onSelectProfile, onRefreshData }: ClanTabProps) {
+export function ClanTab({
+  currentProfile,
+  onSelectProfile,
+  onRefreshData,
+  onOpenManual,
+}: ClanTabProps) {
   const [intervalsAthleteId, setIntervalsAthleteId] = useState<string>("I753639");
   const [intervalsApiKey, setIntervalsApiKey] = useState<string>("");
   const [tuyaClientId, setTuyaClientId] = useState<string>("");
@@ -113,6 +120,13 @@ export function ClanTab({ currentProfile, onSelectProfile, onRefreshData }: Clan
             <span className="text-[10px] font-mono font-bold px-3 py-1 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-800 shadow-sm">
               ● 2 Atletas Ativos
             </span>
+            <button
+              onClick={onOpenManual}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950/60 hover:bg-blue-900/80 text-blue-300 border border-blue-800 text-[10px] font-mono font-bold transition-all shadow-sm"
+            >
+              <BookOpen className="h-3 w-3 text-blue-400" />
+              <span>Manual de Operação</span>
+            </button>
           </div>
         </div>
 

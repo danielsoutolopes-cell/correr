@@ -13,6 +13,7 @@ import {
   Wifi,
   ChevronDown,
   Compass,
+  BookOpen,
 } from "lucide-react";
 import { FootballTeamData } from "@/lib/types";
 import { getProfileSpecs } from "@/lib/physiology";
@@ -25,6 +26,7 @@ interface TopBarGlobalProps {
     gremio: FootballTeamData | null;
   };
   onRefreshData?: () => void;
+  onOpenManual?: () => void;
 }
 
 export function TopBarGlobal({
@@ -32,6 +34,7 @@ export function TopBarGlobal({
   onSelectProfile,
   footballData,
   onRefreshData,
+  onOpenManual,
 }: TopBarGlobalProps) {
   const [daysToSpInter, setDaysToSpInter] = useState<number>(176);
   const [daysToNike, setDaysToNike] = useState<number>(281);
@@ -223,6 +226,16 @@ export function TopBarGlobal({
             <span className="text-[10px] text-gray-400 font-mono">
               {isPatricia ? "Strava Pro" : "I753639"}
             </span>
+          </button>
+
+          {/* Help Manual Button */}
+          <button
+            onClick={onOpenManual}
+            title="Abrir Manual de Operação do Bio-Triad OS"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-blue-500/40 bg-blue-950/40 text-blue-300 hover:text-white hover:bg-blue-900/50 text-xs font-semibold transition-all shadow-md shadow-blue-500/10"
+          >
+            <BookOpen className="h-3.5 w-3.5 text-blue-400" />
+            <span className="font-mono">Manual</span>
           </button>
         </div>
       </div>
