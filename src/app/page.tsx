@@ -18,7 +18,15 @@ import { NutritionTab } from "@/components/tabs/NutritionTab";
 import { MentalHealthTab } from "@/components/tabs/MentalHealthTab";
 import { ClanTab } from "@/components/tabs/ClanTab";
 import { HelpManualModal } from "@/components/HelpManualModal";
-import { BodyMetrics, FootballTeamData, GalaxyWatchTelemetry } from "@/lib/types";
+import { SoccerHubModal } from "@/components/SoccerHubModal";
+import { RaceManagerModal } from "@/components/RaceManagerModal";
+import { ExecutiveReportModal } from "@/components/ExecutiveReportModal";
+import { RaceTacticalSimulatorModal } from "@/components/RaceTacticalSimulatorModal";
+import { TrophyCardGeneratorModal } from "@/components/TrophyCardGeneratorModal";
+import { ClanHallOfFameModal } from "@/components/ClanHallOfFameModal";
+import { SetupManagerModal } from "@/components/SetupManagerModal";
+import { RaceMorningDispatchModal } from "@/components/RaceMorningDispatchModal";
+import { BodyMetrics, FootballTeamData, GalaxyWatchTelemetry, ProfileId } from "@/lib/types";
 import { calculateBodyMetrics } from "@/lib/physiology";
 
 export default function BioTriadApp() {
@@ -26,18 +34,32 @@ export default function BioTriadApp() {
     "COCKPIT" | "COACH" | "NUTRITION" | "MENTAL" | "CLAN"
   >("COCKPIT");
 
-  const [currentProfile, setCurrentProfile] = useState<"DANIEL" | "PATRICIA" | "CLAN">(
-    "DANIEL"
-  );
+  const [currentProfile, setCurrentProfile] = useState<ProfileId>("DANIEL");
   const [isManualOpen, setIsManualOpen] = useState<boolean>(false);
+  const [isSoccerHubOpen, setIsSoccerHubOpen] = useState<boolean>(false);
+  const [isRaceManagerOpen, setIsRaceManagerOpen] = useState<boolean>(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
+  const [isTacticalSimulatorOpen, setIsTacticalSimulatorOpen] = useState<boolean>(false);
+  const [isTrophyCardGeneratorOpen, setIsTrophyCardGeneratorOpen] = useState<boolean>(false);
+  const [isClanHallOfFameOpen, setIsClanHallOfFameOpen] = useState<boolean>(false);
+  const [isSetupOpen, setIsSetupOpen] = useState<boolean>(false);
+  const [isRaceMorningOpen, setIsRaceMorningOpen] = useState<boolean>(false);
+  const [selectedRaceForMorning, setSelectedRaceForMorning] = useState<string | undefined>(undefined);
+
+  const handleOpenRaceMorning = (raceId?: string) => {
+    setSelectedRaceForMorning(raceId);
+    setIsRaceMorningOpen(true);
+  };
 
   // Real-time football telemetry state
   const [footballData, setFootballData] = useState<{
     flamengo: FootballTeamData | null;
     gremio: FootballTeamData | null;
+    palmeiras?: FootballTeamData | null;
   }>({
     flamengo: null,
     gremio: null,
+    palmeiras: null,
   });
 
   // Galaxy Watch Ultra Telemetry State
@@ -52,9 +74,19 @@ export default function BioTriadApp() {
     activities: [],
   });
 
-  // Deterministic body metrics for Daniel vs Patrícia
+  // Deterministic body metrics for Daniel vs Patrícia vs Gabriel
   const metrics: BodyMetrics =
-    currentProfile === "PATRICIA"
+    currentProfile === "GABRIEL"
+      ? calculateBodyMetrics({
+          weightKg: 72.0,
+          waistCm: 78,
+          neckCm: 37,
+          hipCm: 94,
+          heightCm: 178,
+          sex: "MALE",
+          targetWeightKg: 70.0,
+        })
+      : currentProfile === "PATRICIA"
       ? calculateBodyMetrics({
           weightKg: 58.0,
           waistCm: 68,
@@ -75,9 +107,10 @@ export default function BioTriadApp() {
         });
 
   // Fetch football and Intervals data on load with Eco-Green on-demand fetching
-  const refreshLiveDataForProfile = async (profile: "DANIEL" | "PATRICIA" | "CLAN", force = false) => {
+  const refreshLiveDataForProfile = async (profile: ProfileId, force = false) => {
     try {
-      const activeTeam = profile === "PATRICIA" ? "Grêmio" : "Flamengo";
+      const activeTeam =
+        profile === "GABRIEL" ? "Palmeiras" : profile === "PATRICIA" ? "Grêmio" : "Flamengo";
       const requests: Promise<any>[] = [
         fetch(`/api/football/live?team=${activeTeam}${force ? "&refresh=true" : ""}`)
           .then((r) => r.json())
@@ -92,8 +125,10 @@ export default function BioTriadApp() {
       if (teamRes && !teamRes.error) {
         if (activeTeam === "Flamengo") {
           setFootballData((prev) => ({ ...prev, flamengo: teamRes }));
-        } else {
+        } else if (activeTeam === "Grêmio") {
           setFootballData((prev) => ({ ...prev, gremio: teamRes }));
+        } else {
+          setFootballData((prev) => ({ ...prev, palmeiras: teamRes }));
         }
       }
       if (watchRes?.telemetry) {
@@ -108,9 +143,8 @@ export default function BioTriadApp() {
     refreshLiveDataForProfile(currentProfile);
   }, [currentProfile]);
 
-
   // Trigger Tuya Smart Home Scene
-  const handleTriggerTuyaScene = async (scene: string) => {
+  const handleTriggerTuyaScene = async (scene: string, label?: string) => {
     try {
       await fetch("/api/tuya/command", {
         method: "POST",
@@ -131,6 +165,14 @@ export default function BioTriadApp() {
         footballData={footballData}
         onRefreshData={() => refreshLiveDataForProfile(currentProfile, true)}
         onOpenManual={() => setIsManualOpen(true)}
+        onOpenSoccerHub={() => setIsSoccerHubOpen(true)}
+        onOpenRaceManager={() => setIsRaceManagerOpen(true)}
+        onOpenReports={() => setIsReportModalOpen(true)}
+        onOpenTacticalSimulator={() => setIsTacticalSimulatorOpen(true)}
+        onOpenTrophyCardGenerator={() => setIsTrophyCardGeneratorOpen(true)}
+        onOpenClanHallOfFame={() => setIsClanHallOfFameOpen(true)}
+        onOpenSetup={() => setIsSetupOpen(true)}
+        onOpenRaceMorning={handleOpenRaceMorning}
       />
 
       {/* 2. Main Content Area */}
@@ -143,6 +185,11 @@ export default function BioTriadApp() {
             footballData={footballData}
             onTriggerTuyaScene={handleTriggerTuyaScene}
             onNavigateToTab={(tab) => setActiveTab(tab as any)}
+            onOpenRaceManager={() => setIsRaceManagerOpen(true)}
+            onOpenTacticalSimulator={() => setIsTacticalSimulatorOpen(true)}
+            onOpenTrophyCardGenerator={() => setIsTrophyCardGeneratorOpen(true)}
+            onOpenClanHallOfFame={() => setIsClanHallOfFameOpen(true)}
+            onOpenRaceMorning={handleOpenRaceMorning}
           />
         )}
 
@@ -157,7 +204,9 @@ export default function BioTriadApp() {
           <NutritionTab
             currentProfile={currentProfile}
             hasMatchDaySnackMode={
-              currentProfile === "PATRICIA"
+              currentProfile === "GABRIEL"
+                ? footballData.palmeiras?.isMatchDay ?? true
+                : currentProfile === "PATRICIA"
                 ? footballData.gremio?.isMatchDay ?? true
                 : footballData.flamengo?.isMatchDay ?? true
             }
@@ -177,6 +226,8 @@ export default function BioTriadApp() {
             onSelectProfile={setCurrentProfile}
             onRefreshData={() => refreshLiveDataForProfile(currentProfile, true)}
             onOpenManual={() => setIsManualOpen(true)}
+            onOpenRaceMorning={handleOpenRaceMorning}
+            onOpenTacticalSimulator={() => setIsTacticalSimulatorOpen(true)}
           />
         )}
       </main>
@@ -261,11 +312,71 @@ export default function BioTriadApp() {
         </div>
       </nav>
 
-      {/* 4. Interactive In-App Help & Operation Manual */}
+      {/* 4. Modals */}
       <HelpManualModal
         isOpen={isManualOpen}
         onClose={() => setIsManualOpen(false)}
         currentProfile={currentProfile}
+        onOpenSetup={() => {
+          setIsManualOpen(false);
+          setIsSetupOpen(true);
+        }}
+      />
+
+      <SoccerHubModal
+        isOpen={isSoccerHubOpen}
+        onClose={() => setIsSoccerHubOpen(false)}
+        footballData={footballData}
+        onTriggerTuyaScene={handleTriggerTuyaScene}
+      />
+
+      <RaceManagerModal
+        isOpen={isRaceManagerOpen}
+        onClose={() => setIsRaceManagerOpen(false)}
+        activeProfile={currentProfile}
+      />
+
+      <ExecutiveReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        initialProfile={currentProfile}
+      />
+
+      <RaceTacticalSimulatorModal
+        isOpen={isTacticalSimulatorOpen}
+        onClose={() => setIsTacticalSimulatorOpen(false)}
+        activeProfile={currentProfile}
+        onOpenRaceManager={() => setIsRaceManagerOpen(true)}
+        onOpenTrophyCardGenerator={() => setIsTrophyCardGeneratorOpen(true)}
+      />
+
+      <TrophyCardGeneratorModal
+        isOpen={isTrophyCardGeneratorOpen}
+        onClose={() => setIsTrophyCardGeneratorOpen(false)}
+        activeProfile={currentProfile}
+      />
+
+      <ClanHallOfFameModal
+        isOpen={isClanHallOfFameOpen}
+        onClose={() => setIsClanHallOfFameOpen(false)}
+        onSelectProfile={(p) => setCurrentProfile(p)}
+      />
+
+      <SetupManagerModal
+        isOpen={isSetupOpen}
+        onClose={() => setIsSetupOpen(false)}
+        currentProfile={currentProfile}
+        onOpenManual={() => {
+          setIsSetupOpen(false);
+          setIsManualOpen(true);
+        }}
+      />
+
+      <RaceMorningDispatchModal
+        isOpen={isRaceMorningOpen}
+        onClose={() => setIsRaceMorningOpen(false)}
+        currentProfile={currentProfile}
+        initialRaceId={selectedRaceForMorning}
       />
     </div>
   );

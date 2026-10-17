@@ -34,9 +34,10 @@ import {
   getProfileSpecs,
 } from "@/lib/physiology";
 import { ActiveWorkoutModal } from "@/components/ActiveWorkoutModal";
+import { ProfileId } from "@/lib/types";
 
 interface CoachTabProps {
-  currentProfile: "DANIEL" | "PATRICIA" | "CLAN";
+  currentProfile: ProfileId;
   onTriggerTuyaScene: (scene: string) => void;
 }
 
@@ -47,12 +48,16 @@ export function CoachTab({ currentProfile, onTriggerTuyaScene }: CoachTabProps) 
   const [showComparison, setShowComparison] = useState<boolean>(false);
   const [isActiveWorkoutOpen, setIsActiveWorkoutOpen] = useState<boolean>(false);
 
-  const isDaniel = currentProfile !== "PATRICIA";
+  const isDaniel = currentProfile === "DANIEL";
+  const isPatricia = currentProfile === "PATRICIA";
+  const isGabriel = currentProfile === "GABRIEL";
   const spec = getProfileSpecs(currentProfile);
   const danielSpec = getProfileSpecs("DANIEL");
   const patriciaSpec = getProfileSpecs("PATRICIA");
 
-  const [inputPace, setInputPace] = useState<string>(isDaniel ? "5:50" : "6:30");
+  const [inputPace, setInputPace] = useState<string>(
+    isGabriel ? "4:40" : isPatricia ? "6:30" : "5:50"
+  );
   const [inputIncline, setInputIncline] = useState<number>(1.0);
 
   const weeklySchedule = buildWeeklyScheduleTemplate({
@@ -70,7 +75,9 @@ export function CoachTab({ currentProfile, onTriggerTuyaScene }: CoachTabProps) 
       {/* Haute Couture Athlete Identification Banner */}
       <div
         className={`rounded-3xl border p-6 shadow-2xl relative overflow-hidden transition-all ${
-          !isDaniel
+          isGabriel
+            ? "bg-gradient-to-br from-[#061810] via-[#092619] to-[#04100B] border-emerald-500/30"
+            : isPatricia
             ? "bg-gradient-to-br from-[#07111F] via-[#0C1B33] to-[#070D18] border-sky-500/30"
             : "bg-gradient-to-br from-[#1A0A0E] via-[#220D12] to-[#0D0709] border-red-500/30"
         }`}
@@ -80,12 +87,20 @@ export function CoachTab({ currentProfile, onTriggerTuyaScene }: CoachTabProps) 
             <div className="flex items-center gap-2.5 flex-wrap">
               <span
                 className={`px-3 py-1 rounded-full text-xs font-black tracking-wider uppercase border flex items-center gap-1.5 ${
-                  !isDaniel
+                  isGabriel
+                    ? "bg-emerald-950/80 text-emerald-300 border-emerald-500/40"
+                    : isPatricia
                     ? "bg-sky-950/80 text-sky-300 border-sky-500/40"
                     : "bg-red-950/80 text-red-300 border-red-500/40"
                 }`}
               >
-                {!isDaniel ? <Shield className="h-3.5 w-3.5 text-sky-400" /> : <Flame className="h-3.5 w-3.5 text-red-400" />}
+                {isGabriel ? (
+                  <Zap className="h-3.5 w-3.5 text-emerald-400" />
+                ) : isPatricia ? (
+                  <Shield className="h-3.5 w-3.5 text-sky-400" />
+                ) : (
+                  <Flame className="h-3.5 w-3.5 text-red-400" />
+                )}
                 {spec.clubBadge}
               </span>
 
@@ -102,7 +117,18 @@ export function CoachTab({ currentProfile, onTriggerTuyaScene }: CoachTabProps) 
             </div>
 
             <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-              Prescrição de Alta Performance: <span className={!isDaniel ? "text-sky-400" : "text-red-400"}>{spec.name}</span>
+              Prescrição de Alta Performance:{" "}
+              <span
+                className={
+                  isGabriel
+                    ? "text-emerald-400"
+                    : isPatricia
+                    ? "text-sky-400"
+                    : "text-red-400"
+                }
+              >
+                {spec.name}
+              </span>
             </h1>
             <p className="text-xs text-gray-300 max-w-2xl">
               {spec.tagline} • Meta Principal: <strong className="text-white">{spec.primaryRace.name}</strong> ({spec.primaryRace.targetFinish} | Pace {spec.primaryRace.targetPace})

@@ -29,7 +29,17 @@ export class WhatsAppEvolutionService {
     this.instanceName = process.env.EVOLUTION_INSTANCE_NAME || "ecostone";
     this.apiKey = process.env.EVOLUTION_API_KEY || "Gabriel2006";
     this.defaultRecipient =
-      process.env.EVOLUTION_RECIPIENT_NUMBER || "5511999999999";
+      process.env.EVOLUTION_RECIPIENT_NUMBER || "5511988139833";
+  }
+
+  /**
+   * Retorna o número de WhatsApp individualizado para Daniel ou Patrícia
+   */
+  getRecipientForProfile(profile: "DANIEL" | "PATRICIA" | "GABRIEL" | "CLAN"): string {
+    if (profile === "PATRICIA") {
+      return process.env.WHATSAPP_PATRICIA_PHONE || "5511988136702";
+    }
+    return process.env.WHATSAPP_DANIEL_PHONE || "5511988139833";
   }
 
   /**
@@ -197,7 +207,7 @@ export class WhatsAppEvolutionService {
     },
     targetNumber?: string
   ): Promise<WhatsAppSendResult> {
-    const text = `⚽ *[MATCH DAY ALVO: ${params.teamName.toUpperCase()}]*\n\nPróxima partida: *vs ${params.opponent}* às *${params.kickoffTime}*.\n\n⚠️ *Índice de Tensão:* ${params.tensionIndex}/5\n⏱️ *Corte Logístico:* O treino das 19h deve encerrar impreterivelmente às *${params.recommendedEndTime}*.\n🍿 *Buffer Calórico TACO:* +350 kcal ativado para petiscos saudáveis sem sair do plano!`;
+    const text = `⚽ *[MATCH DAY ALVO: ${params.teamName.toUpperCase()}]*\n\nPróxima partida: *vs ${params.opponent}* às *${params.kickoffTime}*.\n\n⚠️ *Índice de Tensão:* ${params.tensionIndex}/5\n🔒 *Trava de Corte Vespertino (1h Antes):* O treino deve encerrar impreterivelmente às *${params.recommendedEndTime}* (exatamente 1 hora antes do pontapé inicial das ${params.kickoffTime}) para estabilizar a FC e permitir o banho relaxante.\n🍿 *Buffer Calórico TACO:* +350 kcal ativado para petiscos saudáveis sem sair do plano!`;
     return this.sendTextMessage(text, targetNumber);
   }
 

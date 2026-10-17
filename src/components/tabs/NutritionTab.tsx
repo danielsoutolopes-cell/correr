@@ -21,12 +21,12 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { OFFICIAL_TACO_FOODS } from "@/lib/taco-data";
-import { FoodTacticalClass, TacoFoodItem } from "@/lib/types";
+import { FoodTacticalClass, ProfileId, TacoFoodItem } from "@/lib/types";
 import { getProfileSpecs } from "@/lib/physiology";
 import { TacoWeeklyGroceryModal } from "@/components/TacoWeeklyGroceryModal";
 
 interface NutritionTabProps {
-  currentProfile: "DANIEL" | "PATRICIA" | "CLAN";
+  currentProfile: ProfileId;
   hasMatchDaySnackMode?: boolean;
 }
 

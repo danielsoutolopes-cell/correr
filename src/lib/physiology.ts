@@ -120,13 +120,14 @@ export function convertPaceToTreadmill(
  */
 export function getStrengthFicha(
   ficha: "A" | "B" | "C",
-  profileOrRestriction: "DANIEL" | "PATRICIA" | "CLAN" | boolean = "DANIEL"
+  profileOrRestriction: "DANIEL" | "PATRICIA" | "GABRIEL" | "CLAN" | boolean = "DANIEL"
 ): StrengthPrescription {
   const isPatricia = profileOrRestriction === "PATRICIA";
+  const isGabriel = profileOrRestriction === "GABRIEL";
   const hasShoulderRestriction =
     typeof profileOrRestriction === "boolean"
       ? profileOrRestriction
-      : profileOrRestriction !== "PATRICIA";
+      : profileOrRestriction === "DANIEL";
 
   // === FICHAS PATRÍCIA (Alta Performance Feminina, Glúteos & Postura) ===
   if (isPatricia) {
@@ -657,7 +658,7 @@ export function buildWeeklyScheduleTemplate(params: {
   weekendMode: WeekendLayoutMode;
   weekPhase?: WeekPhase;
   hasShoulderRestriction?: boolean;
-  profile?: "DANIEL" | "PATRICIA" | "CLAN";
+  profile?: "DANIEL" | "PATRICIA" | "GABRIEL" | "CLAN";
 }) {
   const {
     weekendMode = "CLASSIC_SUNDAY_LONG",
@@ -667,11 +668,12 @@ export function buildWeeklyScheduleTemplate(params: {
   } = params;
 
   const isPatricia = profile === "PATRICIA";
+  const isGabriel = profile === "GABRIEL";
 
   // Individualized running and treadmill targets
-  const tuesSpeed = isPatricia ? 8.5 : 9.5;
-  const tuesOutdoorDist = isPatricia ? 6.0 : 8.5;
-  const tuesOutdoorPace = isPatricia ? "6:45" : "6:15";
+  const tuesSpeed = isGabriel ? 11.5 : isPatricia ? 8.5 : 9.5;
+  const tuesOutdoorDist = isGabriel ? 10.0 : isPatricia ? 6.0 : 8.5;
+  const tuesOutdoorPace = isGabriel ? "5:10" : isPatricia ? "6:45" : "6:15";
 
   const thursSpeed = isPatricia ? 8.8 : 9.8;
   const thursOutdoorDist = isPatricia ? 5.5 : 8.0;
@@ -851,94 +853,221 @@ export function buildWeeklyScheduleTemplate(params: {
  */
 export function evaluateRaceCalendar(
   currentDateStr: string = "2026-10-17",
-  profile: "DANIEL" | "PATRICIA" = "DANIEL"
+  profile: "DANIEL" | "PATRICIA" | "GABRIEL" | "CLAN" = "DANIEL"
 ) {
   const isPatricia = profile === "PATRICIA";
+  const isGabriel = profile === "GABRIEL";
 
-  const races = isPatricia
-    ? [
-        {
-          id: "race-patricia-estacoes-10k-2027",
-          name: "Circuito das Estações SP 2027 (10k)",
-          priority: "P1_TARGET" as const,
-          distanceKm: 10.0,
-          date: "2027-05-23",
-          isTbd: false,
-          location: "São Paulo, SP - Pacaembu",
-          targetPaceMinKm: "6:00",
-          targetFinishTime: "01:00:00",
-          taperingWeeks: 2,
-          carbLoadingDays: 2,
-        },
-        {
-          id: "race-patricia-revezamento-2027",
-          name: "SP City Marathon - Revezamento em Casal (10.5k)",
-          priority: "P1_TARGET" as const,
-          distanceKm: 10.55,
-          date: "2027-07-25",
-          isTbd: false,
-          location: "São Paulo, SP - Jockey Club",
-          targetPaceMinKm: "5:55",
-          targetFinishTime: "01:02:27",
-          taperingWeeks: 2,
-          carbLoadingDays: 2,
-        },
-        {
-          id: "race-patricia-desafio-5k-2027",
-          name: "Desafio Noturno de Verão (5k)",
-          priority: "P2_PREP" as const,
-          distanceKm: 5.0,
-          date: "2027-03-20",
-          isTbd: false,
-          location: "São Paulo, SP - USP",
-          targetPaceMinKm: "5:35",
-          targetFinishTime: "00:27:55",
-          taperingWeeks: 1,
-          carbLoadingDays: 1,
-        },
-      ]
-    : [
-        {
-          id: "race-sp-inter-2027",
-          name: "Maratona Internacional de São Paulo 2027 (21k)",
-          priority: "P1_TARGET" as const,
-          distanceKm: 21.097,
-          date: "2027-04-11",
-          isTbd: false,
-          location: "São Paulo, SP - Ibirapuera",
-          targetPaceMinKm: "5:30",
-          targetFinishTime: "01:55:59",
-          taperingWeeks: 3,
-          carbLoadingDays: 3,
-        },
-        {
-          id: "race-nike-sp-city-2027",
-          name: "Nike SP City Marathon 2027 (21k)",
-          priority: "P1_TARGET" as const,
-          distanceKm: 21.097,
-          date: "2027-07-25",
-          isTbd: false,
-          location: "São Paulo, SP - Pacaembu / Jockey",
-          targetPaceMinKm: "5:25",
-          targetFinishTime: "01:54:15",
-          taperingWeeks: 3,
-          carbLoadingDays: 3,
-        },
-        {
-          id: "race-praia-grande-tbd-2027",
-          name: "Meia Maratona de Praia Grande 2027 (21k)",
-          priority: "P2_PREP" as const,
-          distanceKm: 21.097,
-          date: null,
-          isTbd: true,
-          estimatedWindowMonth: "Set/Out 2027",
-          location: "Praia Grande, SP - Litoral",
-          targetPaceMinKm: "5:35",
-          targetFinishTime: "01:57:45",
-          taperingWeeks: 2,
-          carbLoadingDays: 2,
-        },
-      ];
+  let races: Array<{
+    id: string;
+    name: string;
+    priority: "P1_TARGET" | "P2_PREP" | "P3_FUN_PARTY";
+    distanceKm: number;
+    date: string | null;
+    isTbd: boolean;
+    estimatedWindowMonth?: string;
+    location: string;
+    targetPaceMinKm: string;
+    targetFinishTime: string;
+    taperingWeeks: number;
+    carbLoadingDays: number;
+    raceStartTime?: string;
+  }> = [];
+
+  if (isGabriel) {
+    races = [
+      {
+        id: "race-gabriel-olga-kos-2026",
+        name: "Corrida Olga Kos 2026 (10k)",
+        priority: "P2_PREP" as const,
+        distanceKm: 10.0,
+        date: "2026-12-20",
+        isTbd: false,
+        location: "São Paulo, SP - Ibirapuera",
+        targetPaceMinKm: "4:40",
+        targetFinishTime: "00:46:40",
+        taperingWeeks: 1,
+        carbLoadingDays: 2,
+        raceStartTime: "07:00",
+      },
+      {
+        id: "race-gabriel-athenas-2027",
+        name: "Circuito Athenas SP 2027 (10k)",
+        priority: "P1_TARGET" as const,
+        distanceKm: 10.0,
+        date: "2027-05-23",
+        isTbd: false,
+        location: "São Paulo, SP - Pacaembu",
+        targetPaceMinKm: "4:25",
+        targetFinishTime: "00:44:10",
+        taperingWeeks: 2,
+        carbLoadingDays: 2,
+        raceStartTime: "06:30",
+      },
+    ];
+  } else if (isPatricia) {
+    races = [
+      {
+        id: "race-patricia-athenas-14k-2026",
+        name: "Athenas Mizuno Run Longer (14k) • AMANHÃ!",
+        priority: "P1_TARGET" as const,
+        distanceKm: 14.0,
+        date: "2026-10-18",
+        isTbd: false,
+        location: "São Paulo, SP - Marginal Pinheiros",
+        targetPaceMinKm: "5:55",
+        targetFinishTime: "01:22:50",
+        taperingWeeks: 1,
+        carbLoadingDays: 3,
+        raceStartTime: "06:30",
+      },
+      {
+        id: "race-patricia-venus-21k-2026",
+        name: "Meia Maratona Vênus 2026 (21k)",
+        priority: "P1_TARGET" as const,
+        distanceKm: 21.097,
+        date: "2026-11-22",
+        isTbd: false,
+        location: "São Paulo, SP - Jockey Club",
+        targetPaceMinKm: "6:05",
+        targetFinishTime: "02:08:20",
+        taperingWeeks: 2,
+        carbLoadingDays: 3,
+        raceStartTime: "06:30",
+      },
+      {
+        id: "race-patricia-olga-kos-2026",
+        name: "Corrida Olga Kos 2026 (10k)",
+        priority: "P2_PREP" as const,
+        distanceKm: 10.0,
+        date: "2026-12-20",
+        isTbd: false,
+        location: "São Paulo, SP - Pacaembu",
+        targetPaceMinKm: "5:50",
+        targetFinishTime: "00:58:20",
+        taperingWeeks: 1,
+        carbLoadingDays: 2,
+        raceStartTime: "07:00",
+      },
+      {
+        id: "race-patricia-athenas-14k-2027",
+        name: "Athenas Mizuno Run Longer 2027 (14k)",
+        priority: "P1_TARGET" as const,
+        distanceKm: 14.0,
+        date: "2027-10-17",
+        isTbd: false,
+        location: "São Paulo, SP",
+        targetPaceMinKm: "5:45",
+        targetFinishTime: "01:20:30",
+        taperingWeeks: 2,
+        carbLoadingDays: 3,
+        raceStartTime: "06:30",
+      },
+      {
+        id: "race-patricia-venus-21k-2027",
+        name: "Meia Maratona Vênus 2027 (21k)",
+        priority: "P1_TARGET" as const,
+        distanceKm: 21.097,
+        date: "2027-11-21",
+        isTbd: false,
+        location: "São Paulo, SP - Jockey Club",
+        targetPaceMinKm: "5:55",
+        targetFinishTime: "02:04:50",
+        taperingWeeks: 3,
+        carbLoadingDays: 3,
+        raceStartTime: "06:30",
+      },
+      {
+        id: "race-patricia-olga-kos-2027",
+        name: "Corrida Olga Kos 2027 (10k)",
+        priority: "P2_PREP" as const,
+        distanceKm: 10.0,
+        date: "2027-12-19",
+        isTbd: false,
+        location: "São Paulo, SP - Ibirapuera",
+        targetPaceMinKm: "5:40",
+        targetFinishTime: "00:56:40",
+        taperingWeeks: 1,
+        carbLoadingDays: 2,
+        raceStartTime: "07:00",
+      },
+    ];
+  } else {
+    // DANIEL
+    races = [
+      {
+        id: "race-daniel-athenas-21k-2026",
+        name: "Athenas Mizuno Run Longer (21k) • AMANHÃ!",
+        priority: "P1_TARGET" as const,
+        distanceKm: 21.097,
+        date: "2026-10-18",
+        isTbd: false,
+        location: "São Paulo, SP - Marginal Pinheiros",
+        targetPaceMinKm: "5:26",
+        targetFinishTime: "01:54:40",
+        taperingWeeks: 2,
+        carbLoadingDays: 3,
+        raceStartTime: "06:30",
+      },
+      {
+        id: "race-daniel-olga-kos-2026",
+        name: "Corrida Olga Kos 2026 (10k)",
+        priority: "P2_PREP" as const,
+        distanceKm: 10.0,
+        date: "2026-12-20",
+        isTbd: false,
+        location: "São Paulo, SP - Pacaembu",
+        targetPaceMinKm: "5:00",
+        targetFinishTime: "00:50:00",
+        taperingWeeks: 1,
+        carbLoadingDays: 2,
+        raceStartTime: "07:00",
+      },
+      {
+        id: "race-sp-inter-2027",
+        name: "Maratona Internacional de São Paulo 2027 (Meia 21k)",
+        priority: "P1_TARGET" as const,
+        distanceKm: 21.097,
+        date: "2027-04-11",
+        isTbd: false,
+        location: "São Paulo, SP - Ibirapuera",
+        targetPaceMinKm: "5:20",
+        targetFinishTime: "01:52:30",
+        taperingWeeks: 3,
+        carbLoadingDays: 3,
+        raceStartTime: "06:15",
+      },
+      {
+        id: "race-nike-sp-city-2027",
+        name: "Nike SP City Marathon 2027 (Meia 21k)",
+        priority: "P1_TARGET" as const,
+        distanceKm: 21.097,
+        date: "2027-07-25",
+        isTbd: false,
+        location: "São Paulo, SP - Pacaembu / Jockey",
+        targetPaceMinKm: "5:15",
+        targetFinishTime: "01:50:45",
+        taperingWeeks: 3,
+        carbLoadingDays: 3,
+        raceStartTime: "06:00",
+      },
+      {
+        id: "race-praia-grande-tbd-2027",
+        name: "Meia Maratona de Praia Grande 2027 (21k)",
+        priority: "P2_PREP" as const,
+        distanceKm: 21.097,
+        date: null,
+        isTbd: true,
+        estimatedWindowMonth: "Set/Out 2027",
+        location: "Praia Grande, SP - Litoral",
+        targetPaceMinKm: "5:25",
+        targetFinishTime: "01:54:15",
+        taperingWeeks: 2,
+        carbLoadingDays: 2,
+        raceStartTime: "06:45",
+      },
+    ];
+  }
 
   const now = new Date(currentDateStr);
   const evaluated = races.map((race) => {
@@ -986,12 +1115,90 @@ export function evaluateRaceCalendar(
 /**
  * Retorna as especificações de Grife e Telemetria para cada Atleta do Clã
  */
-export function getProfileSpecs(profile: "DANIEL" | "PATRICIA" | "CLAN") {
+export function getProfileSpecs(profile: "DANIEL" | "PATRICIA" | "GABRIEL" | "CLAN") {
+  // GABRIEL (Palmeiras 🟢⚪, 20 anos, Jovem Atleta 5k/10k)
+  if (profile === "GABRIEL") {
+    return {
+      id: "GABRIEL" as const,
+      name: "Gabriel Souto Maior",
+      tagline: "Atleta Alviverde & Velocidade 5K/10K",
+      birthDate: "15/08/2006",
+      ageYears: 20,
+      phone: "5511988139833", // Comunicação Clã
+      club: "Palmeiras" as const,
+      clubName: "Sociedade Esportiva Palmeiras",
+      clubBadge: "Verdão Alviverde Imponente 🟢⚪",
+      clubStadium: "Allianz Parque (São Paulo)",
+      clubColors: {
+        accent: "emerald",
+        border: "border-emerald-500/40",
+        bgBadge: "bg-emerald-950/40",
+        text: "text-emerald-400",
+        gradient: "from-emerald-600 via-green-600 to-teal-500",
+        shadow: "shadow-emerald-500/20",
+        glow: "rgba(16, 185, 129, 0.25)",
+      },
+      weightKg: 72.0,
+      heightCm: 178,
+      bodyFatPct: 14.2,
+      hrZones: {
+        z1: { min: 120, max: 140, label: "Z1 Regenerativo" },
+        z2: { min: 141, max: 160, label: "Z2 Base Aeróbia / Resistência" },
+        z3: { min: 161, max: 175, label: "Z3 Ritmo de Prova 10K" },
+        z4: { min: 176, max: 188, label: "Z4 Limiar Anaeróbio / Tiros" },
+        z5: { min: 189, max: 202, label: "Z5 VO2 Max Máximo" },
+      },
+      paces: {
+        z1Recovery: "5:50 - 6:30 min/km",
+        z2Base: "5:00 - 5:40 min/km",
+        z3Tempo: "4:30 - 4:55 min/km",
+        z4Threshold: "4:00 - 4:25 min/km",
+        treadmillZ2Speed: "11.0 - 12.0 km/h (1.0% inclinação)",
+      },
+      primaryRace: {
+        name: "Circuito Athenas SP 2027 (10k)",
+        date: "Maio/2027",
+        distance: "10.0 km",
+        targetPace: "4:30 min/km",
+        targetFinish: "Sub-45min",
+        location: "São Paulo, SP",
+      },
+      secondaryRace: {
+        name: "Corrida Olga Kos 2026 (10k)",
+        date: "Dezembro/2026",
+        distance: "10.0 km",
+        targetPace: "4:40 min/km",
+      },
+      hardware: {
+        device: "GPS Smartwatch Gabriel",
+        stravaAthlete: "Gabriel Souto Maior (Strava)",
+        intervalsId: "GABRIEL_ATHLETE",
+      },
+      nutritionTaco: {
+        caloricTargetKcal: 2750,
+        proteinG: 175,
+        carbsG: 340,
+        fatsG: 75,
+        familyPlateSharePct: 35,
+        familyPlateShareText: "Energia Jovem & Hipertrofia",
+      },
+      clinicalSafe: {
+        hasProsthesis: false,
+        shoulderSafe: false,
+        notes: "Jovem atleta de 20 anos, sem restrições articulares. Foco em potência e hipertrofia.",
+      },
+    };
+  }
+
+  // PATRÍCIA (Grêmio 🔵⚪, 56 anos, Meia Maratona & 14k)
   if (profile === "PATRICIA") {
     return {
       id: "PATRICIA" as const,
       name: "Patrícia Lopes",
       tagline: "Atleta de Alta Performance Feminina & Recomposição",
+      birthDate: "04/07/1970",
+      ageYears: 56,
+      phone: "5511988136702",
       club: "Grêmio" as const,
       clubName: "Grêmio Foot-Ball Porto Alegrense",
       clubBadge: "Imortal Tricolor 🔵⚪⚫",
@@ -1009,33 +1216,39 @@ export function getProfileSpecs(profile: "DANIEL" | "PATRICIA" | "CLAN") {
       heightCm: 162,
       bodyFatPct: 22.8,
       hrZones: {
-        z1: { min: 115, max: 130, label: "Z1 Regenerativo" },
-        z2: { min: 131, max: 148, label: "Z2 Base Aeróbia / Queima Lipídica" },
-        z3: { min: 149, max: 162, label: "Z3 Ritmo Prova 10K" },
-        z4: { min: 163, max: 174, label: "Z4 Limiar Anaeróbio / Tiros" },
-        z5: { min: 175, max: 190, label: "Z5 VO2 Max Máximo" },
+        z1: { min: 112, max: 128, label: "Z1 Regenerativo" },
+        z2: { min: 129, max: 145, label: "Z2 Base Aeróbia / Queima Lipídica" },
+        z3: { min: 146, max: 158, label: "Z3 Ritmo Prova 14K / 21K" },
+        z4: { min: 159, max: 169, label: "Z4 Limiar Anaeróbio / Tiros" },
+        z5: { min: 170, max: 182, label: "Z5 VO2 Max Máximo" },
       },
       paces: {
-        z1Recovery: "7:30 - 8:15 min/km",
-        z2Base: "6:30 - 7:15 min/km",
-        z3Tempo: "5:55 - 6:25 min/km",
-        z4Threshold: "5:20 - 5:50 min/km",
-        treadmillZ2Speed: "8.3 - 9.2 km/h (1.0% inclinação)",
+        z1Recovery: "7:20 - 8:00 min/km",
+        z2Base: "6:25 - 7:05 min/km",
+        z3Tempo: "5:50 - 6:20 min/km",
+        z4Threshold: "5:15 - 5:45 min/km",
+        treadmillZ2Speed: "8.5 - 9.4 km/h (1.0% inclinação)",
       },
       primaryRace: {
-        name: "Circuito das Estações SP 2027 (10K)",
-        date: "23/05/2027",
-        distance: "10.0 km",
-        targetPace: "6:00 min/km",
-        targetFinish: "Sub-1h00",
-        location: "Pacaembu, São Paulo",
+        name: "Athenas Mizuno Run Longer (14k) • Amanhã!",
+        date: "18/10/2026",
+        distance: "14.0 km",
+        targetPace: "5:55 min/km",
+        targetFinish: "01:22:50",
+        location: "São Paulo, SP",
+        isTomorrow: true,
       },
       secondaryRace: {
-        name: "SP City Marathon (Revezamento em Casal 10.5k)",
-        date: "25/07/2027",
-        distance: "10.55 km",
-        targetPace: "5:55 min/km",
+        name: "Meia Maratona Vênus 21k & Olga Kos (2026)",
+        date: "Novembro/Dezembro 2026",
+        distance: "21.097 km",
+        targetPace: "6:05 min/km",
       },
+      enrolledRaces2027: [
+        { name: "Athenas Mizuno Run Longer 14k 2027", distance: "14.0 km", priority: "P1" },
+        { name: "Meia Maratona Vênus 21k 2027", distance: "21.097 km", priority: "P1" },
+        { name: "Corrida Olga Kos 2027", distance: "10.0 km", priority: "P2" },
+      ],
       hardware: {
         device: "Smartwatch Patrícia",
         stravaAthlete: "Patrícia Lopes (Strava Pro)",
@@ -1057,11 +1270,14 @@ export function getProfileSpecs(profile: "DANIEL" | "PATRICIA" | "CLAN") {
     };
   }
 
-  // DANIEL
+  // DANIEL (Flamengo 🔴⚫, 52 anos, Prótese Reversa Ombro Direito)
   return {
     id: "DANIEL" as const,
     name: "Daniel Souto Lopes",
     tagline: "Maratonista Híbrido 21k & Prótese Reversa de Ombro",
+    birthDate: "02/05/1974",
+    ageYears: 52,
+    phone: "5511988139833",
     club: "Flamengo" as const,
     clubName: "Clube de Regatas do Flamengo",
     clubBadge: "Mengão Rubro-Negro 🔴⚫",
@@ -1079,11 +1295,11 @@ export function getProfileSpecs(profile: "DANIEL" | "PATRICIA" | "CLAN") {
     heightCm: 170,
     bodyFatPct: 18.5,
     hrZones: {
-      z1: { min: 110, max: 125, label: "Z1 Recuperação Ativa" },
-      z2: { min: 126, max: 142, label: "Z2 Base Aeróbia / Mitocondrial" },
-      z3: { min: 143, max: 155, label: "Z3 Ritmo Alvo Meia Maratona" },
-      z4: { min: 156, max: 168, label: "Z4 Limiar de Lactato" },
-      z5: { min: 169, max: 185, label: "Z5 Capacidade Anaeróbia" },
+      z1: { min: 108, max: 124, label: "Z1 Recuperação Ativa" },
+      z2: { min: 125, max: 141, label: "Z2 Base Aeróbia / Mitocondrial" },
+      z3: { min: 142, max: 154, label: "Z3 Ritmo Alvo Meia Maratona" },
+      z4: { min: 155, max: 167, label: "Z4 Limiar de Lactato" },
+      z5: { min: 168, max: 182, label: "Z5 Capacidade Anaeróbia" },
     },
     paces: {
       z1Recovery: "6:45 - 7:15 min/km",
@@ -1093,19 +1309,25 @@ export function getProfileSpecs(profile: "DANIEL" | "PATRICIA" | "CLAN") {
       treadmillZ2Speed: "9.7 - 10.3 km/h (1.0% inclinação)",
     },
     primaryRace: {
-      name: "Maratona Internacional de SP 2027 (21k)",
-      date: "11/04/2027",
+      name: "Athenas Mizuno Run Longer (21k) • Amanhã!",
+      date: "18/10/2026",
       distance: "21.097 km",
-      targetPace: "5:27 min/km",
-      targetFinish: "Sub-1h55",
-      location: "Ibirapuera, São Paulo",
+      targetPace: "5:26 min/km",
+      targetFinish: "01:54:40",
+      location: "São Paulo, SP",
+      isTomorrow: true,
     },
     secondaryRace: {
-      name: "Nike SP City Marathon 2027 (21k)",
-      date: "25/07/2027",
-      distance: "21.097 km",
-      targetPace: "5:12 min/km",
+      name: "Corrida Olga Kos 2026 (10k)",
+      date: "Dezembro/2026",
+      distance: "10.0 km",
+      targetPace: "5:00 min/km",
     },
+    enrolledRaces2027: [
+      { name: "Maratona Internacional de SP 2027 (Meia 21k)", distance: "21.097 km", priority: "P1" },
+      { name: "Nike SP City Marathon 2027 (Meia 21k)", distance: "21.097 km", priority: "P1" },
+      { name: "Corrida Olga Kos 2027", distance: "10.0 km", priority: "P2" },
+    ],
     hardware: {
       device: "Galaxy Watch Ultra (47mm Titanium)",
       stravaAthlete: "Daniel Souto Lopes (ID: 203901)",
@@ -1123,6 +1345,96 @@ export function getProfileSpecs(profile: "DANIEL" | "PATRICIA" | "CLAN") {
       hasProsthesis: true,
       shoulderSide: "RIGHT",
       notes: "Prótese reversa glenoumeral no ombro direito. Zero sobrecargas overhead e zero supino reto barra.",
+    },
+  };
+}
+
+/**
+ * Calibrador de Ritmo Base (Base Pace Recalibrator):
+ * Utiliza o tempo oficial da prova de amanhã (Athenas Mizuno Run Longer) para recalibrar
+ * os ritmos de treino Z1-Z5 e projetar os tempos das próximas provas (Fórmula de Riegel).
+ */
+export function calculateBasePaceRecalibration(distanceKm: number, finishTimeSeconds: number) {
+  const paceSecondsPerKm = finishTimeSeconds / distanceKm;
+  const paceMin = Math.floor(paceSecondsPerKm / 60);
+  const paceSec = Math.round(paceSecondsPerKm % 60);
+  const basePaceFormatted = `${paceMin}:${paceSec.toString().padStart(2, "0")} min/km`;
+
+  // Fórmula de Riegel: T2 = T1 * (D2 / D1)^1.06
+  const predictTime = (targetDistKm: number) => {
+    const predictedSec = finishTimeSeconds * Math.pow(targetDistKm / distanceKm, 1.06);
+    const hrs = Math.floor(predictedSec / 3600);
+    const mins = Math.floor((predictedSec % 3600) / 60);
+    const secs = Math.round(predictedSec % 60);
+    const pacePerKmSec = predictedSec / targetDistKm;
+    const pM = Math.floor(pacePerKmSec / 60);
+    const pS = Math.round(pacePerKmSec % 60);
+
+    return {
+      distanceKm: targetDistKm,
+      timeFormatted: hrs > 0 
+        ? `${hrs}h ${mins.toString().padStart(2, "0")}m ${secs.toString().padStart(2, "0")}s`
+        : `${mins}m ${secs.toString().padStart(2, "0")}s`,
+      paceFormatted: `${pM}:${pS.toString().padStart(2, "0")} min/km`,
+      totalSeconds: Math.round(predictedSec),
+    };
+  };
+
+  // Recalibra as 5 zonas de treino baseadas no tempo oficial
+  // Z3 (Ritmo Limiar/Meia) = base pace (~100%)
+  // Z2 (Base Aeróbia) = base pace + 30s a 50s
+  // Z1 (Regenerativo) = base pace + 60s a 90s
+  // Z4 (Limiar Lactato) = base pace - 20s a 30s
+  // Z5 (VO2 Max) = base pace - 40s a 60s
+  const formatPaceRange = (deltaMin: number, deltaMax: number) => {
+    const s1 = paceSecondsPerKm + deltaMin;
+    const s2 = paceSecondsPerKm + deltaMax;
+    const m1 = Math.floor(s1 / 60);
+    const sec1 = Math.round(s1 % 60);
+    const m2 = Math.floor(s2 / 60);
+    const sec2 = Math.round(s2 % 60);
+    return `${m1}:${sec1.toString().padStart(2, "0")} - ${m2}:${sec2.toString().padStart(2, "0")} min/km`;
+  };
+
+  const speedKmhForPace = (paceSecKm: number) => (3600 / paceSecKm).toFixed(1);
+
+  return {
+    distanceKm,
+    finishTimeSeconds,
+    basePaceFormatted,
+    recalibratedZones: {
+      z1Recovery: {
+        label: "Z1 Regenerativo & Recuperação Ativa",
+        paceRange: formatPaceRange(60, 90),
+        treadmillSpeedKmh: `${speedKmhForPace(paceSecondsPerKm + 90)} - ${speedKmhForPace(paceSecondsPerKm + 60)} km/h`,
+      },
+      z2Base: {
+        label: "Z2 Base Aeróbia & Lipólise Mitocondrial",
+        paceRange: formatPaceRange(30, 55),
+        treadmillSpeedKmh: `${speedKmhForPace(paceSecondsPerKm + 55)} - ${speedKmhForPace(paceSecondsPerKm + 30)} km/h`,
+      },
+      z3Tempo: {
+        label: "Z3 Ritmo de Prova / Tempo Run",
+        paceRange: formatPaceRange(-5, 20),
+        treadmillSpeedKmh: `${speedKmhForPace(paceSecondsPerKm + 20)} - ${speedKmhForPace(paceSecondsPerKm - 5)} km/h`,
+      },
+      z4Threshold: {
+        label: "Z4 Limiar de Lactato (Tiros Longos)",
+        paceRange: formatPaceRange(-35, -15),
+        treadmillSpeedKmh: `${speedKmhForPace(paceSecondsPerKm - 15)} - ${speedKmhForPace(paceSecondsPerKm - 35)} km/h`,
+      },
+      z5Vo2Max: {
+        label: "Z5 VO2 Max (Potência Anaeróbia / Tiros Curtos)",
+        paceRange: formatPaceRange(-60, -40),
+        treadmillSpeedKmh: `${speedKmhForPace(paceSecondsPerKm - 40)} - ${speedKmhForPace(paceSecondsPerKm - 60)} km/h`,
+      },
+    },
+    projections: {
+      race5k: predictTime(5.0),
+      race10k: predictTime(10.0),
+      race14k: predictTime(14.0),
+      race21k: predictTime(21.097),
+      race42k: predictTime(42.195),
     },
   };
 }

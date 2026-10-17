@@ -89,7 +89,7 @@ Boa recuperação para o Clã Lopes!
 Próxima partida: *vs ${params.opponent}* às *${params.kickoffTime}*.
 
 ⚠️ *Índice de Tensão:* ${params.tensionIndex}/5
-⏱️ *Corte Logístico:* O treino das 19h deve encerrar impreterivelmente às *${params.recommendedEndTime}*.
+🔒 *Trava de Corte Vespertino (1h Antes):* O treino deve encerrar impreterivelmente às *${params.recommendedEndTime}* (1 hora antes do apito inicial das ${params.kickoffTime}) para desaquecimento da FC e banho.
 🍿 *Buffer Calórico:* +350 kcal ativado para petiscos saudáveis sem sair da dieta TACO!
 `;
     return this.sendMessage(text.trim());

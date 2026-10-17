@@ -54,16 +54,18 @@ Abaixo estão as 10 automações fundamentais arquitetadas para o Clã Lopes:
 
 | # | Nome da Automação | Gatilho Temporal / Evento | Hardware Tuya | Datapoints (DP Codes) | Objetivo Fisiológico & Ecológico |
 |---|---|---|---|---|---|
-| **01** | **Aurora Solar Gradual** | Domingos 06:00 (Pré-Longão) | Lâmpadas & Fita LED Quarto/Sala | `colour_data: {h:32, s:800, v:600}`, `bright_value_v2: 600` | Inibe melatonina e eleva cortisol suavemente, sem estresse de alarme. |
-| **02** | **Surge de Dopamina (Eclusa)** | Seg-Qui 18:30 | Lâmpadas Escritório & Sala | `temp_value_v2: 950` (6500K), `bright_value_v2: 900` | Luz fria inibe sonolência pós-trabalho e induz prontidão neuromuscular. |
-| **03** | **Freio Térmico Parassimpático** | Diariamente 20:30 | Iluminação Geral da Casa | `temp_value_v2: 100` (2200K Âmbar), `bright_value_v2: 250` | Bloqueia espectro azul (460nm), estimulando síntese endógena de melatonina. |
+| **01** | **Aurora Solar Gradual** | Domingos 06:00 (Pré-Longão) | `Led Quarto` + Sala (`L_Futebol`) | `colour_data: {h:32, s:800, v:600}`, `bright_value_v2: 600` | Inibe melatonina e eleva cortisol suavemente, sem estresse de alarme sonoro. |
+| **02** | **Surge de Dopamina (Eclusa)** | Seg-Qui 18:30 | Lâmpada Sala/TV (`L_Futebol`) | `temp_value_v2: 950` (6500K Fria), `bright_value_v2: 900` | Luz fria inibe sonolência pós-trabalho e induz prontidão neuromuscular. |
+| **03** | **Freio Térmico Parassimpático** | Diariamente 20:30 | `Led Quarto` (2200K) + `Luz Casal` (Off) | `temp_value_v2: 100` (2200K Âmbar), `bright_value_v2: 250`, `switch_1: false` | Bloqueia radiação azul (480nm) e induz síntese endógena de melatonina para o sono profundo. |
 | **04** | **Pré-Resfriamento de Esteira (Costill)** | 15 min pré-treino indoor | Ar-Condicionado / Tuya IR | `switch: true`, `mode: "cold"`, `temp_set: 19`, `windspeed: "high"` | Mitiga deriva cardíaca. Correr a 19°C economiza 12-15 bpm no mesmo pace. |
-| **05** | **Câmara de Sono Criogênico (N3)** | 22:30 às 04:30 | AC Quarto + Sensor de Temp | `switch: true`, `mode: "cold"`, `temp_set: 20`, `windspeed: "low"` | Queda da temperatura central corporal maximiza estágio N3 e pico de GH. |
-| **06** | **Barista Pré-Longão (Cafeína)** | 05:45 (Dias de Longão) | Smart Plug 16A Cafeteira | `switch_1: true`, `countdown_1: 900` (auto-off 15 min) | Garante 3mg/kg de cafeína anidra absorvida 45 min antes de correr 21 km. |
-| **07** | **Modo "Fui Correr" (Eco All-Off)** | Saída de casa para treino | Smart Plugs + Interruptores | `switch_led: false`, `switch: false`, `switch_1: false` | Corta consumo fantasma (80W/h) de monitores, TVs e luzes secundárias. |
-| **08** | **Chegada Triunfante & Descompressão** | Abertura de porta retorno | Fita LED Hall + Tomada Ventilador | `colour_data: {h:145, s:600, v:700}`, `switch: true` | Luz verde eucalipto e ventilação suave aceleram recuperação vagal pós-treino. |
-| **09** | **Match Day Mengão (Maracanã)** | 1h antes do jogo do Flamengo | Lâmpadas & Fitas LED Sala | `colour_data: {h:358, s:1000, v:1000}` (Vermelho Escarlate) | Imersão sensorial para Daniel + ativação de buffers alimentares no Cockpit. |
-| **10** | **Match Day Grêmio (Arena)** | 1h antes do jogo do Grêmio | Lâmpadas & Fitas LED Sala | `colour_data: {h:202, s:920, v:1000}` (Azul Celeste) | Celebração da identidade tricolor gaúcha de Patrícia com luz fria e celeste. |
+| **05** | **Câmara de Sono Criogênico (N3)** | 22:30 às 04:30 | `Temperatura Suite` + AC + Luzes Off | `switch: true`, `mode: "cold"`, `temp_set: 20`, `switch_1: false` | Telemetria real de temperatura para resfriar corpo central em 1°C e maximizar GH noturno. |
+| **06** | **Cafezinho & Mate (Tomada Dupla)** | 05:45 (Longão Daniel) / 06:00 (Patrícia) | Tomada Dupla (`ebc4a8285904c4bd43crx7`) | Canal 1: `switch_1` (Café) / Canal 2: `switch_2` (Mate) | Garante 3mg/kg de cafeína para Daniel e hidratação termogênica rica em polifenóis para Patrícia. |
+| **07** | **Modo "Fui Correr" (Eco All-Off)** | Saída de casa para treino | `L_Futebol` + `Tomada TV` + `Lavanderia` + `Luz Casal` | `switch_led: false`, `switch: false`, `switch_1: false` | Corta consumo fantasma (80W/h) de TV, monitores e iluminação ao sair para treinar. |
+| **08** | **Chegada Triunfante & Descompressão** | Abertura de porta retorno | `L_Futebol` + `Led Quarto` + `Led Cabide` | `colour_data: {h:145, s:600, v:700}`, `switch: true` | Luz verde eucalipto e ventilação suave aceleram recuperação vagal pós-treino. |
+| **09** | **Match Day Mengão (Maracanã)** | 1h antes do jogo do Flamengo | Lâmpada Sala/TV (`L_Futebol`) RGB | `colour_data: {h:358, s:1000, v:1000}` (Vermelho Escarlate) | Imersão sensorial para Daniel + ativação de buffers alimentares no Cockpit. |
+| **10** | **Match Day Grêmio (Arena)** | 1h antes do jogo do Grêmio | Lâmpada Sala/TV (`L_Futebol`) RGB | `colour_data: {h:202, s:920, v:1000}` (Azul Celeste) | Celebração da identidade tricolor gaúcha de Patrícia com luz fria e celeste. |
+| **11** | **Alvorada de Prova (Rua Maracá • -1h)** | 04:05 nos domingos de prova (-145 min) | `Led Quarto` + `Tomada Dupla` + `Leds Closet` | `colour_data: {h:32, s:750, v:550}`, `switch_1: true` (900s), `switch_2: true` (600s) | Ciclo completo de dia de prova: despertar circadiano suave, café de Daniel + mate de Patrícia e armário iluminado. |
+| **12** | **Iluminação Tática do Closet & Placa de Carbono** | 04:20 (Prova) / 05:30 (Treino) | `Led Cabide` (`eb7e8e6b7909ed343dfawf`) + `Led Porta` | `work_mode: "white"`, `temp_value_v2: 500` (4000K), `bright_value_v2: 750` | Luz neutra sem ofuscamento nos olhos para conferência de número de peito, uniformes e tênis com placa de carbono. |
 
 ---
 
@@ -109,15 +111,25 @@ A transição para o sono profundo de ondas lentas (estágio N3) exige uma **red
 ]
 ```
 
-### 5.3. Tomadas & Plugs Inteligentes (Smart Plug 16A / 20A)
+### 5.3. Tomadas Inteligentes & Plugs Duplos Multi-Canal (Smart Plug 2-Gang)
+A tomada dupla Tuya (`ebc4a8285904c4bd43crx7`) possui **um único Device ID**, porém seus dois canais físicos são acionados de forma 100% independente através dos datapoints:
+
 ```json
+// Canal 1: Cafezinho do Daniel (Cafeteira)
 [
   { "code": "switch_1", "value": true },
-  { "code": "countdown_1", "value": 900 }
+  { "code": "countdown_1", "value": 900 } // Auto-desligamento em 15 min
+]
+
+// Canal 2: Mate / Chimarrão da Patrícia (Chaleira Elétrica)
+[
+  { "code": "switch_2", "value": true },
+  { "code": "countdown_2", "value": 600 } // Auto-desligamento em 10 min
 ]
 ```
-- `countdown_1`: Temporizador de segurança em segundos (ex: 900s = 15 minutos de fervura de café/chá antes de auto-desligamento).
-- `cur_power`: Leitura em tempo real de consumo em Watts (W) para cálculo de eficiência energética.
+- `switch_1`: Liga/Desliga individual da tomada 1 ("cafezinho").
+- `switch_2`: Liga/Desliga individual da tomada 2 ("mate").
+- `countdown_1` / `countdown_2`: Temporizadores de segurança independentes em segundos para evitar gasto elétrico ou fervura seca.
 
 ---
 
@@ -137,16 +149,29 @@ Cada automação executada no Tuya dispara opcionalmente uma confirmação proat
 
 ## 7. Variáveis de Ambiente no Servidor Render / Vercel
 
-Para que as requisições de hardware sejam despachadas para o gateway físico da sua casa, certifique-se de configurar no seu `.env` ou painel de variáveis da Render/Vercel:
+Configuradas no seu arquivo `.env` local e nas variáveis da Render/Vercel para o projeto **Bio-Triad Smart Home**:
 
 ```bash
 # Tuya Cloud OpenAPI Credentials
 TUYA_ENDPOINT="https://openapi.tuyaus.com"
-TUYA_CLIENT_ID="seu_access_id_tuya"
-TUYA_CLIENT_SECRET="seu_access_secret_tuya"
+TUYA_CLIENT_ID="rw87mm7ck7nkhuwt57xr"
+TUYA_CLIENT_SECRET="b2c82f81d1564d9ab5a843178290f858"
 
-# Mapeamento de Hardware Real
-TUYA_DEVICE_LIVING_ROOM_LIGHT="tuya_light_01"
+# Mapeamento de Hardware Real (Projeto: Bio-Triad Smart Home)
+TUYA_DEVICE_LIVING_ROOM_LIGHT="eb52fdf73913d81cf5ruqt" # L_Futebol (Novadigital Sala / TV)
+TUYA_DEVICE_L_FUTEBOL="eb52fdf73913d81cf5ruqt"         # Alias direto
+TUYA_DEVICE_LAUNDRY="eb6ba84adf6c0806d7awk3"           # Lavanderia (TM-Z02)
+TUYA_DEVICE_ZIGBEE_REPEATER="eb22fe793059d76c0df1ob"  # Repetidor Zigbee
+TUYA_DEVICE_BEDROOM_TEMP="ebd06d28857eda13d83o0h"      # Temperatura Suite (Sensor Temp/Umidade Zigbee)
+TUYA_DEVICE_BEDROOM_LED="eb4deff019cb6627614ic8"       # Led Quarto (LED Quarto do Casal)
+TUYA_DEVICE_CLOSET_HANGER_LED="eb7e8e6b7909ed343dfawf" # Led Cabide (Armário Quarto Casal)
+TUYA_DEVICE_CLOSET_DOOR_LED=""                         # Led Porta (Armário Quarto Casal)
+TUYA_DEVICE_BEDROOM_MAIN_LIGHT="eb6bb3db2a18ae84dbsio8" # Luz Casal (EKAZA Mini Interruptor 16A)
+TUYA_DEVICE_TV_PLUG="ebc2434ca5ee0361acjqqp"          # Tomada TV (Smart Plug Sala)
+TUYA_DEVICE_DUAL_PLUG="ebc4a8285904c4bd43crx7"        # Tomada Dupla (Canal 1: Cafezinho / Canal 2: Mate)
+TUYA_DEVICE_CLOSET_DOOR_SENSOR="ebeae211ceff0ab8991caf" # Sensor Armario (Sensor Abertura)
+TUYA_DEVICE_BED_VIBRATION_SENSOR="ebbef73662682d0e9bjk8s" # Sensor Vibração Casal
+TUYA_DEVICE_ZIGBEE_HUB="eb71718d485b63a4a4myp1"       # Hub Casal
 TUYA_DEVICE_BALCONY_LED="tuya_led_02"
 TUYA_DEVICE_AC_TREADMILL="tuya_ir_ac_01"
 TUYA_DEVICE_COFFEE_PLUG="tuya_plug_coffee"

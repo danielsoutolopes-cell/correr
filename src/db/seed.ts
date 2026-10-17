@@ -49,7 +49,7 @@ export async function runSeed() {
         intervalsAthleteId: "I753639",
         intervalsApiKey: process.env.INTERVALS_API_KEY || "",
         tuyaConfig: {
-          livingRoomLightId: process.env.TUYA_DEVICE_LIVING_ROOM_LIGHT || "tuya_light_01",
+          livingRoomLightId: process.env.TUYA_DEVICE_LIVING_ROOM_LIGHT || "eb52fdf73913d81cf5ruqt",
           balconyLedId: process.env.TUYA_DEVICE_BALCONY_LED || "tuya_led_02",
         },
         hrZones: {

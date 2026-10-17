@@ -23,10 +23,12 @@ import confetti from "canvas-confetti";
 import { getStrengthFicha, getProfileSpecs } from "@/lib/physiology";
 import { StrengthExercise } from "@/lib/types";
 
+import { ProfileId } from "@/lib/types";
+
 interface ActiveWorkoutModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentProfile: "DANIEL" | "PATRICIA" | "CLAN";
+  currentProfile: ProfileId;
   initialFicha?: "A" | "B" | "C";
 }
 

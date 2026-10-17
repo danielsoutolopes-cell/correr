@@ -28,14 +28,19 @@ import {
   BookOpen,
   Award,
   Target,
+  Sunrise,
+  Compass,
 } from "lucide-react";
+import { ProfileId } from "@/lib/types";
 import { getProfileSpecs } from "@/lib/physiology";
 
 interface ClanTabProps {
-  currentProfile: "DANIEL" | "PATRICIA" | "CLAN";
-  onSelectProfile: (profile: "DANIEL" | "PATRICIA" | "CLAN") => void;
+  currentProfile: ProfileId;
+  onSelectProfile: (profile: ProfileId) => void;
   onRefreshData?: () => void;
   onOpenManual?: () => void;
+  onOpenRaceMorning?: () => void;
+  onOpenTacticalSimulator?: () => void;
 }
 
 export function ClanTab({
@@ -43,6 +48,8 @@ export function ClanTab({
   onSelectProfile,
   onRefreshData,
   onOpenManual,
+  onOpenRaceMorning,
+  onOpenTacticalSimulator,
 }: ClanTabProps) {
   const [intervalsAthleteId, setIntervalsAthleteId] = useState<string>("I753639");
   const [intervalsApiKey, setIntervalsApiKey] = useState<string>("");
@@ -63,6 +70,7 @@ export function ClanTab({
 
   const danielSpecs = getProfileSpecs("DANIEL");
   const patriciaSpecs = getProfileSpecs("PATRICIA");
+  const gabrielSpecs = getProfileSpecs("GABRIEL");
 
   const handleTestWhatsApp = async () => {
     setIsTestingWhatsApp(true);
@@ -73,7 +81,7 @@ export function ClanTab({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type: "ECLUSA_1830",
-          workoutSummary: `Notificação Clã Lopes: Divisão de Treinos Ativa • Daniel: Mengão / 21k (Pace 5:27) • Patrícia: Grêmio / 10k (Pace 6:00)`,
+          workoutSummary: `Notificação Clã Lopes: Divisão de Treinos Ativa • Daniel: Mengão / 21k (Pace 5:26) • Patrícia: Grêmio / 14k (Pace 5:55) • Gabriel: Palmeiras / 10k (Pace 4:30)`,
         }),
       });
       const data = await res.json();
@@ -112,16 +120,39 @@ export function ClanTab({
                   Hub do Clã Lopes • Alta Performance Familiar
                 </h2>
                 <p className="text-xs text-gray-400 font-mono">
-                  Household ID: LOPES-TRIAD-2027 • Treinos Individuais & Sincronia do Casal
+                  Household ID: LOPES-TRIAD-2027 • Treinos Individuais & Sincronia Familiar
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-[10px] font-mono font-bold px-3 py-1 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-800 shadow-sm">
-              ● 2 Atletas Ativos
+              ● 3 Atletas Ativos (Daniel, Patrícia, Gabriel)
             </span>
+
+            {onOpenRaceMorning && (
+              <button
+                onClick={() => onOpenRaceMorning?.()}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/60 hover:bg-amber-900/80 text-amber-300 border border-amber-800 text-[10px] font-mono font-bold transition-all shadow-sm"
+                title="Alvorada de Prova (Rua Maracá, 132 • Deslocamento de Carro • Regra -1h)"
+              >
+                <Sunrise className="h-3 w-3 text-amber-400" />
+                <span>Alvorada de Prova</span>
+              </button>
+            )}
+
+            {onOpenTacticalSimulator && (
+              <button
+                onClick={onOpenTacticalSimulator}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-950/60 hover:bg-cyan-900/80 text-cyan-300 border border-cyan-800 text-[10px] font-mono font-bold transition-all shadow-sm"
+                title="Abrir Simulador Tático de Prova Km a Km"
+              >
+                <Compass className="h-3 w-3 text-cyan-400" />
+                <span>Simulador Tático</span>
+              </button>
+            )}
+
             <button
               onClick={onOpenManual}
               className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950/60 hover:bg-blue-900/80 text-blue-300 border border-blue-800 text-[10px] font-mono font-bold transition-all shadow-sm"
@@ -133,7 +164,7 @@ export function ClanTab({
         </div>
 
         {/* Member Cards (Haute Horlogerie Identity Cards) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
           {/* Daniel Souto Lopes Card */}
           <div
             onClick={() => onSelectProfile("DANIEL")}
@@ -153,12 +184,12 @@ export function ClanTab({
                     Daniel Souto Lopes
                   </span>
                   <span className="text-[10px] font-mono text-red-400">
-                    FLAMENGO • MARACANÃ • 43 ANOS
+                    FLAMENGO • 52 ANOS (02/05/1974)
                   </span>
                 </div>
               </div>
               <span className="text-[10px] font-mono font-extrabold px-2.5 py-1 rounded-full bg-red-950 text-red-300 border border-red-800">
-                PROVA P1: 21K SP
+                21K ATHENAS AMANHÃ
               </span>
             </div>
 
@@ -169,19 +200,23 @@ export function ClanTab({
               </div>
               <div className="flex justify-between py-1 border-b border-white/5">
                 <span className="text-gray-400">Pace Alvo 21k:</span>
-                <span className="font-bold text-amber-400">5:27 min/km (Sub-1h55)</span>
+                <span className="font-bold text-amber-400">5:26 min/km (Sub-1h55)</span>
               </div>
               <div className="flex justify-between py-1 border-b border-white/5">
                 <span className="text-gray-400">Pace Z2 / Esteira:</span>
                 <span className="font-bold text-white">5:50-6:20 / 9.7-10.3 km/h</span>
               </div>
               <div className="flex justify-between py-1 border-b border-white/5">
-                <span className="text-gray-400">Hardware & Strava:</span>
-                <span className="font-bold text-emerald-400">Galaxy Watch Ultra • Strava 203901</span>
+                <span className="text-gray-400">Categoria & Palmarés:</span>
+                <span className="font-bold text-amber-400">M50-54 • 24º Meia SP (01:54:12)</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-white/5">
+                <span className="text-gray-400">Hardware & WhatsApp:</span>
+                <span className="font-bold text-emerald-400">Galaxy Watch • 5511988139833</span>
               </div>
               <div className="flex justify-between py-1 border-b border-white/5">
                 <span className="text-gray-400">Balança TACO:</span>
-                <span className="font-bold text-cyan-400">58% da Panela (2350 kcal)</span>
+                <span className="font-bold text-cyan-400">58% Panela (2350 kcal)</span>
               </div>
               <p className="text-red-300 text-[11px] font-sans pt-1">
                 ⚠️ Trava Clínica: Prótese Reversa de Ombro Direito (zero overhead, supino halteres 45°).
@@ -208,12 +243,12 @@ export function ClanTab({
                     Patrícia Lopes
                   </span>
                   <span className="text-[10px] font-mono text-sky-400">
-                    GRÊMIO • ARENA • 40 ANOS
+                    GRÊMIO • 56 ANOS (04/07/1970)
                   </span>
                 </div>
               </div>
               <span className="text-[10px] font-mono font-extrabold px-2.5 py-1 rounded-full bg-sky-950 text-sky-300 border border-sky-800">
-                PROVA P1: 10K ESTAÇÕES
+                14K ATHENAS AMANHÃ
               </span>
             </div>
 
@@ -223,23 +258,86 @@ export function ClanTab({
                 <span className="font-bold text-white">58.0kg (Meta: 55kg) • 162cm</span>
               </div>
               <div className="flex justify-between py-1 border-b border-white/5">
-                <span className="text-gray-400">Pace Alvo 10k:</span>
-                <span className="font-bold text-amber-400">6:00 min/km (Sub-1h00)</span>
+                <span className="text-gray-400">Pace Alvo 14k/21k:</span>
+                <span className="font-bold text-amber-400">5:55-6:05 min/km</span>
               </div>
               <div className="flex justify-between py-1 border-b border-white/5">
                 <span className="text-gray-400">Pace Z2 / Esteira:</span>
                 <span className="font-bold text-white">6:30-7:15 / 8.3-9.2 km/h</span>
               </div>
               <div className="flex justify-between py-1 border-b border-white/5">
-                <span className="text-gray-400">Hardware & Strava:</span>
-                <span className="font-bold text-emerald-400">Smartwatch Patrícia • Strava Pro</span>
+                <span className="text-gray-400">Categoria & Palmarés:</span>
+                <span className="font-bold text-amber-400">F55-59 • 12ª Athenas 10k (00:57:40)</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-white/5">
+                <span className="text-gray-400">Hardware & WhatsApp:</span>
+                <span className="font-bold text-emerald-400">Patrícia Watch • 5511988136702</span>
               </div>
               <div className="flex justify-between py-1 border-b border-white/5">
                 <span className="text-gray-400">Balança TACO:</span>
-                <span className="font-bold text-cyan-400">42% da Panela (1780 kcal)</span>
+                <span className="font-bold text-cyan-400">42% Panela (1780 kcal)</span>
               </div>
               <p className="text-sky-300 text-[11px] font-sans pt-1">
-                🛡️ Foco Biomecânico: Glúteo médio, estabilidade de joelho, membros superiores livres.
+                🛡️ Foco: Glúteo médio, joelho estável. Inscrita em 2027: Athenas 14k, Vênus 21k, Olga!
+              </p>
+            </div>
+          </div>
+
+          {/* Gabriel Souto Maior Card */}
+          <div
+            onClick={() => onSelectProfile("GABRIEL")}
+            className={`p-5 rounded-2xl border text-left cursor-pointer transition-all relative overflow-hidden ${
+              currentProfile === "GABRIEL"
+                ? "border-emerald-500/70 bg-gradient-to-br from-[#091B13] to-[#0A0D15] shadow-xl shadow-emerald-500/20 ring-1 ring-emerald-500/40"
+                : "border-white/10 bg-[#07090E]/80 hover:border-white/20"
+            }`}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-lg shadow-md">
+                  🟢⚪
+                </div>
+                <div>
+                  <span className="text-base font-black text-white block">
+                    Gabriel Souto Maior
+                  </span>
+                  <span className="text-[10px] font-mono text-emerald-400">
+                    PALMEIRAS • 20 ANOS (15/08/2006)
+                  </span>
+                </div>
+              </div>
+              <span className="text-[10px] font-mono font-extrabold px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800">
+                PROVAS 10K SPEED
+              </span>
+            </div>
+
+            <div className="space-y-1.5 text-xs text-gray-300 font-mono">
+              <div className="flex justify-between py-1 border-b border-white/5">
+                <span className="text-gray-400">Antropometria:</span>
+                <span className="font-bold text-white">72.0kg (Meta: 70kg) • 178cm</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-white/5">
+                <span className="text-gray-400">Pace Alvo 10k:</span>
+                <span className="font-bold text-amber-400">4:25-4:40 min/km (Sub-45)</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-white/5">
+                <span className="text-gray-400">Pace Z2 / Esteira:</span>
+                <span className="font-bold text-white">5:00-5:40 / 11.0-12.0 km/h</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-white/5">
+                <span className="text-gray-400">Categoria & Palmarés:</span>
+                <span className="font-bold text-amber-400">M20-24 • 6º Gonzaguinha 5k (00:21:15)</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-white/5">
+                <span className="text-gray-400">Hardware & Strava:</span>
+                <span className="font-bold text-emerald-400">Smartwatch • Gabriel Souto Maior</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-white/5">
+                <span className="text-gray-400">Meta TACO:</span>
+                <span className="font-bold text-cyan-400">2750 kcal • 175g Proteína</span>
+              </div>
+              <p className="text-emerald-300 text-[11px] font-sans pt-1">
+                ⚡ Foco: Potência anaeróbia, velocidade pura e hipertrofia funcional.
               </p>
             </div>
           </div>

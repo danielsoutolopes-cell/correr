@@ -189,6 +189,21 @@ export class TuyaSmartHomeService {
   }
 
   /**
+   * Match Day Scene: Palmeiras (Emerald Green & White)
+   */
+  async triggerMatchDayPalmeiras(deviceId: string): Promise<TuyaCommandResult> {
+    return this.sendDeviceCommands(deviceId, [
+      { code: "switch_led", value: true },
+      { code: "work_mode", value: "colour" },
+      {
+        code: "colour_data",
+        value: JSON.stringify({ h: 140, s: 1000, v: 1000 }), // Palestra Emerald Green
+      },
+      { code: "bright_value_v2", value: 1000 },
+    ]);
+  }
+
+  /**
    * Pre-Workout Focus Scene at 18:30 (Cool daylight 6500K for dopamine & focus)
    */
   async triggerPreWorkoutFocus(deviceId: string): Promise<TuyaCommandResult> {
@@ -209,6 +224,21 @@ export class TuyaSmartHomeService {
       { code: "work_mode", value: "white" },
       { code: "temp_value_v2", value: 100 }, // Warm Candle Amber (2200K)
       { code: "bright_value_v2", value: 250 }, // Dim 25% for melatonin production
+    ]);
+  }
+
+  /**
+   * Cinema & Streaming Chill Mode: Warm soft cinema glow (15% brightness, soft amber)
+   */
+  async triggerCinemaMode(deviceId: string): Promise<TuyaCommandResult> {
+    return this.sendDeviceCommands(deviceId, [
+      { code: "switch_led", value: true },
+      { code: "work_mode", value: "colour" },
+      {
+        code: "colour_data",
+        value: JSON.stringify({ h: 28, s: 950, v: 250 }), // Soft warm cinema amber glow
+      },
+      { code: "bright_value_v2", value: 150 },
     ]);
   }
 
@@ -262,6 +292,38 @@ export class TuyaSmartHomeService {
   }
 
   /**
+   * Tomada Dupla (ebc4a8285904c4bd43crx7) - Canal 1: Cafezinho Pré-Treino de Daniel
+   */
+  async triggerCafezinho(deviceId: string, turnOn: boolean = true, countdownMinutes: number = 15): Promise<TuyaCommandResult> {
+    const commands: TuyaDeviceCommand[] = [{ code: "switch_1", value: turnOn }];
+    if (turnOn && countdownMinutes > 0) {
+      commands.push({ code: "countdown_1", value: countdownMinutes * 60 });
+    }
+    return this.sendDeviceCommands(deviceId, commands);
+  }
+
+  /**
+   * Tomada Dupla (ebc4a8285904c4bd43crx7) - Canal 2: Mate / Chimarrão Gaúcho da Patrícia
+   */
+  async triggerMateGaucho(deviceId: string, turnOn: boolean = true, countdownMinutes: number = 10): Promise<TuyaCommandResult> {
+    const commands: TuyaDeviceCommand[] = [{ code: "switch_2", value: turnOn }];
+    if (turnOn && countdownMinutes > 0) {
+      commands.push({ code: "countdown_2", value: countdownMinutes * 60 });
+    }
+    return this.sendDeviceCommands(deviceId, commands);
+  }
+
+  /**
+   * Tomada Dupla (ebc4a8285904c4bd43crx7) - Ambos os Canais: Liga/desliga Cafezinho e Mate
+   */
+  async triggerDualPlugBoth(deviceId: string, turnOn: boolean = true): Promise<TuyaCommandResult> {
+    return this.sendDeviceCommands(deviceId, [
+      { code: "switch_1", value: turnOn },
+      { code: "switch_2", value: turnOn },
+    ]);
+  }
+
+  /**
    * Eco-Green All Off ("Modo Fui Correr"): Kills non-essential standby circuits to save energy
    */
   async triggerEcoAllOff(deviceId: string): Promise<TuyaCommandResult> {
@@ -269,27 +331,97 @@ export class TuyaSmartHomeService {
       { code: "switch_led", value: false },
       { code: "switch", value: false },
       { code: "switch_1", value: false },
+      { code: "switch_2", value: false },
     ]);
   }
 
   /**
-   * Club Goal Strobe Celebration (Flamengo Scarlet Red / Grêmio Sky Blue)
+   * Closet & Kit Uniform Illumination: 4000K Neutral Crisp White for race kit and carbon shoes
+   */
+  async triggerClosetKitLights(deviceId: string): Promise<TuyaCommandResult> {
+    return this.sendDeviceCommands(deviceId, [
+      { code: "switch_led", value: true },
+      { code: "work_mode", value: "white" },
+      { code: "temp_value_v2", value: 500 }, // 4000K Neutral White
+      { code: "bright_value_v2", value: 750 },
+    ]);
+  }
+
+  /**
+   * Full Race Morning Alvorada: Bedroom sunrise + Dual Plug beverages (Cafezinho & Mate) + Closet kit
+   */
+  async triggerRaceMorningAlvorada(options: {
+    bedroomLedId: string;
+    bedroomMainLightId?: string;
+    dualPlugId: string;
+    closetHangerId?: string;
+    closetDoorId?: string;
+  }): Promise<{ success: boolean; results: Record<string, unknown> }> {
+    const results: Record<string, unknown> = {};
+
+    // 1. Sunrise light in bedroom
+    try {
+      results.sunrise = await this.triggerSunriseForLongRun(options.bedroomLedId);
+    } catch (e) {
+      results.sunrise = { error: String(e) };
+    }
+
+    // 2. Dual plug beverages: Cafezinho (switch_1 15 min) + Mate (switch_2 10 min)
+    try {
+      const commands: TuyaDeviceCommand[] = [
+        { code: "switch_1", value: true },
+        { code: "countdown_1", value: 900 },
+        { code: "switch_2", value: true },
+        { code: "countdown_2", value: 600 },
+      ];
+      results.beverages = await this.sendDeviceCommands(options.dualPlugId, commands);
+    } catch (e) {
+      results.beverages = { error: String(e) };
+    }
+
+    // 3. Closet LEDs if available
+    if (options.closetHangerId) {
+      try {
+        results.closetHanger = await this.triggerClosetKitLights(options.closetHangerId);
+      } catch (e) {
+        results.closetHanger = { error: String(e) };
+      }
+    }
+    if (options.closetDoorId) {
+      try {
+        results.closetDoor = await this.triggerClosetKitLights(options.closetDoorId);
+      } catch (e) {
+        results.closetDoor = { error: String(e) };
+      }
+    }
+
+    return {
+      success: true,
+      results,
+    };
+  }
+
+  /**
+   * Club Goal Strobe Celebration (Flamengo Scarlet Red / Grêmio Sky Blue / Palmeiras Emerald Green)
    */
   async triggerClubGoalCelebration(
     deviceId: string,
-    club: "FLAMENGO" | "GREMIO"
+    club: "FLAMENGO" | "GREMIO" | "PALMEIRAS"
   ): Promise<TuyaCommandResult> {
     const isFla = club === "FLAMENGO";
+    const isPalmeiras = club === "PALMEIRAS";
+    const color = isFla
+      ? { h: 358, s: 1000, v: 1000 } // Scarlet Red
+      : isPalmeiras
+      ? { h: 140, s: 1000, v: 1000 } // Emerald Green
+      : { h: 202, s: 920, v: 1000 }; // Sky Blue
+
     return this.sendDeviceCommands(deviceId, [
       { code: "switch_led", value: true },
       { code: "work_mode", value: "colour" },
       {
         code: "colour_data",
-        value: JSON.stringify(
-          isFla
-            ? { h: 358, s: 1000, v: 1000 } // Scarlet Red
-            : { h: 202, s: 920, v: 1000 } // Sky Blue
-        ),
+        value: JSON.stringify(color),
       },
       { code: "flash_scene_1", value: "strobe" },
       { code: "bright_value_v2", value: 1000 },

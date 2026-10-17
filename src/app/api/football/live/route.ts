@@ -9,9 +9,9 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const team = (searchParams.get("team") || "Flamengo") as SoccerTeam;
 
-    if (team !== "Flamengo" && team !== "Grêmio") {
+    if (team !== "Flamengo" && team !== "Grêmio" && team !== "Palmeiras") {
       return NextResponse.json(
-        { error: "Time inválido. Escolha 'Flamengo' ou 'Grêmio'." },
+        { error: "Time inválido. Escolha 'Flamengo', 'Grêmio' ou 'Palmeiras'." },
         { status: 400 }
       );
     }

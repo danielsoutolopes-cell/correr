@@ -22,13 +22,17 @@ import {
   Leaf,
   Clock,
   Radio,
+  Sunrise,
+  Shirt,
 } from "lucide-react";
+
+import { ProfileId } from "@/lib/types";
 
 interface TuyaManifestoModalProps {
   isOpen: boolean;
   onClose: () => void;
   onTriggerScene: (scene: string, label: string) => void;
-  currentProfile: "DANIEL" | "PATRICIA" | "CLAN";
+  currentProfile: ProfileId;
 }
 
 interface AutomationCard {
@@ -59,11 +63,37 @@ export function TuyaManifestoModal({
 
   const automations: AutomationCard[] = [
     {
+      id: "race_morning_dispatch",
+      sceneCode: "RACE_MORNING_ALVORADA",
+      category: "CIRCADIAN",
+      title: "Alvorada de Prova (Rua Maracá • -1h Largada)",
+      hardware: "Led Quarto + Tomada Dupla (Café & Mate) + Leds Closet",
+      datapoints: "colour_data: { h: 32, s: 750, v: 550 }, switch_1: true (900s), switch_2: true (600s)",
+      rationale:
+        "Orquestração completa para o dia de prova: acende quarto em tom solar âmbar 2700K, liga cafezinho de Daniel e mate de Patrícia na tomada dupla e ilumina os uniformes no closet.",
+      triggerTime: "04:05 nos domingos de prova (145 min antes da largada)",
+      color: "border-amber-500/50 text-amber-200 bg-amber-950/30",
+      icon: Sunrise,
+    },
+    {
+      id: "closet_kit",
+      sceneCode: "CLOSET_ON",
+      category: "TRANSITION",
+      title: "Iluminação Tática do Closet & Placa de Carbono",
+      hardware: "Led Cabide (eb7e8e6b7909ed343dfawf) + Led Porta",
+      datapoints: "work_mode: 'white', temp_value_v2: 500 (4000K Neutro), bright_value_v2: 750",
+      rationale:
+        "Luz branca neutra sem ofuscamento para conferência do uniforme, fixação do número de peito e calçamento dos tênis com placa de carbono.",
+      triggerTime: "04:20 nos dias de prova / 05:30 nos treinos",
+      color: "border-purple-500/50 text-purple-200 bg-purple-950/20",
+      icon: Shirt,
+    },
+    {
       id: "sunrise",
       sceneCode: "SUNRISE_LONG_RUN",
       category: "CIRCADIAN",
       title: "Despertar Solar Gradual (Longão 06:00)",
-      hardware: "Lâmpadas & Fita LED RGB+CCT (Sala/Quarto)",
+      hardware: "Led Quarto (Casal) + L_Futebol (Sala)",
       datapoints: "colour_data: { h: 32, s: 800, v: 600 }, bright_value_v2: 600",
       rationale:
         "Simula a rampa espectral da aurora solar para inibir a melatonina e elevar o cortisol de prontidão sem taquicardia de alarme sonoro.",
@@ -76,7 +106,7 @@ export function TuyaManifestoModal({
       sceneCode: "PRE_WORKOUT_FOCUS",
       category: "CIRCADIAN",
       title: "Surge de Dopamina & Foco Pré-Treino (18:30)",
-      hardware: "Lâmpadas Tuya Sala/Escritório",
+      hardware: "Lâmpada L_Futebol (Sala/TV Novadigital)",
       datapoints: "work_mode: 'white', temp_value_v2: 950 (6500K Fria), bright: 900",
       rationale:
         "Luz branca fria a 6500K suprime a sonolência pós-trabalho de escritório e induz foco catecolaminérgico para a corrida das 19h.",
@@ -89,13 +119,26 @@ export function TuyaManifestoModal({
       sceneCode: "PARASYMPATHETIC_NIGHT",
       category: "CIRCADIAN",
       title: "Freio Térmico & Modulação Parassimpática (20:30)",
-      hardware: "Iluminação Geral Residencial",
+      hardware: "Led Quarto (2200K Âmbar) + Luz Casal (Off)",
       datapoints: "work_mode: 'white', temp_value_v2: 100 (2200K Âmbar), bright: 250",
       rationale:
         "Corta 100% de radiação azul nos olhos, induzindo a secreção endógena de melatonina para preparar o sono profundo medido no Galaxy Watch.",
       triggerTime: "Diariamente às 20:30 pontual",
       color: "border-purple-500/40 text-purple-300 bg-purple-950/20",
       icon: Moon,
+    },
+    {
+      id: "alvorada_prova",
+      sceneCode: "RACE_MORNING_ALVORADA",
+      category: "CIRCADIAN",
+      title: "Alvorada de Prova Universal (Rua Maracá • Regra -1h)",
+      hardware: "Led Quarto (2700K) + Tomada Dupla (Café/Mate) + Leds Closet (4000K)",
+      datapoints: "colour_data: {h:32, s:750, v:550}, switch_1: true (900s), switch_2: true (600s), closet: 4000K",
+      rationale:
+        "Cálculo reverso inteligente adaptável a qualquer prova (Athenas, Meia SP, Olga Kos, etc.). Acorda com luz âmbar suave, liga café de Daniel e mate de Patrícia na tomada dupla e ilumina o armário.",
+      triggerTime: "Domingos de Prova (Recalculado por Prova: T-gun - 1h50)",
+      color: "border-amber-500/50 text-amber-300 bg-amber-950/30",
+      icon: Sunrise,
     },
     {
       id: "costill_treadmill",
@@ -115,7 +158,7 @@ export function TuyaManifestoModal({
       sceneCode: "CRYO_SLEEP",
       category: "THERMAL",
       title: "Câmara Criogênica para Sono Profundo N3 (20°C)",
-      hardware: "Ar-Condicionado Quarto + Sensor Tuya Temp",
+      hardware: "Temperatura Suite (Sensor Zigbee) + AC Quarto",
       datapoints: "switch: true, mode: 'cold', temp_set: 20, windspeed: 'low'",
       rationale:
         "Mantém a temperatura central do corpo baixa durante a primeira metade da noite, maximizando o pico de hormônio do crescimento (GH).",
@@ -124,24 +167,50 @@ export function TuyaManifestoModal({
       icon: Thermometer,
     },
     {
-      id: "barista_prerun",
-      sceneCode: "COFFEE_PRE_RUN",
+      id: "cafezinho_daniel",
+      sceneCode: "CAFEZINHO_ON",
       category: "NUTRITION",
-      title: "Cafeteira Barista Pré-Longão (Shot de Cafeína)",
-      hardware: "Smart Plug Tuya 16A com Timer",
+      title: "Tomada 1: Cafezinho Pré-Treino (Daniel • 21k)",
+      hardware: "Tomada Dupla (ebc4a8285904c4bd43crx7) • Canal switch_1",
       datapoints: "switch_1: true, countdown_1: 900 (auto-off em 15 min)",
       rationale:
-        "Liga a cafeteira 15 minutos antes do despertador para garantir dosagem ótima de 3mg/kg de cafeína anidra pré-corrida de 21 km.",
-      triggerTime: "05:45 nos dias de Longão de Daniel",
+        "Ativa a cafeteira 15 min antes da saída para garantir 3mg/kg de cafeína anidra no organismo antes do longão de 21 km.",
+      triggerTime: "05:45 nos dias de treino de Daniel",
       color: "border-amber-600/40 text-amber-200 bg-amber-950/20",
       icon: Coffee,
+    },
+    {
+      id: "mate_patricia",
+      sceneCode: "MATE_ON",
+      category: "NUTRITION",
+      title: "Tomada 2: Mate & Chimarrão Gaúcho (Patrícia • 14k)",
+      hardware: "Tomada Dupla (ebc4a8285904c4bd43crx7) • Canal switch_2",
+      datapoints: "switch_2: true, countdown_2: 600 (auto-off em 10 min)",
+      rationale:
+        "Ferve a chaleira elétrica com infusão rica em polifenóis e termogênese natural para a rainha dos 14k da Athenas Mizuno.",
+      triggerTime: "06:00 nos dias de treino de Patrícia",
+      color: "border-emerald-600/40 text-emerald-200 bg-emerald-950/20",
+      icon: Leaf,
+    },
+    {
+      id: "bebidas_casal",
+      sceneCode: "BEBIDAS_DUAL_ON",
+      category: "NUTRITION",
+      title: "Tomada Dupla: Café & Mate Simultâneos do Casal",
+      hardware: "Tomada Dupla (ebc4a8285904c4bd43crx7) • switch_1 + switch_2",
+      datapoints: "switch_1: true, switch_2: true (ambos os canais ativos)",
+      rationale:
+        "Sincroniza o café de Daniel e o mate de Patrícia simultaneamente quando ambos treinam juntos nas manhãs de fim de semana.",
+      triggerTime: "Manhãs de treino conjunto",
+      color: "border-cyan-600/40 text-cyan-200 bg-cyan-950/20",
+      icon: Zap,
     },
     {
       id: "eco_all_off",
       sceneCode: "ECO_ALL_OFF",
       category: "ECO",
       title: "Modo 'Fui Correr' • Corte Verde de Energia Fantasma",
-      hardware: "Smart Plugs + Interruptores Gerais Tuya",
+      hardware: "Tomada TV + L_Futebol + Lavanderia + Luz Casal",
       datapoints: "switch_led: false, switch: false, switch_1: false",
       rationale:
         "Filosofia 'Tudo pelo meio ambiente': desliga TVs, displays, standbys e luzes secundárias quando o casal sai para treinar na rua.",
@@ -154,7 +223,7 @@ export function TuyaManifestoModal({
       sceneCode: "FLAMENGO_MATCH",
       category: "MATCHDAY",
       title: "Match Day Mengão Rubro-Negro (Maracanã)",
-      hardware: "Fita LED Varanda & Sala Tuya RGB",
+      hardware: "Lâmpada L_Futebol (Sala/TV Novadigital RGB)",
       datapoints: "colour_data: { h: 358, s: 1000, v: 1000 } (Scarlet Red)",
       rationale:
         "Imersão visual total para os jogos do Flamengo de Daniel, com buffers calóricos saudáveis da dieta TACO ativos no Cockpit.",
@@ -167,7 +236,7 @@ export function TuyaManifestoModal({
       sceneCode: "GREMIO_MATCH",
       category: "MATCHDAY",
       title: "Match Day Grêmio Imortal Tricolor (Arena)",
-      hardware: "Fita LED Varanda & Sala Tuya RGB",
+      hardware: "Lâmpada L_Futebol (Sala/TV Novadigital RGB)",
       datapoints: "colour_data: { h: 202, s: 920, v: 1000 } (Sky Blue)",
       rationale:
         "Atmosfera azul celeste e branca para os jogos do Grêmio da Patrícia, celebrando a identidade esportiva individual.",
@@ -180,7 +249,7 @@ export function TuyaManifestoModal({
       sceneCode: isDaniel ? "FLAMENGO_GOAL" : "GREMIO_GOAL",
       category: "MATCHDAY",
       title: isDaniel ? "Gol do Flamengo! (Pulso Estroboscópico)" : "Gol do Grêmio! (Pulso Estroboscópico)",
-      hardware: "Iluminação Tuya RGB",
+      hardware: "Lâmpada L_Futebol (Sala/TV Novadigital RGB)",
       datapoints: "flash_scene_1: 'strobe', bright: 1000",
       rationale:
         "Celebração sensorial dinâmica disparada pelo app quando o clube marca gol na partida.",

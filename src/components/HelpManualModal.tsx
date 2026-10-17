@@ -21,19 +21,34 @@ import {
   CheckCircle2,
   ChevronRight,
   ExternalLink,
-  Smartphone,
   CloudSun,
+  Share2,
+  Settings,
+  Sunrise,
+  Car,
+  Coffee,
+  Navigation,
+  MapPin,
+  Clock,
 } from "lucide-react";
+
+import { ProfileId } from "@/lib/types";
 
 interface HelpManualModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentProfile: "DANIEL" | "PATRICIA" | "CLAN";
+  currentProfile: ProfileId;
+  onOpenSetup?: () => void;
 }
 
-export function HelpManualModal({ isOpen, onClose, currentProfile }: HelpManualModalProps) {
+export function HelpManualModal({
+  isOpen,
+  onClose,
+  currentProfile,
+  onOpenSetup,
+}: HelpManualModalProps) {
   const [activeTopic, setActiveTopic] = useState<
-    "OVERVIEW" | "DANIEL" | "PATRICIA" | "PANELA_TACO" | "HARDWARE" | "SMART_HOME" | "WHATSAPP" | "FAQ"
+    "OVERVIEW" | "DANIEL" | "PATRICIA" | "GABRIEL" | "PANELA_TACO" | "HARDWARE" | "STRAVA_SETUP" | "RACE_MORNING" | "SMART_HOME" | "WHATSAPP" | "FAQ"
   >("OVERVIEW");
 
   if (!isOpen) return null;
@@ -80,12 +95,15 @@ export function HelpManualModal({ isOpen, onClose, currentProfile }: HelpManualM
             {[
               { id: "OVERVIEW", label: "1. Visão Geral & Filosofia", icon: Activity },
               { id: "DANIEL", label: "2. Daniel (FLA • 21k)", icon: Flame, color: "text-red-400" },
-              { id: "PATRICIA", label: "3. Patrícia (GRE • 10k)", icon: Shield, color: "text-sky-400" },
-              { id: "PANELA_TACO", label: "4. Panela TACO (58% x 42%)", icon: Scale, color: "text-amber-400" },
-              { id: "HARDWARE", label: "5. Galaxy Watch & Strava", icon: Watch, color: "text-emerald-400" },
-              { id: "SMART_HOME", label: "6. Tuya Smart Home", icon: Zap, color: "text-purple-400" },
-              { id: "WHATSAPP", label: "7. WhatsApp & Telegram", icon: MessageSquare, color: "text-green-400" },
-              { id: "FAQ", label: "8. FAQ & Solução de Dúvidas", icon: HelpCircle },
+              { id: "PATRICIA", label: "3. Patrícia (GRE • 14k/21k)", icon: Shield, color: "text-sky-400" },
+              { id: "GABRIEL", label: "4. Gabriel (PAL • 10k)", icon: Zap, color: "text-emerald-400" },
+              { id: "PANELA_TACO", label: "5. Panela TACO Familiar", icon: Scale, color: "text-amber-400" },
+              { id: "HARDWARE", label: "6. Galaxy Watch & Sensores", icon: Watch, color: "text-emerald-400" },
+              { id: "STRAVA_SETUP", label: "7. Strava Patrícia & Gabriel", icon: Share2, color: "text-orange-400" },
+              { id: "RACE_MORNING", label: "8. Alvorada de Prova (Rua Maracá)", icon: Sunrise, color: "text-amber-400" },
+              { id: "SMART_HOME", label: "9. Tuya Smart Home", icon: Zap, color: "text-purple-400" },
+              { id: "WHATSAPP", label: "10. WhatsApp Evolution", icon: MessageSquare, color: "text-green-400" },
+              { id: "FAQ", label: "11. FAQ & Solução de Dúvidas", icon: HelpCircle },
             ].map((topic) => {
               const Icon = topic.icon;
               const isActive = activeTopic === topic.id;
@@ -229,7 +247,7 @@ export function HelpManualModal({ isOpen, onClose, currentProfile }: HelpManualM
                     </h3>
                   </div>
                   <p className="text-xs text-sky-400 font-mono mt-0.5">
-                    Grêmio Foot-Ball Porto Alegrense • Arena • 40 anos • 58.0kg (Meta: 55kg) • 162cm
+                    Grêmio Foot-Ball Porto Alegrense • Arena • 56 anos (04/07/1970) • 58.0kg (Meta: 55kg) • 162cm
                   </p>
                 </div>
 
@@ -266,7 +284,41 @@ export function HelpManualModal({ isOpen, onClose, currentProfile }: HelpManualM
               </div>
             )}
 
-            {/* Topic 4: PANELA_TACO */}
+            {/* Topic 4: GABRIEL */}
+            {activeTopic === "GABRIEL" && (
+              <div className="space-y-4 animate-fadeIn">
+                <div className="border-b border-emerald-500/30 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">🟢⚪</span>
+                    <h3 className="text-xl font-black text-white">
+                      Manual do Atleta: Gabriel Souto Maior
+                    </h3>
+                  </div>
+                  <p className="text-xs text-emerald-400 font-mono mt-0.5">
+                    Sociedade Esportiva Palmeiras • Allianz Parque • 20 anos (15/08/2006) • 72.0kg • 178cm
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="p-4 rounded-2xl bg-emerald-950/20 border border-emerald-500/30 space-y-2">
+                    <h4 className="font-bold text-emerald-300 flex items-center gap-2 text-sm">
+                      <Zap className="h-4 w-4 text-emerald-400" />
+                      Foco Fisiológico: Potência, Velocidade 5k/10k & Hipertrofia
+                    </h4>
+                    <p className="text-xs text-gray-300 leading-relaxed">
+                      Gabriel representa a velocidade pura do Clã Lopes. Seus treinos combinam:
+                    </p>
+                    <ul className="list-disc pl-5 text-xs text-gray-300 space-y-1">
+                      <li><strong>Velocidade & Limiar de Lactato:</strong> Tiros de 400m a 1000m em ritmo sub-4:15 min/km e rodagens Z2 a 11-12 km/h na esteira.</li>
+                      <li><strong>Musculação Potente:</strong> Treinos focados em hipertrofia funcional com cargas progressivas para sustentar velocidade sem risco de sobrecarga tendínea.</li>
+                      <li><strong>Nutrição Tática TACO:</strong> Aporte elevado de 2750 kcal diárias e 175g de proteína para regeneração muscular.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Topic 5: PANELA_TACO */}
             {activeTopic === "PANELA_TACO" && (
               <div className="space-y-4 animate-fadeIn">
                 <div className="border-b border-amber-500/30 pb-3">
@@ -349,7 +401,219 @@ export function HelpManualModal({ isOpen, onClose, currentProfile }: HelpManualM
               </div>
             )}
 
-            {/* Topic 6: SMART_HOME */}
+            {/* Topic 7: STRAVA_SETUP */}
+            {activeTopic === "STRAVA_SETUP" && (
+              <div className="space-y-4 animate-fadeIn">
+                <div className="border-b border-orange-500/30 pb-3">
+                  <span className="text-[10px] font-mono tracking-widest text-orange-400 uppercase">
+                    Integração Strava V3 Multi-Atleta
+                  </span>
+                  <h3 className="text-xl font-black text-white mt-1">
+                    Como Conectar o Strava da Patrícia e do Gabriel
+                  </h3>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Guia passo a passo para ler treinos, ritmos e quilometragem de cada membro do clã.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-orange-950/20 border border-orange-500/30 space-y-3 text-xs leading-relaxed">
+                  <h4 className="font-bold text-orange-300 text-sm flex items-center gap-2">
+                    <Share2 className="h-4 w-4 text-orange-400" />
+                    Como o Bio-Triad OS lê o Strava da Patrícia e do Gabriel:
+                  </h4>
+                  <p className="text-gray-300">
+                    O Strava utiliza o protocolo <strong>OAuth 2.0</strong> com permissão de leitura de atividades (<code>scope: read,activity:read_all</code>). Cada atleta precisa apenas autorizar o aplicativo uma única vez.
+                  </p>
+
+                  <div className="space-y-2 mt-2">
+                    <div className="p-3 rounded-xl bg-black/40 border border-white/10 space-y-1">
+                      <span className="font-bold text-white block">Passo 1: Acessar a API do Strava</span>
+                      <p className="text-gray-400">
+                        Faça login no Strava com a conta da Patrícia ou do Gabriel e entre em{" "}
+                        <a
+                          href="https://www.strava.com/settings/api"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-orange-400 underline"
+                        >
+                          strava.com/settings/api
+                        </a>.
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-black/40 border border-white/10 space-y-1">
+                      <span className="font-bold text-white block">Passo 2: Criar o Aplicativo Pessoal</span>
+                      <p className="text-gray-400">
+                        Preencha o formulário simples:
+                      </p>
+                      <ul className="list-disc pl-5 text-[11px] text-gray-300 space-y-0.5">
+                        <li><strong>Application Name:</strong> Bio-Triad OS Patrícia (ou Gabriel)</li>
+                        <li><strong>Category:</strong> Training / Fitness</li>
+                        <li><strong>Website:</strong> http://localhost:3000</li>
+                        <li><strong>Authorization Callback Domain:</strong> localhost</li>
+                      </ul>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-black/40 border border-white/10 space-y-1">
+                      <span className="font-bold text-white block">Passo 3: Salvar na Central de Setup</span>
+                      <p className="text-gray-400">
+                        Copie o <strong>Client ID</strong> e o <strong>Client Secret</strong> e cole na nova aba <strong>⚙️ Central de Setup</strong> do Bio-Triad OS.
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-black/40 border border-white/10 space-y-1">
+                      <span className="font-bold text-white block">Passo 4: Gerar o Link de Autorização</span>
+                      <p className="text-gray-400">
+                        A Central de Setup gera automaticamente o link oficial do Strava para autorizar a leitura. Ao clicar em "Autorizar", o sistema recebe o token permanente e passa a ler todas as corridas, pace médio, distância e elevação!
+                      </p>
+                    </div>
+                  </div>
+
+                  {onOpenSetup && (
+                    <div className="pt-2">
+                      <button
+                        onClick={onOpenSetup}
+                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-black font-bold font-mono text-xs flex items-center gap-2 shadow-lg shadow-orange-600/30 transition-all"
+                      >
+                        <Settings className="h-4 w-4" />
+                        <span>Abrir Central de Setup Agora</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Topic 8: RACE_MORNING */}
+            {activeTopic === "RACE_MORNING" && (
+              <div className="space-y-4 animate-fadeIn">
+                <div className="border-b border-amber-500/30 pb-3">
+                  <span className="text-[10px] font-mono tracking-widest text-amber-400 uppercase">
+                    Logística & Rotina Circadiana de Prova
+                  </span>
+                  <h3 className="text-xl font-black text-white mt-1 flex items-center gap-2">
+                    <Sunrise className="h-6 w-6 text-amber-400" />
+                    Alvorada de Prova Universal (Rua Maracá, 132 • Adaptável a Todas as Provas)
+                  </h3>
+                  <p className="text-xs text-gray-400 mt-0.5 font-mono">
+                    Partida: Rua Maracá, 132 (CEP 04313-210) • Adaptável a Qualquer Hora de Largada • Tomada Dupla Tuya • Nutrição TACO
+                  </p>
+                </div>
+
+                {/* Golden Rule Highlight Box */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-950/40 via-[#10141D] to-black border border-amber-500/40 space-y-2">
+                  <div className="flex items-center gap-2 text-amber-300 font-mono font-bold text-sm">
+                    <Clock className="h-4 w-4 text-amber-400" />
+                    <span>Cálculo Reverso Inteligente Ancorado na Hora de Largada (T-Gun)</span>
+                  </div>
+                  <p className="text-xs text-gray-300 leading-relaxed font-sans">
+                    Válido para <strong>todas as corridas cadastradas no sistema</strong> (Athenas Mizuno, Meia Internacional SP, Meia Vênus, Olga Kos, São Silvestre ou personalizadas).
+                    O cronograma reverso se adapta automaticamente à hora oficial de largada da prova (T-Gun):
+                    a chegada ocorre <strong>rigorosamente 1 hora antes (-1h)</strong>, permitindo estacionar sem estresse, usar sanitários sem filas,
+                    realizar aquecimento neuromuscular Z1 de 15 min e entrar no curral com FC estabilizada 15 min antes da largada.
+                  </p>
+                </div>
+
+                {/* Origin and Driving Logistics */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                  <div className="p-3.5 rounded-2xl bg-[#090D16] border border-cyan-500/30 space-y-1.5">
+                    <span className="font-bold text-cyan-400 font-mono flex items-center gap-1.5">
+                      <MapPin className="h-4 w-4" />
+                      Origem Residencial: Rua Maracá, 132 (CEP 04313-210)
+                    </span>
+                    <p className="text-gray-300 leading-relaxed font-sans">
+                      Endereço residencial oficial do atleta Daniel e da Patrícia (Vila Guarani / Jabaquara).
+                      O sistema auto-geocodifica rotas para Marginal Pinheiros (14.2 km • 32 min), Ibirapuera (7.8 km • 24 min),
+                      Pacaembu (12.8 km • 30 min), USP (18.5 km • 38 min) e Jockey Club (13.5 km • 30 min).
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-[#090D16] border border-purple-500/30 space-y-1.5">
+                    <span className="font-bold text-purple-400 font-mono flex items-center gap-1.5">
+                      <Car className="h-4 w-4" />
+                      Regra de Chegada -1h & Deslocamento Automatizado
+                    </span>
+                    <p className="text-gray-300 leading-relaxed font-sans">
+                      A hora de saída da garagem é calculada: <strong>T-Saída = T-Largada - 60 min - T-Trânsito</strong>.
+                      Se a largada é 06:30 na Marginal, a saída é <strong>04:58</strong>. Se for 06:15 no Ibirapuera, a saída é <strong>04:51</strong>.
+                      Tudo sincronizado com deep-links no Waze e Google Maps com um clique.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Tuya Hardware Automation */}
+                <div className="p-4 rounded-2xl bg-[#090D16] border border-white/10 space-y-3">
+                  <h4 className="font-mono font-bold text-white text-xs uppercase flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-amber-400" />
+                    Automação Residencial Tuya Smart Home no Despertar
+                  </h4>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
+                    <div className="p-3 rounded-xl bg-black/40 border border-amber-500/20 space-y-1">
+                      <span className="text-amber-300 font-bold block">1. Alvorada Solar (04:05)</span>
+                      <p className="text-[11px] text-gray-400 font-sans">
+                        Led Quarto (eb4deff019cb6627614ic8) acende em 2700K âmbar gradualmente (15% a 60%), despertando o corpo sem taquicardia sonoro.
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-black/40 border border-emerald-500/20 space-y-1">
+                      <span className="text-emerald-300 font-bold block">2. Tomada Dupla (04:15)</span>
+                      <p className="text-[11px] text-gray-400 font-sans">
+                        Tomada Dupla (ebc4a8285904c4bd43crx7): switch_1 liga cafeteira de Daniel (15 min) e switch_2 liga chaleira de mate da Patrícia (10 min).
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-black/40 border border-purple-500/20 space-y-1">
+                      <span className="text-purple-300 font-bold block">3. Closet Guiado (04:20)</span>
+                      <p className="text-[11px] text-gray-400 font-sans">
+                        Led Cabide (eb7e8e6b7909ed343dfawf) e Porta acendem em branco neutro 4000K para vestir os uniformes e tênis de carbono.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Timeline Reversa Resumida */}
+                <div className="p-3.5 rounded-2xl bg-black/30 border border-white/10 space-y-2 text-xs">
+                  <h4 className="font-mono font-bold text-gray-300 flex items-center gap-1.5">
+                    <Clock className="h-4 w-4 text-cyan-400" />
+                    Cronograma Reverso Consolidado (Largada 06:30):
+                  </h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-center">
+                    <div className="p-2 rounded-xl bg-[#080B12] border border-white/10">
+                      <span className="text-gray-400 text-[10px] block">04:05</span>
+                      <span className="text-amber-300 font-bold text-xs">Luzes Quarto</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-[#080B12] border border-white/10">
+                      <span className="text-gray-400 text-[10px] block">04:15</span>
+                      <span className="text-emerald-300 font-bold text-xs">Café + Mate</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-[#080B12] border border-white/10">
+                      <span className="text-gray-400 text-[10px] block">04:25</span>
+                      <span className="text-cyan-300 font-bold text-xs">Café TACO</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-[#080B12] border border-white/10">
+                      <span className="text-gray-400 text-[10px] block">04:58</span>
+                      <span className="text-white font-bold text-xs">Saída Rua Maracá</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Direct Action Links */}
+                <div className="p-3 rounded-2xl bg-cyan-950/20 border border-cyan-500/30 flex flex-wrap items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2">
+                    <Navigation className="h-4 w-4 text-cyan-400" />
+                    <span className="text-cyan-300 font-mono">
+                      Deep-links com Waze e Google Maps prontos com um clique.
+                    </span>
+                  </div>
+                  <span className="text-gray-400 text-[11px] font-mono">
+                    Acesse pelo botão <strong>"Alvorada de Prova"</strong> na TopBar ou Cockpit.
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Topic 9: SMART_HOME */}
             {activeTopic === "SMART_HOME" && (
               <div className="space-y-4 animate-fadeIn">
                 <div className="border-b border-purple-500/30 pb-3">
@@ -510,6 +774,15 @@ export function HelpManualModal({ isOpen, onClose, currentProfile }: HelpManualM
                     </span>
                     <p className="text-gray-300">
                       Na aba <strong>Nutrição</strong>, clique no botão verde <em>"Fotografar / Enviar Prato"</em>. A IA Gemini 2.5 Flash analisa os alimentos e separa as gramas recomendadas para o Daniel e para a Patrícia instantaneamente.
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-[#090D16] border border-amber-500/30 space-y-1">
+                    <span className="font-bold text-amber-300 block">
+                      4. "Como funciona a Trava Inteligente de Corte Vespertino Pré-Jogo?"
+                    </span>
+                    <p className="text-gray-300">
+                      O sistema consulta a agenda oficial do clube (Flamengo para o Daniel, Grêmio para a Patrícia, Palmeiras para o Gabriel). A trava inteligente calcula dinamicamente o pontapé inicial e programa o encerramento do treino vespertino para <strong>exatamente 1 hora antes</strong> (ex: jogo às 18h30 ➔ trava às 17h30; jogo às 20h00 ➔ trava às 19h00; jogo às 16h00 ➔ trava às 15h00). Essa janela de 60 minutos protege a transição metabólica da frequência cardíaca, permite o banho relaxante e libera o buffer de petiscos TACO para a torcida!
                     </p>
                   </div>
                 </div>

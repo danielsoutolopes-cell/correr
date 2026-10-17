@@ -1,12 +1,41 @@
 export type BiologicalSex = "MALE" | "FEMALE";
 export type PrimaryGoal = "WEIGHT_LOSS" | "RECOMPOSITION" | "MAINTENANCE" | "PERFORMANCE";
-export type SoccerTeam = "Flamengo" | "Grêmio";
+export type ProfileId = "DANIEL" | "PATRICIA" | "GABRIEL" | "CLAN";
+export type SoccerTeam = "Flamengo" | "Grêmio" | "Palmeiras";
 export type RacePriority = "P1_TARGET" | "P2_PREP" | "P3_FUN_PARTY";
 export type WeekPhase = "BASE" | "SPECIFIC" | "TAPER_P1" | "POST_21K_RECOVERY";
 export type WeekendLayoutMode = "CLASSIC_SUNDAY_LONG" | "SATURDAY_LONG_SUNDAY_FAMILY_BIKE";
 export type Modality = "RUN" | "BIKE" | "STRENGTH" | "REST" | "DECOMPRESSION";
 export type WorkoutStatus = "PLANNED" | "COMPLETED" | "SKIPPED";
 export type AllowedEnvironment = "DUAL_OUTDOOR_TREADMILL" | "OUTDOOR_STREET_ONLY" | "GYM" | "INDOOR_OUTDOOR_BIKE";
+
+export interface TargetRaceItem {
+  id: string;
+  athleteId: "DANIEL" | "PATRICIA" | "GABRIEL" | "CLAN";
+  name: string;
+  raceDate: string; // YYYY-MM-DD
+  distanceKm: number;
+  location: string;
+  priority: RacePriority;
+  targetPaceMinKm: string;
+  targetFinishTime: string;
+  taperingWeeksCount: number;
+  carbLoadingDaysBefore: number;
+  isCompleted?: boolean;
+  actualFinishTime?: string; // Tempo líquido oficial (Chip Time)
+  actualGunTime?: string; // Tempo bruto (Gun Time)
+  actualPaceMinKm?: string; // Pace oficial médio (min/km)
+  overallRank?: string; // Ex: "412 / 4.850" ou "412º Geral"
+  categoryRank?: string; // Ex: "28 / 620" ou "28º na Faixa Etária"
+  genderRank?: string; // Ex: "340 / 3.100" ou "340º Masculino"
+  ageGroupCategory?: string; // Ex: "M50-54", "F55-59", "M20-24"
+  podiumAward?: string; // Ex: "🥈 Top 5% Categoria", "Recorde Pessoal (RP)", "Medalha Conquistada"
+  percentileRankPct?: number; // Ex: 92 (melhor que 92% do pelotão)
+  raceNotes?: string; // Observações da prova (clima, hidratação, tênis usado)
+  certificateUrl?: string; // Comprovante / Link oficial de resultados
+  isCalibrationBase?: boolean;
+  raceStartTime?: string; // Hora da largada oficial (ex: "06:30", "06:15", "07:00")
+}
 
 export type FoodTacticalClass = "P1" | "P2" | "P3" | "C1" | "C2" | "C3" | "V1" | "V2" | "V3";
 
@@ -109,6 +138,28 @@ export interface MatchInfo {
   score?: string;
   stadium?: string;
   status: "FINISHED" | "SCHEDULED" | "LIVE";
+  broadcastChannels?: string[];
+  broadcastPlatform?: string;
+}
+
+export type StreamingPlatform = "NETFLIX" | "DISNEY_PLUS" | "PRIME_VIDEO" | "MAX" | "APPLE_TV";
+
+export interface StreamingRecommendation {
+  id: string;
+  title: string;
+  originalTitle?: string;
+  type: "FILME" | "SERIE" | "DORAMA" | "DOCUMENTARIO";
+  platform: StreamingPlatform;
+  platformName: string;
+  genre: string;
+  releaseYear: number;
+  durationOrSeasons: string;
+  synopsis: string;
+  ratingScore: string;
+  recommendedFor: ProfileId;
+  dopamineTheme: "RELAX_CALMANTE" | "SUPERAÇÃO_ESPORTIVA" | "EMOCIONANTE_DORAMA" | "DIVERSÃO_FAMÍLIA";
+  coverGradient: string;
+  tags: string[];
 }
 
 export interface FootballTeamData {
@@ -126,9 +177,14 @@ export interface FootballTeamData {
   nextMatchDateCountdown?: string;
   logisticalAdjustments?: {
     requiresTrainingCut: boolean;
-    recommendedEndTime: string; // e.g. "20:50"
+    recommendedEndTime: string; // e.g. "17:30" (1h before 18:30 kickoff)
     caloricBufferKcal: number; // e.g. 350
     recommendedSnacks: string[];
+    targetKickoffTime?: string; // e.g. "18:30"
+    targetOpponent?: string; // e.g. "Bahia"
+    targetMatchDate?: string; // e.g. "18/10/2026"
+    isMatchToday?: boolean;
+    lockReason?: string;
   };
 }
 
@@ -177,4 +233,55 @@ export interface TacoFoodItem {
   portionName: string;
   familyRecommendedPortionDanielG: number;
   familyRecommendedPortionPatriciaG: number;
+}
+
+export interface RaceMorningScheduleStep {
+  id: string;
+  timestamp: string; // Ex: "04:05"
+  relativeMinutesToGun: number; // Ex: -145
+  relativeMinutesToDeparture: number; // Ex: -53
+  category: "CIRCADIAN" | "NUTRITION" | "GEAR" | "LOGISTICS" | "VENUE" | "GUN";
+  title: string;
+  description: string;
+  tuyaAction?: string;
+  tuyaDeviceLabel?: string;
+  badgeLabel?: string;
+  isCompleted?: boolean;
+}
+
+export interface RaceVenuePreset {
+  id: string;
+  name: string;
+  locationLabel: string;
+  distanceKmFromMaraca: number;
+  estimatedDriveMinutesSundayMorning: number;
+  parkingBufferMinutes: number;
+  notes: string;
+  defaultRaceStartTime: string;
+}
+
+export interface RaceLogisticsPlan {
+  originAddress: string;
+  destinationVenue: string;
+  raceStartTime: string;
+  distanceKm: number;
+  estimatedDriveMinutes: number;
+  parkingBufferMinutes: number;
+  totalTransitMinutes: number;
+  venueArrivalTarget: string; // Exact 1 hour before gun
+  departureFromHomeTime: string;
+  alarmWakeupTime: string;
+  circadianSunriseTime: string;
+  hotDrinksBrewTime: string;
+  closetIlluminationTime: string;
+  breakfastTime: string;
+  departureAllOffTime: string;
+  wazeUrl: string;
+  googleMapsUrl: string;
+  steps: RaceMorningScheduleStep[];
+  raceName?: string;
+  raceDate?: string;
+  recommendedBedtime?: string; // Horário ideal para dormir na véspera (8h de sono)
+  athleteId?: "DANIEL" | "PATRICIA" | "GABRIEL" | "CLAN";
+  hotBeveragePreference?: "CAFEZINHO" | "MATE" | "BOTH";
 }

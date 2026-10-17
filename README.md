@@ -1,104 +1,110 @@
-# Bio-Triad OS (Anti-Mock & Real-Data Edition - V10.0)
+# Bio-Triad OS (Haute Horlogerie & Tactical Dispatch Edition - V11.0)
 
-> **Sistema Operacional Unificado de Performance Híbrida, Nutrição TACO de Precisão e Neuro-Descompressão**  
-> *Repositório Oficial:* `https://github.com/danielsoutolopes-cell/correr.git`
+> **Sistema Operacional Unificado de Performance Híbrida, Nutrição TACO de Precisão, Logística de Alvorada e Neuro-Descompressão**  
+> *Repositório Oficial:* `https://github.com/danielsoutolopes-cell/correr.git`  
+> *Ambiente de Produção:* `https://correr-gukc.onrender.com`  
+> *Residência do Clã:* `Rua Maracá, 132, São Paulo, SP, CEP 04313-210`
 
 ---
 
-## 1. Visão Geral da Arquitetura
+## 1. Visão Geral da Arquitetura & Módulos
 
-O **Bio-Triad OS** é uma plataforma full-stack de engenharia esportiva e descompressão neural desenhada especificamente para a **Família Lopes (Daniel & Patrícia)**, integrando:
+O **Bio-Triad OS** é uma plataforma full-stack de engenharia esportiva, descompressão neural e automação residencial desenhada especificamente para o **Clã Lopes (Daniel, Patrícia & Gabriel)**:
 
-1. **Performance Híbrida & Corrida Dual-Mode:**
-   - **Rua (Outdoor):** Métricas de GPS, pace alvo (`min/km`), zonas de frequência cardíaca Z1 a Z5 e cadência.
-   - **Esteira (Indoor):** Conversão biomecânica via fórmula de Costill com inclinação compensatória (1.0% a 4.0%) e blocos de tempo/velocidade somando no máximo **60 minutos nos dias úteis**.
-   - **Musculação Completa (Fichas A, B, C):** IronLog com adaptação clínica estrita para a **prótese reversa no ombro direito de Daniel** (bloqueio de exercícios overhead, substituição por pegada neutra a 45° no plano escapular).
-   - **Ciclismo & Mobilidade:** 1 a 2x por semana (giros regenerativos e pedal recreativo em família).
+1. **Alvorada de Prova & Despacho Tático (Rua Maracá, 132):**
+   - **Origem Fixada:** `Rua Maracá, 132, São Paulo, SP, CEP 04313-210` (Vila Guarani / Jabaquara).
+   - **Regra de Ouro (-1h):** Chegada no local da prova garantida com 1 hora de antecedência (ex: 05:30 para largada 06:30).
+   - **Cálculo de Deslocamento:** 14.2 km até a Marginal Pinheiros (22 min de carro + 10 min de manobra = 32 min total; saída às 04:58).
+   - **Tomada Dupla Tuya (`ebc4a8285904c4bd43crx7`):** Acionamento automatizado do cafezinho de Daniel (`switch_1` 15 min) e chimarrão de Patrícia (`switch_2` 10 min).
+   - **Iluminação Tática do Closet:** Leds do Cabide e Porta em 4000K para uniformes e tênis com placa de carbono.
+   - **Navegação com 1 Clique:** Deep-links diretos para Waze e Google Maps.
 
-2. **Fim de Semana Flexível:**
-   - Alternância dinâmica entre **Modo Clássico** (Longão de 16-18 km no Domingo) vs. **Modo Família** (Longão no Sábado + Pedal em Família no Domingo).
+2. **Simulador Tático Km a Km & Modo Prova Ao Vivo:**
+   - **Execução em Tempo Real:** Cronômetro Haute Horlogerie centesimal, contagem regressiva 3-2-1 e tiro de largada sonoro via Web Audio API.
+   - **Registro de Splits:** Botão "Passar Km" que registra tempo parcial, compara com o planejado e calcula o delta em tempo real.
+   - **Áudio Coach ao Vivo:** Voz sintetizada que narra os tempos e dá instruções de ritmo e hidratação.
+   - **Metrônomo Sonoro de Cadência:** Ajuste preciso de SPM (178 Daniel, 180 Patrícia, 185 Gabriel).
+   - **Calibrador de Base:** Salva os tempos para cálculo de zonas e gera Trophy Cards para redes sociais.
 
-3. **Nutrição de Precisão & Tabela TACO Oficial:**
-   - **Multimodal Bio-Scanner:** Alimentado por `gemini-2.5-flash` para identificação taxonômica de pratos e fotos.
-   - **Tabela TACO (UNICAMP):** Classificação tática em **P1-P3** (Proteínas), **C1-C3** (Carboidratos/Leguminosas) e **V1-V3** (Vegetais, Nitratos e Lipídeos Cardioprotetores).
-   - **Porcionamento Familiar:** Cálculo automático de gramaturas para Daniel (80kg -> meta 75kg) vs Patrícia (58kg -> meta 55kg).
-   - **Modo Petiscos Saudáveis:** Buffer calórico de +350 kcal ativado em dias de jogos tensos.
-   - **Calculadora de Carb-Loading:** Saturação de glicogênio (7-8g carb/kg) nos 3 dias pré-prova de 21k.
+3. **Sincronização com Futebol & Trava de Treino (-1h):**
+   - **Trava de Corte Vespertino:** Corta o treino 1 hora antes do início do jogo (Flamengo, Grêmio ou Palmeiras) para banho e acomodação.
+   - **Onde Assistir:** Indicação em tempo real dos canais e serviços de streaming da partida (Globo, Premiere, SporTV, CazéTV, Prime Video, Disney+).
 
-4. **Saúde Mental & Neuro-Descompressão (5 Estações):**
-   - **Eclusa 18h30:** Brain Dump para desconexão do trabalho antes da rotina familiar e do treino.
-   - **Freio Térmico 20h30:** Resfriamento fisiológico pós-treino e estímulo da melatonina com iluminação âmbar.
-   - **Protocolo Pós-Jogo:** Manejo da taquicardia e do tônus simpático pós-partidas de Flamengo e Grêmio.
-   - **Reset de Dias OFF:** Segunda e Sexta-feira dedicadas a descanso passivo completo.
-   - **Botão SOS 4-7-8:** Player visual com guia respiratório (4s inspiração, 7s retenção, 8s expiração).
+4. **Mental Health & Módulo Streaming (Netflix, Disney+, Prime Video):**
+   - Sugestões curadas de filmes, documentários esportivos, séries e doramas para relaxamento pós-jantar.
+   - Botão "🎬 Modo Cinema" com iluminação âmbar a 15% e tomada da TV ligada.
 
-5. **Family Football Hub em Tempo Real:**
-   - Consulta à internet via Google Gen AI SDK com grounding no Google Search.
-   - Tabela do Brasileirão atualizada, últimos resultados e próximos jogos de Flamengo e Grêmio.
-   - Índice de Tensão Cardíaca (1 a 5) com corte logístico automático de treino para término às 20h50 quando Tensão >= 4.
+5. **Previsão do Tempo do Dia Seguinte (D+1):**
+   - Temperatura matinal, umidade, vento, ponto de orvalho e sugestão de vestuário e hidratação para a manhã seguinte.
 
-6. **Hardware & IoT (Zero Mock):**
-   - **Samsung Galaxy Watch Ultra:** Consumo direto da API REST do Intervals.icu (`/wellness` e `/activities` para o atleta `I753639`).
-   - **Tuya Smart Home Cloud:** OpenAPI dos EUA com assinatura HMAC-SHA256 para controle de cenas de luzes e tomadas inteligentes.
+6. **Hall do Clã Lopes, Troféus & Easter Eggs:**
+   - Vitrine de 1.652 km somados pela família, tempos oficiais líquidos (*Chip Time*), posições gerais e de categoria.
+   - Easter eggs com cliques no logotipo exibindo celebrações clubistas com hinos e fogos.
 
-7. **Temporada de Provas 2027:**
-   - **P1 Confirmada:** Maratona Internacional de São Paulo (21k) - 11 de Abril de 2027.
-   - **P1 Confirmada:** Nike SP City Marathon (21k) - 25 de Julho de 2027.
-   - **P2 Prep (Rascunho TBD):** Meia Maratona de Praia Grande (21k) - Janela Set/Out 2027.
-   - Tapering regressivo de 3 semanas e Recovery Lock de 14 dias pós-21k.
+7. **Nutrição de Precisão TACO (Balança dos 58% vs 42%):**
+   - Panela familiar única dividida matematicamente na balança (58% Daniel / 42% Patrícia).
+   - Protocolo de café da manhã de prova pré-calculado com carboidratos de rápida absorção e sódio.
+
+8. **Automação Residencial Tuya IoT (12 Cenas Ativas):**
+   - Conexão direta com OpenAPI Tuya US com assinatura HMAC-SHA256 para lâmpadas, fitas LED, tomadas inteligentes e ar-condicionado.
 
 ---
 
 ## 2. Stack Tecnológica
 
-- **Framework:** Next.js 15 (App Router) + React 18 + TypeScript estrito
-- **Estilização:** Tailwind CSS com paleta esportiva escura (`#090D16`), cards (`#111827`) e acentos neon HSL
-- **ORM & Banco de Dados:** Drizzle ORM + PostgreSQL (`src/db/schema.ts`)
-- **Motor de Inteligência Artificial:** `@google/genai` (Gemini 2.5 Flash + Google Search Grounding)
-- **PWA:** `manifest.json` com suporte a `Web Share Target` para compartilhamento direto de fotos
-- **Agendamento Serverless:** Vercel Cron (`vercel.json`)
+- **Framework:** Next.js 15 (App Router) + React 19 + TypeScript
+- **Estética:** Haute Horlogerie Dark Theme, Vanilla TailwindCSS, Neons HSL, Glassmorphism
+- **Áudio & Voz:** Web Audio API (Sintetizador Harmônico de Buzinas e Metrônomo) + SpeechSynthesis nativo
+- **Inteligência Artificial:** Google Gemini 2.5 Flash com Search Grounding
+- **APIs de Terceiros:** Intervals.icu REST, OpenWeatherMap, Tuya IoT Cloud OpenAPI, Evolution API WhatsApp, Telegram Bot API
+- **Banco de Dados:** PostgreSQL Serverless Neon / Supabase
 
 ---
 
-## 3. Variáveis de Ambiente (`.env.local` / `.env`)
+## 3. Variáveis de Ambiente (`.env`)
 
 ```ini
-# Google Gen AI SDK (Obrigatório para Football Hub e Bio-Scanner visual)
+# Google Gemini 2.5 Flash
 GEMINI_API_KEY="sua_chave_gemini"
 
-# Intervals.icu REST API (Telemetria do Galaxy Watch Ultra)
-INTERVALS_API_KEY="sua_chave_intervals"
+# Intervals.icu (Galaxy Watch Ultra Daniel)
 INTERVALS_ATHLETE_ID="I753639"
+INTERVALS_API_KEY="sua_chave_intervals"
 
-# Tuya Smart Home Cloud OpenAPI (EUA)
-TUYA_CLIENT_ID="seu_tuya_access_id"
-TUYA_CLIENT_SECRET="seu_tuya_secret"
+# Tuya Smart Home Cloud (US OpenAPI)
+TUYA_CLIENT_ID="seu_access_id"
+TUYA_CLIENT_SECRET="seu_client_secret"
 TUYA_ENDPOINT="https://openapi.tuyaus.com"
-TUYA_DEVICE_LIVING_ROOM_LIGHT="id_lampada_sala"
-TUYA_DEVICE_BALCONY_LED="id_fita_led"
+TUYA_DEVICE_DUAL_PLUG="ebc4a8285904c4bd43crx7"
+TUYA_DEVICE_BEDROOM_LED="eb4deff019cb6627614ic8"
+TUYA_DEVICE_CLOSET_HANGER_LED="eb7e8e6b7909ed343dfawf"
+TUYA_DEVICE_LIVING_ROOM_LIGHT="eb52fdf73913d81cf5ruqt"
 
-# PostgreSQL Serverless (Neon / Supabase / Local)
-DATABASE_URL="postgres://postgres:postgres@localhost:5432/bio_triad_os"
+# WhatsApp Evolution API
+EVOLUTION_API_URL="https://whatsapp-ecostone.onrender.com"
+EVOLUTION_INSTANCE_NAME="ecostone"
+EVOLUTION_API_KEY="sua_chave"
 
-# App URL
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
+# Telegram Bot
+TELEGRAM_BOT_TOKEN="seu_token"
+TELEGRAM_CHAT_ID="seu_chat_id"
 ```
 
 ---
 
-## 4. Execução Local
+## 4. Execução Local & Build
 
 ```bash
-# Instalação das dependências
+# Instalar dependências
 npm install
 
-# Inicialização do servidor em desenvolvimento
+# Rodar servidor de desenvolvimento
 npm run dev
 
-# Build de produção
+# Validar e compilar produção
 npm run build
-npm start
-
-# Seeding do banco de dados com a Tabela TACO Oficial
-npm run db:seed
 ```
+
+---
+
+*Bio-Triad OS v11.0.0 • Desenvolvido com carinho e precisão suíça para o Clã Lopes.*

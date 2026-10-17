@@ -26,29 +26,73 @@ import {
   Timer,
   Layers,
   Award,
+  Medal,
+  Trophy,
+  Star,
+  Dumbbell,
+  Bike,
+  Check,
+  CalendarDays,
+  Lock,
+  ShieldAlert,
 } from "lucide-react";
 import {
   BodyMetrics,
   FootballTeamData,
   GalaxyWatchTelemetry,
   WeekendLayoutMode,
+  ProfileId,
+  TargetRaceItem,
 } from "@/lib/types";
 import { WeatherPacingData } from "@/lib/weather-service";
-import { getProfileSpecs, evaluateRaceCalendar } from "@/lib/physiology";
+import {
+  getProfileSpecs,
+  evaluateRaceCalendar,
+  buildWeeklyScheduleTemplate,
+  getStrengthFicha,
+} from "@/lib/physiology";
 import { PatriciaMorningCheckin } from "@/components/PatriciaMorningCheckin";
 import { TuyaManifestoModal } from "@/components/TuyaManifestoModal";
-import { Snowflake, Leaf } from "lucide-react";
+import { ActiveWorkoutModal } from "@/components/ActiveWorkoutModal";
+import {
+  Snowflake,
+  Leaf,
+  Volume2,
+  VolumeX,
+  Sliders,
+  Smartphone,
+  Crown,
+  Share2,
+  Sunrise,
+  Car,
+  Coffee,
+  Moon,
+  Navigation,
+} from "lucide-react";
+import { audioCoach } from "@/lib/audio-coach";
+import {
+  calculateRaceMorningSchedule,
+  resolveVenueMetrics,
+  resolveRaceDefaultStartTime,
+  MARACA_HOME_ADDRESS,
+} from "@/lib/race-logistics";
 
 interface CockpitTabProps {
-  currentProfile: "DANIEL" | "PATRICIA" | "CLAN";
+  currentProfile: ProfileId;
   metrics: BodyMetrics;
   telemetry: GalaxyWatchTelemetry;
   footballData: {
     flamengo: FootballTeamData | null;
     gremio: FootballTeamData | null;
+    palmeiras?: FootballTeamData | null;
   };
   onTriggerTuyaScene: (scene: string) => void;
   onNavigateToTab: (tab: string) => void;
+  onOpenRaceManager?: () => void;
+  onOpenTacticalSimulator?: () => void;
+  onOpenTrophyCardGenerator?: () => void;
+  onOpenClanHallOfFame?: () => void;
+  onOpenRaceMorning?: (raceId?: string) => void;
 }
 
 export function CockpitTab({
@@ -58,10 +102,15 @@ export function CockpitTab({
   footballData,
   onTriggerTuyaScene,
   onNavigateToTab,
+  onOpenRaceManager,
+  onOpenTacticalSimulator,
+  onOpenTrophyCardGenerator,
+  onOpenClanHallOfFame,
+  onOpenRaceMorning,
 }: CockpitTabProps) {
-  const isDaniel = currentProfile !== "PATRICIA";
+  const isDaniel = currentProfile === "DANIEL";
   const specs = getProfileSpecs(currentProfile);
-  const races = evaluateRaceCalendar("2026-10-17", isDaniel ? "DANIEL" : "PATRICIA");
+  const races = evaluateRaceCalendar("2026-10-17", currentProfile);
 
   const [selectedBodyPart, setSelectedBodyPart] = useState<string>(
     isDaniel ? "SHOULDER" : "PELVIS"
@@ -70,14 +119,218 @@ export function CockpitTab({
   const [showTuyaManifesto, setShowTuyaManifesto] = useState<boolean>(false);
   const [tuyaNotification, setTuyaNotification] = useState<string | null>(null);
 
-  const teamData = isDaniel ? footballData.flamengo : footballData.gremio;
+  const teamData =
+    currentProfile === "GABRIEL"
+      ? footballData.palmeiras
+      : currentProfile === "PATRICIA"
+      ? footballData.gremio
+      : footballData.flamengo;
 
   const [weatherData, setWeatherData] = useState<WeatherPacingData | null>(null);
   const [telegramStatus, setTelegramStatus] = useState<string | null>(null);
+  const [storedRaces, setStoredRaces] = useState<TargetRaceItem[]>([]);
+  const [twinEasterEgg, setTwinEasterEgg] = useState<string | null>(null);
+  const [selectedAlvoradaRaceId, setSelectedAlvoradaRaceId] = useState<string>("");
+
+  // Dynamic scheduled upcoming races for currentProfile
+  const profileUpcomingRaces = [
+    ...races.filter((r) => !r.isTbd && r.date),
+    ...storedRaces
+      .filter((r) => r.athleteId === currentProfile && !r.isCompleted && !races.some((cr) => cr.id === r.id))
+      .map((r) => ({
+        id: r.id,
+        name: r.name,
+        priority: r.priority,
+        distanceKm: r.distanceKm,
+        date: r.raceDate,
+        isTbd: false,
+        location: r.location,
+        targetPaceMinKm: r.targetPaceMinKm,
+        targetFinishTime: r.targetFinishTime,
+        taperingWeeks: r.taperingWeeksCount,
+        carbLoadingDays: r.carbLoadingDaysBefore,
+        raceStartTime: r.raceStartTime,
+      })),
+  ];
+
+  const activeAlvoradaRace =
+    profileUpcomingRaces.find((r) => r.id === selectedAlvoradaRaceId) ||
+    profileUpcomingRaces[0] ||
+    races[0];
+
+  const alvoradaStartTime = (() => {
+    if (typeof window !== "undefined" && activeAlvoradaRace) {
+      const savedTime = localStorage.getItem(`RACE_START_TIME_${activeAlvoradaRace.id}`);
+      if (savedTime) return savedTime;
+    }
+    return (
+      activeAlvoradaRace?.raceStartTime ||
+      resolveRaceDefaultStartTime(activeAlvoradaRace?.distanceKm || 21, activeAlvoradaRace?.name || "")
+    );
+  })();
+
+  const venueResolved = resolveVenueMetrics(activeAlvoradaRace?.location || "");
+
+  const alvoradaPlan = calculateRaceMorningSchedule({
+    raceStartTime: alvoradaStartTime,
+    selectedPresetId: venueResolved.matchedPresetId,
+    customVenueName: activeAlvoradaRace?.location,
+    venueArrivalBufferMinutes: 60,
+    raceName: activeAlvoradaRace?.name || "Athenas Mizuno Run Longer",
+    raceDate: activeAlvoradaRace?.date || undefined,
+    athleteId: currentProfile === "PATRICIA" ? "PATRICIA" : currentProfile === "GABRIEL" ? "GABRIEL" : "DANIEL",
+    hotBeveragePreference:
+      currentProfile === "PATRICIA" ? "MATE" : currentProfile === "CLAN" ? "BOTH" : "CAFEZINHO",
+  });
+
+  // JS getDay(): 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+  // WeeklySchedule index: 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
+  const getTodayScheduleIndex = () => {
+    const day = new Date().getDay();
+    if (day === 0) return 6; // Sunday
+    return day - 1; // Mon=0 .. Sat=5
+  };
+
+  const todayIndex = getTodayScheduleIndex();
+  const [selectedDayIndex, setSelectedDayIndex] = useState<number>(todayIndex);
+  const [completedWorkouts, setCompletedWorkouts] = useState<Record<string, boolean>>({});
+  const [isActiveWorkoutOpen, setIsActiveWorkoutOpen] = useState<boolean>(false);
+  const [activeFichaForModal, setActiveFichaForModal] = useState<"A" | "B" | "C">("A");
+
+  // Audio Coach & Metronome State
+  const [isMetronomeActive, setIsMetronomeActive] = useState<boolean>(false);
+  const [metronomeBpm, setMetronomeBpm] = useState<number>(() => {
+    if (currentProfile === "GABRIEL") return 185;
+    if (currentProfile === "PATRICIA") return 180;
+    return 178;
+  });
+  const [isSpeakingCoach, setIsSpeakingCoach] = useState<boolean>(false);
+  const [weatherViewMode, setWeatherViewMode] = useState<"LIVE_NOW" | "TOMORROW">("TOMORROW");
+
+  const handleSpeakTomorrowWeather = () => {
+    if (!weatherData?.tomorrow) return;
+    const t = weatherData.tomorrow;
+    const text = `Previsão oficial para a prova de amanhã, domingo! Na largada às 06h30 teremos temperatura fresca de ${t.tempStartC} graus, sensação de ${t.feelsLikeC} graus e umidade de ${t.humidityPct} por cento. Vento suave de ${t.windSpeedKmh} quilômetros por hora. Condições térmicas ideais, com zero perda por calor. Vista regata leve, bermuda com bolso para gel e prepare o pódio!`;
+    audioCoach.speakCoachBriefing(text);
+  };
+
+  const handleSpeakPreGameCutoffLock = () => {
+    if (!teamData?.nextMatches?.[0]) return;
+    const nm = teamData.nextMatches[0];
+    const cutoff = teamData.logisticalAdjustments?.recommendedEndTime || "17:30";
+    const team = teamData.teamName;
+    const athleteName = isDaniel ? "Daniel" : currentProfile === "PATRICIA" ? "Patrícia" : "Gabriel";
+    const text = `Atenção ${athleteName}! A trava inteligente de corte de treino vespertino está ativada para o próximo jogo do ${team} contra o ${nm.opponent}. A partida começa às ${nm.timeBrasilia}. Por disciplina tática e proteção metabólica, seu treino vespertino deve encerrar impreterivelmente às ${cutoff}, exatamente uma hora antes do pontapé inicial. Você terá 60 minutos para desaquecimento da frequência cardíaca, banho relaxante e foco total na torcida!`;
+    audioCoach.speakCoachBriefing(text);
+  };
+
+  useEffect(() => {
+    if (currentProfile === "GABRIEL") setMetronomeBpm(185);
+    else if (currentProfile === "PATRICIA") setMetronomeBpm(180);
+    else setMetronomeBpm(178);
+    if (audioCoach.isPlaying()) {
+      audioCoach.stopMetronome();
+      setIsMetronomeActive(false);
+    }
+  }, [currentProfile]);
+
+  const handleToggleMetronome = (targetBpm?: number) => {
+    const bpmToUse = targetBpm || metronomeBpm;
+    if (isMetronomeActive) {
+      audioCoach.stopMetronome();
+      setIsMetronomeActive(false);
+    } else {
+      audioCoach.startMetronome(bpmToUse);
+      setIsMetronomeActive(true);
+    }
+  };
+
+  const handleAdjustBpm = (delta: number) => {
+    const nextBpm = Math.max(140, Math.min(210, metronomeBpm + delta));
+    setMetronomeBpm(nextBpm);
+    if (isMetronomeActive) {
+      audioCoach.startMetronome(nextBpm);
+    }
+  };
+
+  const handleSpeakDailyBriefing = () => {
+    if (isSpeakingCoach) {
+      audioCoach.stopSpeaking();
+      setIsSpeakingCoach(false);
+      return;
+    }
+
+    const athleteName = specs.name;
+    const weatherInfo = weatherData
+      ? `Temperatura em São Paulo está em ${weatherData.tempC} graus, com umidade de ${weatherData.humidityPct} por cento.`
+      : "Clima ameno em São Paulo.";
+
+    let speechText = "";
+    if (todayIndex === 5) {
+      // Sábado Véspera da Athenas Mizuno
+      speechText = `Atenção ${athleteName}! Hoje é sábado, véspera da Athenas Mizuno Run Longer. ${weatherInfo} ${
+        isDaniel
+          ? "Daniel, 21 quilômetros amanhã na Marginal Pinheiros! Hoje protocolo estrito: hidratação isotônica constante, carbo loading de 58 por cento na panela, verificação do chip de cronometragem no cadarço e descanso. Cadência travada em 178 passos por minuto para amortecer impacto e proteger a prótese reversa."
+          : currentProfile === "PATRICIA"
+          ? "Patrícia, 14 quilômetros amanhã! Ativação isométrica do glúteo médio, joelhos alinhados e estabilidade rítmica a 180 passos por minuto. A prova é sua!"
+          : "Gabriel, motor alviverde ligado a 185 passos por minuto! Pronto para explodir nos 10 quilômetros sub 45."
+      } Vamos juntos rumo ao pódio do Clã Lopes!`;
+    } else {
+      speechText = `Atenção ${athleteName}! Treino de hoje calibrado com sucesso pelo Bio-Triad OS. Cadência recomendada de ${metronomeBpm} passos por minuto. Mantenha foco e hidratação!`;
+    }
+
+    setIsSpeakingCoach(true);
+    audioCoach.speakCoachBriefing(speechText);
+    setTimeout(() => setIsSpeakingCoach(false), 24000);
+  };
+
+  useEffect(() => {
+    setSelectedDayIndex(getTodayScheduleIndex());
+  }, [currentProfile]);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("BIO_TRIAD_COMPLETED_WORKOUTS");
+      if (stored) {
+        setCompletedWorkouts(JSON.parse(stored));
+      }
+    } catch (e) {}
+  }, []);
+
+  const handleToggleCompleteWorkout = (key: string) => {
+    const next = { ...completedWorkouts, [key]: !completedWorkouts[key] };
+    setCompletedWorkouts(next);
+    try {
+      localStorage.setItem("BIO_TRIAD_COMPLETED_WORKOUTS", JSON.stringify(next));
+    } catch (e) {}
+  };
 
   useEffect(() => {
     setSelectedBodyPart(isDaniel ? "SHOULDER" : "PELVIS");
   }, [isDaniel]);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("BIO_TRIAD_RACES_V3");
+      if (stored) {
+        setStoredRaces(JSON.parse(stored));
+      }
+    } catch (e) {}
+  }, []);
+
+  const handleBodyPartClick = (part: string) => {
+    setSelectedBodyPart(part);
+    if (part === "SHOULDER" && isDaniel) {
+      setTwinEasterEgg("🛡️ MODO CIBORGUE: Prótese reversa em titânio cirúrgico 100% blindada! Zero overhead, proteção articular ativa e Z5 pronto para amanhã!");
+      setTimeout(() => setTwinEasterEgg(null), 7000);
+    } else if (part === "PELVIS" && !isDaniel) {
+      setTwinEasterEgg("👑 RAINHA DO PÓDIO: Estabilidade do glúteo médio de aço, zero valgo dinâmico e garra tricolor!");
+      setTimeout(() => setTwinEasterEgg(null), 7000);
+    } else if (currentProfile === "GABRIEL" && (part === "TORSO" || part === "ARMS" || part === "LEGS")) {
+      setTwinEasterEgg("⚡ MOTOR ALVIVERDE 2006: 20 anos, fibra tipo IIx veloz e arrancada rumo ao sub-45!");
+      setTimeout(() => setTwinEasterEgg(null), 7000);
+    }
+  };
 
   useEffect(() => {
     fetch("/api/weather/live?city=Sao%20Paulo,BR")
@@ -225,6 +478,324 @@ export function CockpitTab({
       {/* Patricia Morning Check-in Card (Subjective Readiness without Galaxy Watch) */}
       {!isDaniel && <PatriciaMorningCheckin />}
 
+      {/* Haute Horlogerie Tactical Command Center & Precision Audio Metronome */}
+      <div className="rounded-3xl bg-gradient-to-r from-[#0C1220] via-[#0F172A] to-[#0A0E18] border border-cyan-500/30 p-4 sm:p-5 shadow-[0_8px_32px_rgba(6,182,212,0.15)] relative overflow-hidden backdrop-blur-xl">
+        <div className="absolute top-0 right-1/4 w-72 h-32 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-5 relative z-10">
+          {/* Metronome Control Dial */}
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => handleToggleMetronome()}
+                className={`h-12 w-12 rounded-2xl flex items-center justify-center font-mono font-black transition-all shadow-lg ${
+                  isMetronomeActive
+                    ? "bg-gradient-to-tr from-cyan-500 to-blue-600 text-black border-2 border-cyan-300 shadow-cyan-500/40 animate-pulse"
+                    : "bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/10"
+                }`}
+                title={isMetronomeActive ? "Parar Metrônomo Sonoro" : "Iniciar Metrônomo Sonoro de Cadência"}
+              >
+                {isMetronomeActive ? (
+                  <Volume2 className="h-6 w-6 text-black" />
+                ) : (
+                  <VolumeX className="h-6 w-6 text-gray-400" />
+                )}
+              </button>
+
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono tracking-widest uppercase text-cyan-400 font-bold">
+                    METRÔNOMO DE CADÊNCIA
+                  </span>
+                  {isMetronomeActive && (
+                    <span className="h-2 w-2 rounded-full bg-cyan-400 animate-ping" />
+                  )}
+                </div>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className="text-2xl font-black font-mono text-white tracking-tight">
+                    {metronomeBpm}
+                  </span>
+                  <span className="text-xs font-mono font-bold text-gray-400">SPM</span>
+                  <span className="text-[10px] text-gray-400 ml-2 hidden sm:inline">
+                    ({isDaniel ? "Daniel 178" : currentProfile === "PATRICIA" ? "Patrícia 180" : "Gabriel 185"})
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick SPM Presets & Fine Tuning */}
+            <div className="flex items-center gap-1.5 font-mono text-xs">
+              <button
+                onClick={() => handleAdjustBpm(-2)}
+                className="px-2 py-1 rounded-lg bg-black/40 border border-white/10 text-gray-300 hover:text-white hover:border-white/30"
+                title="Diminuir cadência em 2 SPM"
+              >
+                -2
+              </button>
+              <button
+                onClick={() => handleAdjustBpm(2)}
+                className="px-2 py-1 rounded-lg bg-black/40 border border-white/10 text-gray-300 hover:text-white hover:border-white/30"
+                title="Aumentar cadência em 2 SPM"
+              >
+                +2
+              </button>
+              <button
+                onClick={() => {
+                  setMetronomeBpm(178);
+                  if (isMetronomeActive) audioCoach.startMetronome(178);
+                }}
+                className={`px-2 py-1 rounded-lg border text-[11px] ${
+                  metronomeBpm === 178
+                    ? "bg-red-500/20 border-red-500 text-red-300 font-bold"
+                    : "bg-black/30 border-white/10 text-gray-400"
+                }`}
+              >
+                178 FLA
+              </button>
+              <button
+                onClick={() => {
+                  setMetronomeBpm(180);
+                  if (isMetronomeActive) audioCoach.startMetronome(180);
+                }}
+                className={`px-2 py-1 rounded-lg border text-[11px] ${
+                  metronomeBpm === 180
+                    ? "bg-sky-500/20 border-sky-500 text-sky-300 font-bold"
+                    : "bg-black/30 border-white/10 text-gray-400"
+                }`}
+              >
+                180 GRE
+              </button>
+              <button
+                onClick={() => {
+                  setMetronomeBpm(185);
+                  if (isMetronomeActive) audioCoach.startMetronome(185);
+                }}
+                className={`px-2 py-1 rounded-lg border text-[11px] ${
+                  metronomeBpm === 185
+                    ? "bg-emerald-500/20 border-emerald-500 text-emerald-300 font-bold"
+                    : "bg-black/30 border-white/10 text-gray-400"
+                }`}
+              >
+                185 PAL
+              </button>
+            </div>
+
+            {/* Coach Voice Synthesis Button */}
+            <button
+              onClick={handleSpeakDailyBriefing}
+              className={`flex items-center gap-2 px-3 py-2 rounded-xl font-mono text-xs font-bold border transition-all ${
+                isSpeakingCoach
+                  ? "bg-red-500/20 border-red-500 text-red-300 animate-pulse"
+                  : "bg-cyan-500/15 border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/25"
+              }`}
+            >
+              <Volume2 className="h-4 w-4" />
+              <span>{isSpeakingCoach ? "Parar Áudio Treinador" : "🎙️ Ouvir Briefing de Hoje"}</span>
+            </button>
+          </div>
+
+          {/* Direct Flagship Feature Launchers */}
+          <div className="flex items-center flex-wrap gap-2">
+            <button
+              onClick={() => onOpenRaceMorning?.(activeAlvoradaRace?.id)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-amber-600/30 to-orange-600/30 border border-amber-500/50 text-amber-300 hover:text-white hover:bg-amber-600/40 text-xs font-mono font-bold transition-all shadow-md shadow-amber-500/10"
+              title="Alvorada de Prova (Rua Maracá, 132 • Deslocamento de Carro • Regra -1h • Tuya Dual Plug)"
+            >
+              <Sunrise className="h-3.5 w-3.5 text-amber-400" />
+              <span>Alvorada de Prova</span>
+            </button>
+
+            <button
+              onClick={onOpenTacticalSimulator}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-cyan-950/40 border border-cyan-500/40 text-cyan-300 hover:text-white hover:bg-cyan-900/40 text-xs font-mono font-bold transition-all shadow-md"
+              title="Abrir Simulador Tático Km a Km de Prova (Splits, Carbogéis & Hidratação)"
+            >
+              <Compass className="h-3.5 w-3.5 text-cyan-400" />
+              <span>Simulador Tático</span>
+            </button>
+
+            <button
+              onClick={onOpenTrophyCardGenerator}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-950/40 border border-amber-500/40 text-amber-300 hover:text-white hover:bg-amber-900/40 text-xs font-mono font-bold transition-all shadow-md"
+              title="Gerar Card HD de Conquista para Instagram Story e WhatsApp"
+            >
+              <Smartphone className="h-3.5 w-3.5 text-amber-400" />
+              <span>Card & Story</span>
+            </button>
+
+            <button
+              onClick={onOpenClanHallOfFame}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-950/40 border border-purple-500/40 text-purple-300 hover:text-white hover:bg-purple-900/40 text-xs font-mono font-bold transition-all shadow-md"
+              title="Hall de Recordes, 1.652 km Coletivos e Vitrine de Troféus do Clã Lopes"
+            >
+              <Crown className="h-3.5 w-3.5 text-purple-400" />
+              <span>Hall do Clã</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Race Day Morning Logistics & Alvorada Quick Dispatch Banner (Dynamic for ALL Races) */}
+      <div className="rounded-3xl bg-gradient-to-r from-[#14120B] via-[#10141D] to-[#0D121B] border border-amber-500/30 p-4 sm:p-5 shadow-[0_8px_32px_rgba(245,158,11,0.12)] relative overflow-hidden backdrop-blur-xl">
+        <div className="absolute top-0 right-0 w-80 h-32 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        
+        <div className="relative z-10 space-y-4">
+          {/* Header & Main Badges */}
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
+            <div className="flex items-start gap-3.5">
+              <div className="h-11 w-11 rounded-2xl bg-gradient-to-tr from-amber-500/20 to-orange-500/30 border border-amber-500/40 flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/20">
+                <Sunrise className="h-6 w-6 text-amber-400 animate-pulse" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm font-black font-mono text-white tracking-wide uppercase">
+                    Alvorada & Logística Inteligente Pré-Prova
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 border border-amber-500/40 text-amber-300">
+                    REGRA -1h CHEGADA
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-cyan-500/20 border border-cyan-500/40 text-cyan-300">
+                    Origem: Rua Maracá, 132
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 border border-emerald-500/40 text-emerald-300">
+                    Largada T-Gun: {alvoradaStartTime}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-300 font-sans mt-1">
+                  <strong>{activeAlvoradaRace?.name}</strong> • Chegada antecipada às <strong>{alvoradaPlan.venueArrivalTarget}</strong> • 
+                  Saída de carro às <strong>{alvoradaPlan.departureFromHomeTime}</strong> ({alvoradaPlan.distanceKm} km • {alvoradaPlan.totalTransitMinutes} min) • 
+                  {currentProfile === "PATRICIA" ? "Tomada Dupla switch_2 (Mate)" : "Tomada Dupla switch_1 (Café)"} às <strong>{alvoradaPlan.hotDrinksBrewTime}</strong>.
+                </p>
+              </div>
+            </div>
+
+            {/* Quick Actions (Test Tuya, Waze, Full Dispatch) */}
+            <div className="flex items-center flex-wrap gap-2 w-full lg:w-auto justify-end">
+              <button
+                onClick={() => {
+                  onTriggerTuyaScene("RACE_MORNING_ALVORADA");
+                  setTuyaNotification(
+                    `🌅 Alvorada disparada para ${activeAlvoradaRace?.name}! Quarto 2700K + Tomada Dupla (${
+                      currentProfile === "PATRICIA" ? "switch_2 Mate" : "switch_1 Café"
+                    }) + Closet 4000K ligados!`
+                  );
+                  setTimeout(() => setTuyaNotification(null), 7000);
+                }}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 hover:bg-amber-500/25 text-xs font-mono font-bold transition-all shadow"
+                title="Disparar Alvorada Tuya no Quarto, Tomada Dupla e Closet"
+              >
+                <Zap className="h-3.5 w-3.5 text-amber-400" />
+                <span>⚡ Testar Tuya</span>
+              </button>
+
+              <a
+                href={alvoradaPlan.wazeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-cyan-950/50 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-900/50 text-xs font-mono font-bold transition-all shadow"
+              >
+                <Car className="h-3.5 w-3.5 text-cyan-400" />
+                <span>Waze ({alvoradaPlan.distanceKm} km)</span>
+              </a>
+
+              <button
+                onClick={() => onOpenRaceMorning?.(activeAlvoradaRace?.id)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black text-xs font-mono font-black transition-all shadow-md shadow-amber-500/20"
+              >
+                <Clock className="h-3.5 w-3.5 text-black" />
+                <span>Abrir Cronograma Completo</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Race Switcher Chips (Dynamic for all scheduled races) */}
+          {profileUpcomingRaces.length > 1 && (
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1 scrollbar-thin border-t border-white/5">
+              <span className="text-[10px] font-mono uppercase text-gray-400 font-bold shrink-0 mr-1 flex items-center gap-1">
+                <Calendar className="h-3 w-3 text-amber-400" />
+                Trocar Prova Alvo:
+              </span>
+              {profileUpcomingRaces.map((r) => {
+                const isSelected = activeAlvoradaRace?.id === r.id;
+                const rStartTime = (() => {
+                  if (typeof window !== "undefined") {
+                    const st = localStorage.getItem(`RACE_START_TIME_${r.id}`);
+                    if (st) return st;
+                  }
+                  return (r as any).raceStartTime || resolveRaceDefaultStartTime(r.distanceKm, r.name);
+                })();
+                return (
+                  <button
+                    key={r.id}
+                    onClick={() => setSelectedAlvoradaRaceId(r.id)}
+                    className={`px-2.5 py-1 rounded-xl text-xs font-mono transition-all shrink-0 flex items-center gap-1.5 border ${
+                      isSelected
+                        ? "bg-amber-500/20 border-amber-500 text-amber-300 font-bold shadow"
+                        : "bg-black/40 border-white/10 text-gray-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <span>{r.name.split("•")[0].trim()}</span>
+                    <span className="text-[10px] text-amber-400/90 font-bold">({rStartTime})</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* 6 Key Reverse Milestones Metrics */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-xs font-mono">
+            {/* Largada */}
+            <div className="p-2.5 rounded-xl bg-black/50 border border-amber-500/40">
+              <span className="text-[9px] text-amber-400 block uppercase font-bold">🏁 Largada T-Gun</span>
+              <span className="text-base font-black text-white">{alvoradaStartTime}</span>
+              <span className="text-[9px] text-gray-400 block truncate">{activeAlvoradaRace?.location.split("-")[1] || activeAlvoradaRace?.location}</span>
+            </div>
+
+            {/* Chegada na Arena */}
+            <div className="p-2.5 rounded-xl bg-black/50 border border-white/10">
+              <span className="text-[9px] text-gray-400 block uppercase font-bold">📍 Arena (-1h)</span>
+              <span className="text-base font-black text-amber-300">{alvoradaPlan.venueArrivalTarget}</span>
+              <span className="text-[9px] text-gray-500 block">Curral & chip</span>
+            </div>
+
+            {/* Saída de Casa */}
+            <div className="p-2.5 rounded-xl bg-black/50 border border-white/10">
+              <span className="text-[9px] text-gray-400 block uppercase font-bold">🚗 Saída Maracá 132</span>
+              <span className="text-base font-black text-cyan-300">{alvoradaPlan.departureFromHomeTime}</span>
+              <span className="text-[9px] text-gray-400 block">{alvoradaPlan.totalTransitMinutes} min ({alvoradaPlan.distanceKm} km)</span>
+            </div>
+
+            {/* Bebidas Tuya Dupla */}
+            <div className="p-2.5 rounded-xl bg-black/50 border border-white/10">
+              <span className="text-[9px] text-gray-400 block uppercase font-bold">
+                {currentProfile === "PATRICIA" ? "🧉 Tomada Dupla Chá" : "☕ Tomada Dupla Café"}
+              </span>
+              <span className="text-base font-black text-emerald-300">{alvoradaPlan.hotDrinksBrewTime}</span>
+              <span className="text-[9px] text-gray-400 block">
+                {currentProfile === "PATRICIA" ? "switch_2 (Mate 10m)" : "switch_1 (Café 15m)"}
+              </span>
+            </div>
+
+            {/* Alvorada Quarto */}
+            <div className="p-2.5 rounded-xl bg-black/50 border border-white/10">
+              <span className="text-[9px] text-gray-400 block uppercase font-bold">🌅 Alvorada Quarto</span>
+              <span className="text-base font-black text-amber-200">{alvoradaPlan.circadianSunriseTime}</span>
+              <span className="text-[9px] text-gray-400 block">Luz 2700K âmbar</span>
+            </div>
+
+            {/* Sono Véspera */}
+            <div className="p-2.5 rounded-xl bg-black/50 border border-purple-500/30">
+              <span className="text-[9px] text-purple-400 block uppercase font-bold flex items-center gap-1">
+                <Moon className="h-2.5 w-2.5" />
+                <span>🌙 Sono Véspera</span>
+              </span>
+              <span className="text-base font-black text-purple-300">{alvoradaPlan.recommendedBedtime}</span>
+              <span className="text-[9px] text-purple-400/80 block">8h de sono N3</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Hero Section: Digital Twin + Daily Telemetry */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Left Column: Digital Twin Interactive Guide (5 Cols) */}
@@ -252,6 +823,22 @@ export function CockpitTab({
               </span>
             </div>
 
+            {/* Biomechanical Twin Easter Egg Alert Banner */}
+            {twinEasterEgg && (
+              <div className="mb-3 p-3 rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 text-black font-mono text-xs font-bold shadow-xl animate-fadeIn flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 shrink-0" />
+                  <span>{twinEasterEgg}</span>
+                </div>
+                <button
+                  onClick={() => setTwinEasterEgg(null)}
+                  className="p-1 rounded-lg hover:bg-black/20 text-xs font-black ml-2"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
             {/* Interactive Anatomical SVG Model */}
             <div className="relative py-4 flex flex-col items-center justify-center bg-[#07090E]/90 rounded-2xl border border-white/5 my-2 shadow-inner">
               <svg
@@ -274,7 +861,7 @@ export function CockpitTab({
                   fill="#1E293B"
                   stroke="#3B82F6"
                   strokeWidth="1.5"
-                  onClick={() => setSelectedBodyPart("HEAD")}
+                  onClick={() => handleBodyPartClick("HEAD")}
                   className="hover:fill-blue-900/40 transition-colors"
                 />
                 {/* Neck */}
@@ -285,14 +872,15 @@ export function CockpitTab({
                   fill="#1E293B"
                   stroke="#374151"
                   strokeWidth="1.5"
-                  onClick={() => setSelectedBodyPart("TORSO")}
+                  onClick={() => handleBodyPartClick("TORSO")}
                   className="hover:fill-blue-900/40 transition-colors"
                 />
 
                 {/* Left Arm (Viewer's left = Right arm of athlete) */}
                 {isDaniel ? (
                   // DANIEL: Reverse Shoulder Prosthesis with Titanium Indicator
-                  <g onClick={() => setSelectedBodyPart("SHOULDER")} className="cursor-pointer">
+                  <g onClick={() => handleBodyPartClick("SHOULDER")} className="cursor-pointer">
+                    <title>Prótese Reversa de Titânio • Clique para inspecionar!</title>
                     <circle
                       cx="62"
                       cy="75"
@@ -316,7 +904,7 @@ export function CockpitTab({
                   </g>
                 ) : (
                   // PATRICIA: Completely Free & Healthy Arm
-                  <g onClick={() => setSelectedBodyPart("ARMS")} className="cursor-pointer">
+                  <g onClick={() => handleBodyPartClick("ARMS")} className="cursor-pointer">
                     <circle
                       cx="62"
                       cy="75"
@@ -336,7 +924,7 @@ export function CockpitTab({
                   r="9"
                   fill="#1E293B"
                   stroke="#374151"
-                  onClick={() => setSelectedBodyPart("ARMS")}
+                  onClick={() => handleBodyPartClick("ARMS")}
                   className="cursor-pointer"
                 />
                 <rect x="134" y="85" width="14" height="60" rx="6" fill="#334155" />
@@ -346,12 +934,13 @@ export function CockpitTab({
                   <path
                     d="M80,170 L120,170 L115,200 L85,200 Z"
                     fill="#334155"
-                    onClick={() => setSelectedBodyPart("PELVIS")}
+                    onClick={() => handleBodyPartClick("PELVIS")}
                     className="cursor-pointer"
                   />
                 ) : (
                   // PATRICIA: Active Pelvic Stability & Gluteus Focus
-                  <g onClick={() => setSelectedBodyPart("PELVIS")} className="cursor-pointer">
+                  <g onClick={() => handleBodyPartClick("PELVIS")} className="cursor-pointer">
+                    <title>Estabilidade Pélvica & Glúteo Médio • Clique para inspecionar!</title>
                     <path
                       d="M78,168 L122,168 L116,202 L84,202 Z"
                       fill="#0369A1"
@@ -518,105 +1107,400 @@ export function CockpitTab({
 
         {/* Right Column: Mission of the Day & Live Hubs (7 Cols) */}
         <div className="lg:col-span-7 space-y-5">
-          {/* Daily Mission Card (Tailored Haute Horlogerie Bezel) */}
-          <div className="rounded-3xl bg-gradient-to-br from-[#101726] via-[#141C30] to-[#0D121F] border border-blue-500/30 p-5 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-52 h-52 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+          {/* Daily Mission Card (Dynamic Treino do Dia) */}
+          <div className="rounded-3xl bg-gradient-to-br from-[#101726] via-[#141C30] to-[#0D121F] border border-blue-500/40 p-5 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-1 rounded-xl bg-blue-500/20 text-blue-300 border border-blue-500/30 text-xs font-mono font-bold uppercase tracking-wider">
-                  Missão do Dia • {specs.name.split(" ")[0]}
-                </span>
-                <span className="text-xs text-amber-400 font-bold flex items-center gap-1 font-mono">
-                  <Clock className="h-3.5 w-3.5" />
-                  {isDaniel ? "Teto: 55 min (<= 60 min)" : "Teto: 45 min (<= 50 min)"}
-                </span>
+            {/* Header: Today's Status & Action Ribbons */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span
+                    className={`px-3 py-1 rounded-xl text-xs font-mono font-black uppercase tracking-wider border flex items-center gap-1.5 ${
+                      selectedDayIndex === todayIndex
+                        ? "bg-gradient-to-r from-red-600 to-rose-600 text-white border-red-400 shadow-md shadow-red-600/30 animate-pulse"
+                        : "bg-blue-950/80 text-blue-300 border-blue-800"
+                    }`}
+                  >
+                    {selectedDayIndex === todayIndex ? "🔥 TREINO DE HOJE" : "📅 TREINO PLANEJADO"} • {(() => {
+                      const sched = buildWeeklyScheduleTemplate({
+                        weekendMode: "CLASSIC_SUNDAY_LONG",
+                        hasShoulderRestriction: isDaniel,
+                        profile: currentProfile,
+                      });
+                      return (sched[selectedDayIndex] || sched[todayIndex] || sched[5]).dayNamePt.toUpperCase();
+                    })()}
+                  </span>
+
+                  <span className="text-xs text-amber-300 font-bold flex items-center gap-1 font-mono px-2 py-0.5 rounded-lg bg-black/40 border border-white/10">
+                    <Clock className="h-3.5 w-3.5 text-amber-400" />
+                    {(() => {
+                      const sched = buildWeeklyScheduleTemplate({
+                        weekendMode: "CLASSIC_SUNDAY_LONG",
+                        hasShoulderRestriction: isDaniel,
+                        profile: currentProfile,
+                      });
+                      const w = sched[selectedDayIndex] || sched[todayIndex] || sched[5];
+                      return w.durationMin > 0 ? `Teto: ${w.durationMin} min` : "Dia OFF";
+                    })()}
+                  </span>
+
+                  {(() => {
+                    const sched = buildWeeklyScheduleTemplate({
+                      weekendMode: "CLASSIC_SUNDAY_LONG",
+                      hasShoulderRestriction: isDaniel,
+                      profile: currentProfile,
+                    });
+                    const w = sched[selectedDayIndex] || sched[todayIndex] || sched[5];
+                    const wKey = `${currentProfile}_${w.dayOfWeek}_2026-10-17`;
+                    return completedWorkouts[wKey] ? (
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700 flex items-center gap-1">
+                        <Check className="h-3 w-3 text-emerald-400" />
+                        CONCLUÍDO HOJE
+                      </span>
+                    ) : null;
+                  })()}
+                </div>
+
+                <h3 className="text-lg font-black text-white tracking-tight mt-2 flex items-center gap-2">
+                  <span>
+                    {(() => {
+                      const sched = buildWeeklyScheduleTemplate({
+                        weekendMode: "CLASSIC_SUNDAY_LONG",
+                        hasShoulderRestriction: isDaniel,
+                        profile: currentProfile,
+                      });
+                      return (sched[selectedDayIndex] || sched[todayIndex] || sched[5]).title;
+                    })()}
+                  </span>
+                </h3>
               </div>
 
-              <button
-                onClick={() => onNavigateToTab("COACH")}
-                className="text-xs font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-all"
-              >
-                <span>Planilha Completa</span>
-                <ChevronRight className="h-3.5 w-3.5" />
-              </button>
+              <div className="flex items-center gap-2 self-end sm:self-auto">
+                {(() => {
+                  const sched = buildWeeklyScheduleTemplate({
+                    weekendMode: "CLASSIC_SUNDAY_LONG",
+                    hasShoulderRestriction: isDaniel,
+                    profile: currentProfile,
+                  });
+                  const w = sched[selectedDayIndex] || sched[todayIndex] || sched[5];
+                  const wKey = `${currentProfile}_${w.dayOfWeek}_2026-10-17`;
+                  const isDone = !!completedWorkouts[wKey];
+
+                  return (
+                    <button
+                      onClick={() => handleToggleCompleteWorkout(wKey)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold font-mono transition-all flex items-center gap-1.5 shadow ${
+                        isDone
+                          ? "bg-emerald-600 text-white hover:bg-emerald-500"
+                          : "bg-white/10 text-gray-300 hover:text-white hover:bg-white/20 border border-white/15"
+                      }`}
+                      title={isDone ? "Marcar como pendente" : "Marcar como concluído"}
+                    >
+                      <CheckCircle2 className={`h-3.5 w-3.5 ${isDone ? "text-white" : "text-emerald-400"}`} />
+                      <span>{isDone ? "Concluído ✅" : "Marcar Concluído"}</span>
+                    </button>
+                  );
+                })()}
+
+                <button
+                  onClick={() => onNavigateToTab("COACH")}
+                  className="px-2.5 py-1.5 rounded-xl text-xs font-semibold text-blue-300 hover:text-white hover:bg-blue-600/20 border border-blue-500/30 flex items-center gap-1 transition-all"
+                  title="Abrir a planilha completa do Treinador"
+                >
+                  <span className="hidden sm:inline">Planilha</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
             </div>
 
-            <h3 className="text-lg font-black text-white tracking-tight">
-              {isDaniel
-                ? "Corrida Contínua Z2: Dual-Mode (Rua vs Esteira 9.5 km/h)"
-                : "Corrida Contínua Z2: Dual-Mode (Rua vs Esteira 8.8 km/h)"}
-            </h3>
-            <p className="text-xs text-gray-300 mt-1">
-              {isDaniel
-                ? "Desenvolvimento mitocondrial e lipólise sem estresse sobre a prótese do ombro."
-                : "Base aeróbia com postura ereta e reforço rítmico para os 10K do Circuito das Estações."}
-            </p>
+            {/* 7-Day Quick Day Switcher Bar (Always keeping TODAY prominent) */}
+            <div className="mb-4 bg-black/50 p-1.5 rounded-2xl border border-white/10 flex items-center justify-between gap-1 overflow-x-auto text-xs font-mono">
+              {[
+                { label: "Seg", dayPt: "Segunda", idx: 0 },
+                { label: "Ter", dayPt: "Terça", idx: 1 },
+                { label: "Qua", dayPt: "Quarta", idx: 2 },
+                { label: "Qui", dayPt: "Quinta", idx: 3 },
+                { label: "Sex", dayPt: "Sexta", idx: 4 },
+                { label: "Sáb", dayPt: "Sábado", idx: 5 },
+                { label: "Dom", dayPt: "Domingo", idx: 6 },
+              ].map((d) => {
+                const isThisDayToday = d.idx === todayIndex;
+                const isSelected = d.idx === selectedDayIndex;
+                const sched = buildWeeklyScheduleTemplate({
+                  weekendMode: "CLASSIC_SUNDAY_LONG",
+                  hasShoulderRestriction: isDaniel,
+                  profile: currentProfile,
+                });
+                const dWorkout = sched[d.idx];
+                const dKey = `${currentProfile}_${dWorkout.dayOfWeek}_2026-10-17`;
+                const isDone = !!completedWorkouts[dKey];
 
-            {/* Dual Mode Switcher Tabs */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-              {/* Mode A: Street / Outdoor */}
-              <div className="p-3.5 rounded-2xl bg-[#07090E]/80 border border-white/10 hover:border-blue-500/50 transition-all shadow-inner">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-bold text-blue-400 flex items-center gap-1.5">
-                    <Compass className="h-3.5 w-3.5" />
-                    Opção 1: Asfalto (Rua)
-                  </span>
-                  <span className="text-[10px] font-mono text-gray-400">
-                    {isDaniel ? "8.5 km" : "6.0 km"}
-                  </span>
+                return (
+                  <button
+                    key={d.idx}
+                    onClick={() => setSelectedDayIndex(d.idx)}
+                    className={`flex-1 py-1 px-1.5 rounded-xl text-center transition-all min-w-[42px] relative ${
+                      isSelected
+                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold shadow-md shadow-blue-600/30 ring-1 ring-white/20"
+                        : isThisDayToday
+                        ? "bg-red-950/60 text-red-300 border border-red-700/60 font-bold"
+                        : "text-gray-400 hover:text-gray-200 hover:bg-white/5"
+                    }`}
+                  >
+                    <span className="block text-[11px]">{d.label}</span>
+                    {isThisDayToday && (
+                      <span className="text-[8px] font-black uppercase text-amber-300 block -mt-0.5">
+                        HOJE
+                      </span>
+                    )}
+                    {isDone && (
+                      <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-400"></span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Special Race Eve Context Alert (Saturday 17/10 -> Tomorrow Sunday 18/10) */}
+            {selectedDayIndex === 5 && (
+              <div className="mb-4 p-3.5 rounded-2xl bg-gradient-to-r from-amber-950/40 via-[#1F170E] to-black/40 border border-amber-500/50 flex items-start gap-3">
+                <div className="h-8 w-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 shrink-0 mt-0.5">
+                  <Sparkles className="h-4 w-4" />
                 </div>
-                <div className="space-y-1.5 text-xs text-gray-300 font-mono">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Pace Alvo:</span>
-                    <span className="font-bold text-white">
-                      {isDaniel ? "6:15 min/km" : "6:45 min/km"}
-                    </span>
+                <div className="text-xs space-y-1">
+                  <div className="font-bold text-amber-300 flex items-center gap-1.5">
+                    <span>⚡ Protocolo de Véspera: Athenas Mizuno Run Longer (Amanhã!)</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Zona FC:</span>
-                    <span className="font-bold text-emerald-400">
-                      {isDaniel ? "Z2 (110 a 127 bpm)" : "Z2 (131 a 148 bpm)"}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-gray-400 font-sans mt-2 pt-2 border-t border-white/5">
+                  <p className="text-gray-300 text-[11px] leading-relaxed">
                     {isDaniel
-                      ? "1.5km aquec. + 6km ritmo + 1km solto. Zero impacto no braço direito."
-                      : "1.0km aquec. + 4.5km ritmo + 0.5km solto. Cadência 178 spm."}
+                      ? "Daniel corre os 21.097 km amanhã! Hoje: ativação muito leve de 15 min Z1 (ou descanso passivo), hidratação com eletrólitos a cada hora, carbo-loading (58% panela TACO) e revisão do chip no cadarço. Meta: Sub-1h55!"
+                      : currentProfile === "PATRICIA"
+                      ? "Patrícia corre os 14.0 km amanhã! Hoje: rodagem solta de 15 min Z1 + ativação isométrica do glúteo médio com miniband + 42% carbo na panela. Meta: 5:55/km estável e sem valgo dinâmico!"
+                      : "Gabriel foca em velocidade nos 10k sub-45 min. Hoje: descanso ativo ou rodagem leve."}
                   </p>
                 </div>
               </div>
+            )}
 
-              {/* Mode B: Treadmill (Esteira) */}
-              <div className="p-3.5 rounded-2xl bg-[#07090E]/80 border border-cyan-800/40 hover:border-cyan-500/60 transition-all shadow-inner">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-bold text-cyan-400 flex items-center gap-1.5">
-                    <Zap className="h-3.5 w-3.5" />
-                    Opção 2: Esteira (km/h + %)
-                  </span>
-                  <span className="text-[10px] font-mono text-cyan-300">
-                    {isDaniel ? "55 min" : "45 min"}
-                  </span>
+            {/* Special Race Day Context Alert (Sunday 18/10) */}
+            {selectedDayIndex === 6 && (
+              <div className="mb-4 p-3.5 rounded-2xl bg-gradient-to-r from-red-950/50 via-[#261014] to-black/40 border border-red-500/50 flex items-start gap-3">
+                <div className="h-8 w-8 rounded-xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-400 shrink-0 mt-0.5 animate-pulse">
+                  <Flame className="h-4 w-4" />
                 </div>
-                <div className="space-y-1.5 text-xs text-gray-300 font-mono">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Velocidade:</span>
-                    <span className="font-bold text-white">
-                      {isDaniel ? "9.5 km/h" : "8.8 km/h"}
-                    </span>
+                <div className="text-xs space-y-1">
+                  <div className="font-bold text-red-300 flex items-center gap-1.5">
+                    <span>🏆 DIA DA PROVA OFICIAL: ATHENAS MIZUNO RUN LONGER</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Inclinação:</span>
-                    <span className="font-bold text-cyan-300">1.5% (resistência ar)</span>
-                  </div>
-                  <p className="text-[11px] text-gray-400 font-sans mt-2 pt-2 border-t border-white/5">
-                    {isDaniel
-                      ? "10m a 7.5 km/h + 35m a 9.5 km/h (Z2 estável) + 10m caminhada ativa."
-                      : "10m a 7.0 km/h + 28m a 8.8 km/h + 7m solto. Postura alinhada."}
+                  <p className="text-gray-300 text-[11px] leading-relaxed">
+                    Marginal Pinheiros • Largada 06:30. {isDaniel ? "Daniel 21k (Pace 5:26)" : currentProfile === "PATRICIA" ? "Patrícia 14k (Pace 5:55)" : "Gabriel 10k"}.
+                    Ao terminar, use o botão de Lançar Resultados para registrar o Chip Time oficial!
                   </p>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* Trava Inteligente de Corte Vespertino Pré-Jogo (Sincronizada a 1h do Jogo) */}
+            {teamData?.nextMatches && teamData.nextMatches[0] && (
+              <div className="mb-4 p-3.5 rounded-2xl bg-gradient-to-r from-amber-950/40 via-[#18130B] to-black/60 border border-amber-500/40 text-xs font-mono space-y-2 shadow-lg">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                      <ShieldAlert className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5 font-bold text-amber-300">
+                        <span>🔒 TRAVA INTELIGENTE DE CORTE VESPERTINO</span>
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-200 border border-amber-500/30 font-normal">
+                          1h Antes do Jogo
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-gray-400 font-sans">
+                        Sincronização: {teamData.teamName} vs {teamData.nextMatches[0].opponent} às {teamData.nextMatches[0].timeBrasilia} ({teamData.nextMatches[0].date})
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                    <button
+                      onClick={handleSpeakPreGameCutoffLock}
+                      className="px-2.5 py-1 rounded-xl bg-amber-500/20 border border-amber-500/40 hover:bg-amber-500/30 text-amber-300 text-[10px] font-bold flex items-center gap-1 transition-all"
+                      title="Ouvir instrução da trava pré-jogo narrada pelo Treinador"
+                    >
+                      <Volume2 className="h-3 w-3" />
+                      <span>🎙️ Ouvir Trava</span>
+                    </button>
+
+                    <span className="px-2.5 py-1 rounded-xl bg-red-600/30 border border-red-500 text-red-300 font-black text-xs">
+                      Trava: {teamData.logisticalAdjustments?.recommendedEndTime || "17:30"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 border-t border-white/5 text-[11px]">
+                  <div className="p-2 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between">
+                    <span className="text-gray-400 text-[10px]">Pontapé Inicial</span>
+                    <span className="font-bold text-white">{teamData.nextMatches[0].timeBrasilia} (Brasília)</span>
+                  </div>
+
+                  <div className="p-2 rounded-xl bg-white/5 border border-amber-500/30 flex items-center justify-between">
+                    <span className="text-amber-400 text-[10px]">Trava de Término</span>
+                    <span className="font-bold text-amber-300">
+                      {teamData.logisticalAdjustments?.recommendedEndTime || "17:30"}
+                    </span>
+                  </div>
+
+                  <div className="p-2 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between">
+                    <span className="text-gray-400 text-[10px]">Transição Segura</span>
+                    <span className="font-bold text-emerald-400">60 min Protegidos</span>
+                  </div>
+                </div>
+
+                <p className="text-[10px] text-gray-300 leading-relaxed font-sans">
+                  💡 {teamData.logisticalAdjustments?.lockReason || `O treino vespertino deve terminar impreterivelmente às ${teamData.logisticalAdjustments?.recommendedEndTime || "17:30"} para permitir 60 minutos de estabilização da frequência cardíaca, banho relaxante e início da torcida.`}
+                </p>
+              </div>
+            )}
+
+            {/* Dual Mode Running Prescription (If activeDay has running) */}
+            {(() => {
+              const sched = buildWeeklyScheduleTemplate({
+                weekendMode: "CLASSIC_SUNDAY_LONG",
+                hasShoulderRestriction: isDaniel,
+                profile: currentProfile,
+              });
+              const activeDay = sched[selectedDayIndex] || sched[todayIndex] || sched[5];
+
+              if (!activeDay.runPrescriptionOutdoor) return null;
+
+              return (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Outdoor Street Option */}
+                  <div className="p-3.5 rounded-2xl bg-[#07090E]/80 border border-white/10 hover:border-blue-500/50 transition-all shadow-inner">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-blue-400 flex items-center gap-1.5">
+                        <Compass className="h-3.5 w-3.5" />
+                        Opção 1: Asfalto (Rua)
+                      </span>
+                      <span className="text-[11px] font-mono font-black text-white">
+                        {activeDay.runPrescriptionOutdoor.totalDistanceKm} km
+                      </span>
+                    </div>
+                    <div className="space-y-1.5 text-xs text-gray-300 font-mono">
+                      <div className="flex justify-between py-0.5 border-b border-white/5">
+                        <span className="text-gray-400">Pace Alvo:</span>
+                        <span className="font-bold text-white">
+                          {activeDay.runPrescriptionOutdoor.targetPaceMinKm} min/km
+                        </span>
+                      </div>
+                      <div className="flex justify-between py-0.5 border-b border-white/5">
+                        <span className="text-gray-400">Zonas FC:</span>
+                        <span className="font-bold text-emerald-400">
+                          {activeDay.runPrescriptionOutdoor.targetZones.join(", ")}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-gray-300 font-sans mt-2 pt-1.5 border-t border-white/5 leading-relaxed">
+                        {activeDay.runPrescriptionOutdoor.mainSetDescription}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Treadmill Option */}
+                  <div className="p-3.5 rounded-2xl bg-[#07090E]/80 border border-cyan-800/40 hover:border-cyan-500/60 transition-all shadow-inner">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-cyan-400 flex items-center gap-1.5">
+                        <Zap className="h-3.5 w-3.5" />
+                        Opção 2: Esteira Calibrada
+                      </span>
+                      <span className="text-[11px] font-mono text-cyan-300 font-bold">
+                        {activeDay.runPrescriptionTreadmill?.totalDurationMin || activeDay.durationMin} min
+                      </span>
+                    </div>
+                    <div className="space-y-1.5 text-xs text-gray-300 font-mono">
+                      <div className="flex justify-between py-0.5 border-b border-white/5">
+                        <span className="text-gray-400">Velocidade Média:</span>
+                        <span className="font-bold text-white">
+                          {activeDay.runPrescriptionTreadmill?.averageSpeedKmh || (isDaniel ? 9.5 : currentProfile === "PATRICIA" ? 8.8 : 11.5)} km/h
+                        </span>
+                      </div>
+                      <div className="flex justify-between py-0.5 border-b border-white/5">
+                        <span className="text-gray-400">Inclinação Obrigatória:</span>
+                        <span className="font-bold text-cyan-300">1.0% (compensação ar)</span>
+                      </div>
+                      <p className="text-[11px] text-gray-300 font-sans mt-2 pt-1.5 border-t border-white/5 leading-relaxed">
+                        {activeDay.runPrescriptionTreadmill?.steps
+                          ? activeDay.runPrescriptionTreadmill.steps.map((s) => `${s.durationMin}m @ ${s.speedKmh}km/h`).join(" → ")
+                          : "Aquecimento gradual + rodagem contínua aeróbia + 5m solto."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Rest Day Display */}
+            {(() => {
+              const sched = buildWeeklyScheduleTemplate({
+                weekendMode: "CLASSIC_SUNDAY_LONG",
+                hasShoulderRestriction: isDaniel,
+                profile: currentProfile,
+              });
+              const activeDay = sched[selectedDayIndex] || sched[todayIndex] || sched[5];
+
+              if (activeDay.modality !== "REST") return null;
+
+              return (
+                <div className="p-4 rounded-2xl bg-black/40 border border-white/10 text-xs text-gray-300 space-y-2 font-mono">
+                  <div className="flex items-center gap-2 text-emerald-400 font-bold">
+                    <Heart className="h-4 w-4" />
+                    <span>Protocolo de Recuperação Passiva & Reset Neuro-Metabólico</span>
+                  </div>
+                  <p className="text-[11px] text-gray-400 font-sans leading-relaxed">
+                    {activeDay.description || "Descanso total para absorção neuromuscular e reposição mitocondrial. Hidratação reforçada e sono reparador."}
+                  </p>
+                </div>
+              );
+            })()}
+
+            {/* Strength Workout Option (If activeDay has strength) */}
+            {(() => {
+              const sched = buildWeeklyScheduleTemplate({
+                weekendMode: "CLASSIC_SUNDAY_LONG",
+                hasShoulderRestriction: isDaniel,
+                profile: currentProfile,
+              });
+              const activeDay = sched[selectedDayIndex] || sched[todayIndex] || sched[5];
+
+              if (!activeDay.strengthPrescription) return null;
+
+              return (
+                <div className="mt-3 p-3.5 rounded-2xl bg-[#080D18] border border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 font-mono">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <Dumbbell className="h-4 w-4 text-emerald-400" />
+                      <span className="text-xs font-bold text-white">
+                        Musculação Funcional Ficha {activeDay.strengthPrescription.ficha}: {activeDay.strengthPrescription.focus}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-gray-400 font-sans mt-0.5">
+                      {activeDay.strengthPrescription.exercises.length} exercícios programados • {isDaniel ? "Blindagem do ombro direito ativa" : "Reforço glúteo e postural"}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setActiveFichaForModal(activeDay.strengthPrescription?.ficha || "A");
+                      setIsActiveWorkoutOpen(true);
+                    }}
+                    className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-md shrink-0"
+                  >
+                    <Play className="h-3 w-3 fill-white" />
+                    <span>Iniciar Treino Guiado</span>
+                  </button>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Quick Smart Home Tuya Control Strip */}
@@ -643,26 +1527,52 @@ export function CockpitTab({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-2">
               <button
                 onClick={() =>
                   handleSceneClick(
-                    isDaniel ? "FLAMENGO_MATCH" : "GREMIO_MATCH",
-                    isDaniel ? "Match Day Mengão Rubro-Negro" : "Match Day Grêmio Imortal"
+                    currentProfile === "GABRIEL"
+                      ? "PALMEIRAS_MATCH"
+                      : isDaniel
+                      ? "FLAMENGO_MATCH"
+                      : "GREMIO_MATCH",
+                    currentProfile === "GABRIEL"
+                      ? "Match Day Palmeiras"
+                      : isDaniel
+                      ? "Match Day Mengão"
+                      : "Match Day Grêmio"
                   )
                 }
                 className={`p-2.5 rounded-2xl border text-left transition-all ${
-                  isDaniel
-                    ? "bg-red-950/20 border-red-500/40 hover:bg-red-900/30 text-red-300 shadow-md shadow-red-500/10"
-                    : "bg-sky-950/20 border-sky-500/40 hover:bg-sky-900/30 text-sky-300 shadow-md shadow-sky-500/10"
+                  currentProfile === "GABRIEL"
+                    ? "bg-emerald-950/20 border-emerald-500/40 hover:bg-emerald-900/30 text-emerald-300"
+                    : isDaniel
+                    ? "bg-red-950/20 border-red-500/40 hover:bg-red-900/30 text-red-300"
+                    : "bg-sky-950/20 border-sky-500/40 hover:bg-sky-900/30 text-sky-300"
                 }`}
               >
                 <span className="text-xs font-bold block">
-                  {isDaniel ? "🔴 Modo Mengão" : "🔵 Modo Imortal"}
+                  {currentProfile === "GABRIEL"
+                    ? "🟢 Modo Verdão"
+                    : isDaniel
+                    ? "🔴 Modo Mengão"
+                    : "🔵 Modo Imortal"}
                 </span>
                 <span className="text-[10px] opacity-75">
-                  {isDaniel ? "Luzes Maracanã" : "Luzes Arena Grêmio"}
+                  {currentProfile === "GABRIEL"
+                    ? "Luzes Allianz"
+                    : isDaniel
+                    ? "Luzes Maracanã"
+                    : "Luzes Arena"}
                 </span>
+              </button>
+
+              <button
+                onClick={() => handleSceneClick("CINEMA_MODE", "Modo Cinema & TV (Netflix / Doramas)")}
+                className="p-2.5 rounded-2xl bg-rose-950/20 border border-rose-500/40 hover:bg-rose-900/30 text-rose-300 text-left transition-all shadow-md shadow-rose-500/10"
+              >
+                <span className="text-xs font-bold block">🎬 Modo Cinema</span>
+                <span className="text-[10px] opacity-75">TV & 15% Âmbar</span>
               </button>
 
               <button
@@ -727,65 +1637,345 @@ export function CockpitTab({
             currentProfile={currentProfile}
           />
 
-          {/* Real-time Weather-Pacing & Telegram Proactive Hub */}
+          {/* Dual Weather Station: Real-time Weather-Pacing & Tomorrow's Race Eve Forecast */}
           {weatherData && (
-            <div className="rounded-3xl bg-gradient-to-b from-[#0F1420] to-[#0A0D15] border border-white/10 p-4 shadow-xl space-y-3">
-              <div className="flex items-center justify-between">
+            <div className="rounded-3xl bg-gradient-to-b from-[#0F1420] to-[#0A0D15] border border-cyan-500/30 p-4 sm:p-5 shadow-xl space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2">
-                  <CloudSun className="h-4 w-4 text-cyan-400" />
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-white">
-                    Weather-Pacing em Tempo Real ({weatherData.city})
-                  </h4>
+                  <CloudSun className="h-5 w-5 text-cyan-400" />
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-black uppercase tracking-wider text-white font-mono flex items-center gap-2">
+                      <span>ESTAÇÃO METEOROLÓGICA DE PACING</span>
+                      <span className="text-[10px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-normal">
+                        {weatherData.city}
+                      </span>
+                    </h4>
+                    <p className="text-[10px] text-gray-400 font-mono">
+                      Monitoramento Térmico, Vento e Planejamento para o Dia Seguinte
+                    </p>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                {/* Switcher: Hoje vs Amanhã */}
+                <div className="flex items-center gap-1.5 bg-black/50 p-1 rounded-xl border border-white/10 text-xs font-mono self-end sm:self-auto">
                   <button
-                    onClick={handleSendTelegramBriefing}
-                    className="px-3 py-1.5 rounded-xl bg-blue-600/30 border border-blue-500/50 hover:bg-blue-600/50 text-[11px] font-bold text-blue-300 flex items-center gap-1.5 transition-all shadow-md"
+                    onClick={() => setWeatherViewMode("TOMORROW")}
+                    className={`px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 ${
+                      weatherViewMode === "TOMORROW"
+                        ? "bg-gradient-to-r from-amber-600 to-yellow-600 text-black shadow-md font-black"
+                        : "text-gray-400 hover:text-white"
+                    }`}
                   >
-                    <Send className="h-3 w-3" />
-                    <span>{telegramStatus || "Alerta Telegram"}</span>
+                    <span>🌅 Amanhã (Prova / Longão)</span>
+                    <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                  </button>
+
+                  <button
+                    onClick={() => setWeatherViewMode("LIVE_NOW")}
+                    className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+                      weatherViewMode === "LIVE_NOW"
+                        ? "bg-blue-600/30 border border-blue-500 text-blue-300 shadow-md"
+                        : "text-gray-400 hover:text-white"
+                    }`}
+                  >
+                    <span>☀️ Tempo Real (Hoje)</span>
                   </button>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
-                <div className="p-2 rounded-2xl bg-[#07090E] border border-white/5">
-                  <span className="text-[10px] text-gray-400 block font-mono">Temperatura</span>
-                  <span className="font-extrabold font-mono text-white text-sm">{weatherData.tempC}°C</span>
-                  <span className="text-[9px] text-gray-500 block">Sensação {weatherData.feelsLikeC}°C</span>
-                </div>
+              {/* VIEW 1: PREVISÃO DO TEMPO PARA AMANHÃ (DOMINGO / PROVA ATHENAS MIZUNO) */}
+              {weatherViewMode === "TOMORROW" && weatherData.tomorrow && (
+                <div className="space-y-3 animate-fadeIn">
+                  {/* Tomorrow Race Header Banner */}
+                  <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-950/40 via-[#1C160C] to-black border border-amber-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">🏁</span>
+                      <div>
+                        <span className="font-bold text-amber-300 font-mono block">
+                          {weatherData.tomorrow.dateFormatted} • {weatherData.tomorrow.raceTimeFormatted}
+                        </span>
+                        <span className="text-[10px] text-gray-300 font-mono">
+                          Marginal Pinheiros • Athenas Mizuno Run Longer (Daniel 21k • Patrícia 14k)
+                        </span>
+                      </div>
+                    </div>
 
-                <div className="p-2 rounded-2xl bg-[#07090E] border border-white/5">
-                  <span className="text-[10px] text-gray-400 block font-mono">Umidade</span>
-                  <span className="font-extrabold font-mono text-cyan-400 text-sm">{weatherData.humidityPct}%</span>
-                  <span className="text-[9px] text-gray-500 block">Vento {weatherData.windSpeedKmh}km/h</span>
-                </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handleSpeakTomorrowWeather}
+                        className="px-2.5 py-1 rounded-xl bg-amber-500/20 border border-amber-500/40 hover:bg-amber-500/30 text-amber-300 text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
+                        title="Ouvir previsão do tempo de amanhã narrada pelo treinador"
+                      >
+                        <Volume2 className="h-3 w-3" />
+                        <span>🎙️ Ouvir Previsão</span>
+                      </button>
 
-                <div className="p-2 rounded-2xl bg-[#07090E] border border-white/5">
-                  <span className="text-[10px] text-gray-400 block font-mono">Ajuste de Pace</span>
-                  <span className={`font-extrabold font-mono text-sm ${weatherData.paceAdjustmentSec > 5 ? "text-amber-400" : "text-emerald-400"}`}>
-                    +{weatherData.paceAdjustmentSec}s/km
-                  </span>
-                  <span className="text-[9px] text-gray-500 block">Custo térmico</span>
-                </div>
+                      <button
+                        onClick={handleSendTelegramBriefing}
+                        className="px-2.5 py-1 rounded-xl bg-blue-600/20 border border-blue-500/40 hover:bg-blue-600/30 text-blue-300 text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
+                      >
+                        <Send className="h-3 w-3" />
+                        <span>{telegramStatus || "Telegram"}</span>
+                      </button>
+                    </div>
+                  </div>
 
-                <div className="p-2 rounded-2xl bg-[#07090E] border border-white/5">
-                  <span className="text-[10px] text-gray-400 block font-mono">Condição</span>
-                  <span className="font-bold text-gray-200 text-xs truncate capitalize block">
-                    {weatherData.condition}
-                  </span>
-                  <span className="text-[9px] text-emerald-400 font-semibold block">
-                    {weatherData.environmentalRisk === "OPTIMAL" ? "Ideal p/ Asfalto" : "Moderado"}
-                  </span>
-                </div>
-              </div>
+                  {/* 4 Tomorrow Key Metrics */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+                    <div className="p-2.5 rounded-2xl bg-[#07090E] border border-amber-500/30">
+                      <span className="text-[10px] text-amber-400 block font-mono">Largada (06h30)</span>
+                      <span className="font-black font-mono text-white text-base">
+                        {weatherData.tomorrow.tempStartC}°C
+                      </span>
+                      <span className="text-[9px] text-gray-400 block">
+                        Sensação {weatherData.tomorrow.feelsLikeC}°C
+                      </span>
+                    </div>
 
-              <p className="text-[11px] text-gray-300 italic bg-[#07090E]/60 p-2.5 rounded-xl border border-white/5 font-sans">
-                Diretriz de Pacing: {weatherData.tacticalRecommendation}
-              </p>
+                    <div className="p-2.5 rounded-2xl bg-[#07090E] border border-white/5">
+                      <span className="text-[10px] text-gray-400 block font-mono">Chegada (~09h00)</span>
+                      <span className="font-black font-mono text-emerald-400 text-base">
+                        {weatherData.tomorrow.tempFinishC}°C
+                      </span>
+                      <span className="text-[9px] text-gray-400 block">Aquecimento suave</span>
+                    </div>
+
+                    <div className="p-2.5 rounded-2xl bg-[#07090E] border border-white/5">
+                      <span className="text-[10px] text-gray-400 block font-mono">Umidade & Vento</span>
+                      <span className="font-black font-mono text-cyan-400 text-base">
+                        {weatherData.tomorrow.humidityPct}%
+                      </span>
+                      <span className="text-[9px] text-gray-400 block truncate">
+                        {weatherData.tomorrow.windSpeedKmh}km/h {weatherData.tomorrow.windDirectionText}
+                      </span>
+                    </div>
+
+                    <div className="p-2.5 rounded-2xl bg-[#07090E] border border-emerald-500/30">
+                      <span className="text-[10px] text-emerald-400 block font-mono">Ajuste no Pace</span>
+                      <span className="font-black font-mono text-emerald-300 text-base">
+                        +{weatherData.tomorrow.paceAdjustmentSec}s/km
+                      </span>
+                      <span className="text-[9px] text-emerald-400 font-semibold block">
+                        Condição Ótima (RP)
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Hourly Temperature Splits During Race */}
+                  {weatherData.tomorrow.hourlySplits && (
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-white/5 space-y-1.5">
+                      <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wide block">
+                        Evolução Horária ao Longo da Prova (06h às 09h):
+                      </span>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs font-mono">
+                        {weatherData.tomorrow.hourlySplits.map((h, idx) => (
+                          <div key={idx} className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-center">
+                            <span className="text-[9px] text-gray-400 block">{h.timeStr}</span>
+                            <span className="font-bold text-white text-xs">{h.tempC}°C</span>
+                            <span className="text-[8px] text-gray-500 block truncate">{h.condition}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Gear & Hydration Recommendation */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-sans">
+                    <div className="p-2.5 rounded-xl bg-[#07090E] border border-white/5 space-y-0.5">
+                      <span className="font-bold text-amber-300 block font-mono">🎽 Traje Recomendado de Prova:</span>
+                      <p className="text-gray-300">{weatherData.tomorrow.gearRecommendation}</p>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-[#07090E] border border-white/5 space-y-0.5">
+                      <span className="font-bold text-cyan-300 block font-mono">💧 Estratégia de Hidratação:</span>
+                      <p className="text-gray-300">{weatherData.tomorrow.hydrationPlan}</p>
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-gray-300 italic bg-[#07090E]/60 p-2.5 rounded-xl border border-white/5 font-sans">
+                    Diretriz Tática para Amanhã: {weatherData.tomorrow.tacticalAdvice}
+                  </p>
+                </div>
+              )}
+
+              {/* VIEW 2: TEMPO REAL HOJE */}
+              {weatherViewMode === "LIVE_NOW" && (
+                <div className="space-y-3 animate-fadeIn">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+                    <div className="p-2.5 rounded-2xl bg-[#07090E] border border-white/5">
+                      <span className="text-[10px] text-gray-400 block font-mono">Temperatura Atual</span>
+                      <span className="font-extrabold font-mono text-white text-sm">{weatherData.tempC}°C</span>
+                      <span className="text-[9px] text-gray-500 block">Sensação {weatherData.feelsLikeC}°C</span>
+                    </div>
+
+                    <div className="p-2.5 rounded-2xl bg-[#07090E] border border-white/5">
+                      <span className="text-[10px] text-gray-400 block font-mono">Umidade Atual</span>
+                      <span className="font-extrabold font-mono text-cyan-400 text-sm">{weatherData.humidityPct}%</span>
+                      <span className="text-[9px] text-gray-500 block">Vento {weatherData.windSpeedKmh}km/h</span>
+                    </div>
+
+                    <div className="p-2.5 rounded-2xl bg-[#07090E] border border-white/5">
+                      <span className="text-[10px] text-gray-400 block font-mono">Ajuste de Pace</span>
+                      <span className={`font-extrabold font-mono text-sm ${weatherData.paceAdjustmentSec > 5 ? "text-amber-400" : "text-emerald-400"}`}>
+                        +{weatherData.paceAdjustmentSec}s/km
+                      </span>
+                      <span className="text-[9px] text-gray-500 block">Custo térmico hoje</span>
+                    </div>
+
+                    <div className="p-2.5 rounded-2xl bg-[#07090E] border border-white/5">
+                      <span className="text-[10px] text-gray-400 block font-mono">Condição Atual</span>
+                      <span className="font-bold text-gray-200 text-xs truncate capitalize block">
+                        {weatherData.condition}
+                      </span>
+                      <span className="text-[9px] text-emerald-400 font-semibold block">
+                        {weatherData.environmentalRisk === "OPTIMAL" ? "Ideal p/ Asfalto" : "Moderado"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-gray-300 italic bg-[#07090E]/60 p-2.5 rounded-xl border border-white/5 font-sans">
+                    Diretriz de Pacing de Hoje: {weatherData.tacticalRecommendation}
+                  </p>
+                </div>
+              )}
             </div>
           )}
+        </div>
+      </div>
+
+      {/* 🏆 Palmarés Oficial, Resultados Homologados & Classificações de Faixa Etária */}
+      <div className="rounded-3xl bg-gradient-to-b from-[#141A29] via-[#0F1420] to-[#0A0D15] border border-amber-500/30 p-5 shadow-2xl relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-300 shadow-inner">
+              <Trophy className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-white tracking-wide">
+                  Palmarés Oficial & Classificações de Faixa Etária
+                </h3>
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">
+                  {isDaniel ? "Categoria M50-54" : currentProfile === "PATRICIA" ? "Categoria F55-59" : "Categoria M20-24"}
+                </span>
+              </div>
+              <p className="text-[11px] text-gray-400 font-mono">
+                Chip Times • Classificações Homologadas • Athenas Mizuno Run Longer (Amanhã!)
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onOpenRaceManager}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 text-white text-xs font-bold transition-all shadow-md"
+          >
+            <Medal className="h-3.5 w-3.5" />
+            <span>Lançar / Ver Resultados Oficiais</span>
+          </button>
+        </div>
+
+        {/* Display official completed races & Tomorrow's Action Card */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Most recent official completed race */}
+          <div className="p-4 rounded-2xl bg-black/40 border border-white/10 flex flex-col justify-between space-y-3 font-mono">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] uppercase font-bold text-emerald-400 flex items-center gap-1">
+                  <CheckCircle2 className="h-3 w-3" />
+                  Última Prova Homologada
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-800 font-bold">
+                  {isDaniel
+                    ? "🥈 Top 5% Categoria (M50-54)"
+                    : currentProfile === "PATRICIA"
+                    ? "👑 Top 3% Faixa Etária (F55-59)"
+                    : "⚡ Top 3% Jovens (M20-24)"}
+                </span>
+              </div>
+
+              <h4 className="text-sm font-black text-white mt-1">
+                {isDaniel
+                  ? "Meia Maratona Internacional de SP 2026 (21k)"
+                  : currentProfile === "PATRICIA"
+                  ? "Circuito Athenas SP 2026 - Etapa 1 (10k)"
+                  : "Corrida Sargento Gonzaguinha 2026 (5k)"}
+              </h4>
+            </div>
+
+            <div className="grid grid-cols-4 gap-2 text-center">
+              <div className="p-2 rounded-xl bg-white/5 border border-white/5">
+                <span className="text-[8px] text-gray-400 uppercase block">Chip Time</span>
+                <span className="text-xs font-black text-emerald-400 block mt-0.5">
+                  {isDaniel ? "01:54:12" : currentProfile === "PATRICIA" ? "00:57:40" : "00:21:15"}
+                </span>
+                <span className="text-[8px] text-gray-500 block">
+                  {isDaniel ? "5:25/km" : currentProfile === "PATRICIA" ? "5:46/km" : "4:15/km"}
+                </span>
+              </div>
+
+              <div className="p-2 rounded-xl bg-white/5 border border-white/5">
+                <span className="text-[8px] text-gray-400 uppercase block">Gun Time</span>
+                <span className="text-xs font-bold text-gray-300 block mt-0.5">
+                  {isDaniel ? "01:56:45" : currentProfile === "PATRICIA" ? "00:59:15" : "00:21:40"}
+                </span>
+                <span className="text-[8px] text-gray-500 block">Bruto</span>
+              </div>
+
+              <div className="p-2 rounded-xl bg-white/5 border border-white/5">
+                <span className="text-[8px] text-gray-400 uppercase block">Faixa Etária</span>
+                <span className="text-xs font-black text-amber-400 block mt-0.5">
+                  {isDaniel ? "24º / 512" : currentProfile === "PATRICIA" ? "12ª / 380" : "6º / 220"}
+                </span>
+                <span className="text-[8px] text-amber-300/80 block">
+                  {isDaniel ? "M50-54" : currentProfile === "PATRICIA" ? "F55-59" : "M20-24"}
+                </span>
+              </div>
+
+              <div className="p-2 rounded-xl bg-white/5 border border-white/5">
+                <span className="text-[8px] text-gray-400 uppercase block">Geral / Sexo</span>
+                <span className="text-xs font-bold text-white block mt-0.5">
+                  {isDaniel ? "389º" : currentProfile === "PATRICIA" ? "198ª" : "78º"}
+                </span>
+                <span className="text-[8px] text-cyan-400 block">
+                  {isDaniel ? "330º Masc" : currentProfile === "PATRICIA" ? "84ª Fem" : "65º Masc"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Tomorrow's Race Countdown & Launch Call */}
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-red-950/30 to-black/40 border border-red-500/40 flex flex-col justify-between space-y-3 font-mono">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] uppercase font-bold text-red-400 flex items-center gap-1 animate-pulse">
+                  <Flame className="h-3 w-3" />
+                  Próxima Prova • AMANHÃ (18/10/2026)!
+                </span>
+                <span className="text-[9px] bg-red-600 text-white px-2 py-0.5 rounded font-black uppercase">
+                  Alvo P1
+                </span>
+              </div>
+
+              <h4 className="text-sm font-black text-white mt-1">
+                Athenas Mizuno Run Longer {isDaniel ? "21k" : currentProfile === "PATRICIA" ? "14k" : "10k"}
+              </h4>
+              <p className="text-[11px] text-gray-300 mt-1">
+                Marginal Pinheiros • Largada 06:30 • {isDaniel ? "21.097 km" : currentProfile === "PATRICIA" ? "14.0 km" : "10.0 km"}
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-white/5">
+              <span className="text-[11px] text-gray-400">
+                Meta: <strong className="text-amber-400">{isDaniel ? "01:54:40 (5:26/km)" : currentProfile === "PATRICIA" ? "01:22:50 (5:55/km)" : "00:44:10 (4:25/km)"}</strong>
+              </span>
+
+              <button
+                onClick={onOpenRaceManager}
+                className="px-3 py-1.5 rounded-xl bg-red-600/30 border border-red-500/50 hover:bg-red-600/50 text-white text-[11px] font-bold transition-all shadow"
+              >
+                Registrar Tempo Oficial →
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -947,31 +2137,47 @@ export function CockpitTab({
                 </div>
               </div>
 
-              {/* Next Game & Logistical Adjustment */}
+              {/* Next Game & Smart Workout Cutoff Lock */}
               {teamData.nextMatches && teamData.nextMatches[0] && (
-                <div className="p-3.5 rounded-2xl bg-[#07090E] border border-white/10 space-y-2 shadow-inner">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-white">
-                      Próximo Jogo: vs {teamData.nextMatches[0].opponent}
-                    </span>
-                    <span className="text-xs font-mono text-amber-400 font-semibold">
-                      {teamData.nextMatches[0].date} ({teamData.nextMatches[0].timeBrasilia})
-                    </span>
+                <div className="p-3.5 rounded-2xl bg-[#07090E] border border-amber-500/30 space-y-2.5 shadow-inner">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 border-b border-white/5 pb-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-base">⚽</span>
+                      <div>
+                        <span className="text-xs font-bold text-white block">
+                          vs {teamData.nextMatches[0].opponent}
+                        </span>
+                        <span className="text-[10px] text-gray-400 font-mono">
+                          {teamData.nextMatches[0].date} • {teamData.nextMatches[0].timeBrasilia} (Brasília)
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleSpeakPreGameCutoffLock}
+                      className="px-2.5 py-1 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-[10px] font-mono font-bold flex items-center gap-1 transition-all self-end sm:self-auto"
+                      title="Ouvir aviso da trava inteligente narrado pelo treinador"
+                    >
+                      <Volume2 className="h-3 w-3" />
+                      <span>🎙️ Ouvir Trava</span>
+                    </button>
                   </div>
 
                   {teamData.logisticalAdjustments && (
-                    <div className="p-2.5 rounded-xl bg-amber-950/30 border border-amber-800/40 text-[11px] text-amber-200 flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <AlertTriangle className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-                        <span>
-                          {teamData.logisticalAdjustments.requiresTrainingCut
-                            ? `Corte logístico: Treino deve encerrar às ${teamData.logisticalAdjustments.recommendedEndTime}`
-                            : "Horário de treino livre"}
+                    <div className="p-2.5 rounded-xl bg-amber-950/30 border border-amber-800/40 text-[11px] text-amber-200 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <ShieldAlert className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                          <span className="font-bold text-amber-300">
+                            Trava de Corte Vespertino: {teamData.logisticalAdjustments.recommendedEndTime}
+                          </span>
+                        </div>
+                        <span className="font-mono font-bold text-emerald-400 text-[10px]">
+                          +{teamData.logisticalAdjustments.caloricBufferKcal} kcal buffer
                         </span>
                       </div>
-                      <span className="font-mono font-bold">
-                        +{teamData.logisticalAdjustments.caloricBufferKcal} kcal buffer
-                      </span>
+                      <p className="text-[10px] text-gray-300 font-sans">
+                        Sincronizada automaticamente para 1h antes do pontapé inicial ({teamData.nextMatches[0].timeBrasilia}). Garante 60 min de transição para banho e hidratação.
+                      </p>
                     </div>
                   )}
                 </div>
@@ -990,6 +2196,14 @@ export function CockpitTab({
           </div>
         )}
       </div>
+
+      {/* Interactive Active Workout Modal for Gym Guidance */}
+      <ActiveWorkoutModal
+        isOpen={isActiveWorkoutOpen}
+        onClose={() => setIsActiveWorkoutOpen(false)}
+        currentProfile={currentProfile}
+        initialFicha={activeFichaForModal}
+      />
     </div>
   );
 }
