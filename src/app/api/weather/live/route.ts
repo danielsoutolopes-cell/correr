@@ -9,7 +9,11 @@ export async function GET(request: Request) {
     const city = searchParams.get("city") || "Sao Paulo,BR";
 
     const data = await weatherPacingService.getCurrentWeather(city);
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600",
+      },
+    });
   } catch (err) {
     console.error("[API Weather Live] Error:", err);
     return NextResponse.json(

@@ -17,7 +17,11 @@ export async function GET(request: Request) {
     }
 
     const data = await footballLiveService.getTeamLiveTelemetry(team);
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=7200",
+      },
+    });
   } catch (err) {
     console.error("[API Football Live] Error:", err);
     return NextResponse.json(

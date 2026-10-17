@@ -16,6 +16,8 @@ export class WeatherPacingService {
   private weatherApiKey: string;
   private mapsApiKey: string;
   private mapsBaseUrl: string;
+  private cache: Record<string, { data: WeatherPacingData; expiresAt: number }> = {};
+  private readonly CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutos (Economia de rede e energia)
 
   constructor() {
     this.weatherApiKey = process.env.OPENWEATHER_API_KEY || "5da58775f6ec76784b6d24b2f848d8be";
@@ -25,14 +27,22 @@ export class WeatherPacingService {
 
   /**
    * Fetches real-time weather and computes running pace physiological penalty
+   * Utiliza cache ecológico de 30 minutos para evitar chamadas de rede desnecessárias
    */
-  async getCurrentWeather(city: string = "Sao Paulo,BR"): Promise<WeatherPacingData> {
+  async getCurrentWeather(city: string = "Sao Paulo,BR", forceRefresh = false): Promise<WeatherPacingData> {
+    const cacheKey = city.toLowerCase().trim();
+    const now = Date.now();
+    if (!forceRefresh && this.cache[cacheKey] && now < this.cache[cacheKey].expiresAt) {
+      return this.cache[cacheKey].data;
+    }
+
     try {
       const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
         city
       )}&units=metric&lang=pt_br&appid=${this.weatherApiKey}`;
 
-      const res = await fetch(url, { next: { revalidate: 900 } }); // 15 min cache
+      const res = await fetch(url, { next: { revalidate: 1800 } });
+
       if (!res.ok) {
         throw new Error(`OpenWeather API error: ${res.status}`);
       }
@@ -77,7 +87,7 @@ export class WeatherPacingService {
       const lon = data.coord?.lon || -46.6576;
       const staticMapUrl = `${this.mapsBaseUrl}?style=osm-dark&width=600&height=300&center=lonlat:${lon},${lat}&zoom=13&apiKey=${this.mapsApiKey}`;
 
-      return {
+      const result: WeatherPacingData = {
         city: data.name || "São Paulo",
         tempC,
         feelsLikeC,
@@ -90,6 +100,13 @@ export class WeatherPacingService {
         tacticalRecommendation,
         staticMapUrl,
       };
+
+      this.cache[cacheKey] = {
+        data: result,
+        expiresAt: now + this.CACHE_TTL_MS,
+      };
+
+      return result;
     } catch (err) {
       console.error("[WeatherService] Error:", err);
       return {

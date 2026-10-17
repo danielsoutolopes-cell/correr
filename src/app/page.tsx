@@ -72,20 +72,27 @@ export default function BioTriadApp() {
           targetWeightKg: 75.0,
         });
 
-  // Fetch football and Intervals data on load
-  const refreshAllLiveData = async () => {
+  // Fetch football and Intervals data on load with Eco-Green on-demand fetching
+  const refreshLiveDataForProfile = async (profile: "DANIEL" | "PATRICIA" | "CLAN", force = false) => {
     try {
-      const [flaRes, greRes, watchRes] = await Promise.all([
-        fetch("/api/football/live?team=Flamengo").then((r) => r.json()).catch(() => null),
-        fetch("/api/football/live?team=Grêmio").then((r) => r.json()).catch(() => null),
-        fetch("/api/sync/galaxy-watch").then((r) => r.json()).catch(() => null),
-      ]);
+      const activeTeam = profile === "PATRICIA" ? "Grêmio" : "Flamengo";
+      const requests: Promise<any>[] = [
+        fetch(`/api/football/live?team=${activeTeam}${force ? "&refresh=true" : ""}`)
+          .then((r) => r.json())
+          .catch(() => null),
+        fetch(`/api/sync/galaxy-watch${force ? "?refresh=true" : ""}`)
+          .then((r) => r.json())
+          .catch(() => null),
+      ];
 
-      if (flaRes && !flaRes.error) {
-        setFootballData((prev) => ({ ...prev, flamengo: flaRes }));
-      }
-      if (greRes && !greRes.error) {
-        setFootballData((prev) => ({ ...prev, gremio: greRes }));
+      const [teamRes, watchRes] = await Promise.all(requests);
+
+      if (teamRes && !teamRes.error) {
+        if (activeTeam === "Flamengo") {
+          setFootballData((prev) => ({ ...prev, flamengo: teamRes }));
+        } else {
+          setFootballData((prev) => ({ ...prev, gremio: teamRes }));
+        }
       }
       if (watchRes?.telemetry) {
         setTelemetry(watchRes.telemetry);
@@ -96,8 +103,9 @@ export default function BioTriadApp() {
   };
 
   useEffect(() => {
-    refreshAllLiveData();
-  }, []);
+    refreshLiveDataForProfile(currentProfile);
+  }, [currentProfile]);
+
 
   // Trigger Tuya Smart Home Scene
   const handleTriggerTuyaScene = async (scene: string) => {
@@ -119,7 +127,7 @@ export default function BioTriadApp() {
         currentProfile={currentProfile}
         onSelectProfile={setCurrentProfile}
         footballData={footballData}
-        onRefreshData={refreshAllLiveData}
+        onRefreshData={() => refreshLiveDataForProfile(currentProfile, true)}
       />
 
       {/* 2. Main Content Area */}
@@ -164,7 +172,7 @@ export default function BioTriadApp() {
           <ClanTab
             currentProfile={currentProfile}
             onSelectProfile={setCurrentProfile}
-            onRefreshData={refreshAllLiveData}
+            onRefreshData={() => refreshLiveDataForProfile(currentProfile, true)}
           />
         )}
       </main>

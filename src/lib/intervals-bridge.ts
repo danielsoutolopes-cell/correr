@@ -32,6 +32,8 @@ export class IntervalsGalaxyBridge {
   private baseUrl = "https://intervals.icu/api/v1";
   private athleteId: string;
   private apiKey: string;
+  private cache: { telemetry: GalaxyWatchTelemetry; expiresAt: number } | null = null;
+  private readonly CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutos (Green Computing)
 
   constructor(athleteId?: string, apiKey?: string) {
     // Intervals.icu normalizes athlete IDs in lowercase (ex: i753639)
@@ -110,12 +112,18 @@ export class IntervalsGalaxyBridge {
 
   /**
    * Sintetiza o pacote de telemetria REAL do Galaxy Watch Ultra consumido do Intervals.icu
+   * Otimizado com cache ecológico em memória de 15 minutos (Zero pings desnecessários)
    */
-  async getLatestTelemetry(dateStr?: string): Promise<GalaxyWatchTelemetry> {
+  async getLatestTelemetry(dateStr?: string, forceRefresh = false): Promise<GalaxyWatchTelemetry> {
+    const now = Date.now();
+    if (!forceRefresh && this.cache && now < this.cache.expiresAt) {
+      return this.cache.telemetry;
+    }
+
     const targetDate = dateStr || new Date().toISOString().split("T")[0];
     
     // Busca dados dos últimos 30 dias para garantir o registro mais recente disponível
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000)
       .toISOString()
       .split("T")[0];
 
@@ -129,7 +137,7 @@ export class IntervalsGalaxyBridge {
     const sleepSecs = latestWellness.sleepSecs || 0;
     const sleepDurationMinutes = sleepSecs > 0 ? Math.round(sleepSecs / 60) : 440;
 
-    return {
+    const result: GalaxyWatchTelemetry = {
       date: latestWellness.id || targetDate,
       restingHeartRate: latestWellness.restingHR || 54,
       hrvRmssd: latestWellness.hrv || 68,
@@ -169,6 +177,14 @@ export class IntervalsGalaxyBridge {
         };
       }),
     };
+
+    // Salva no cache ecológico
+    this.cache = {
+      telemetry: result,
+      expiresAt: now + this.CACHE_TTL_MS,
+    };
+
+    return result;
   }
 }
 
