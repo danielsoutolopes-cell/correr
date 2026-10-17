@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { PwaRegister } from "@/components/PwaRegister";
 
 export const metadata: Metadata = {
   title: "Bio-Triad OS | Alta Performance Híbrida do Clã Lopes",
@@ -33,8 +32,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className="dark">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined' && 'serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').catch(function() {});
+                });
+              }
+            `,
+          }}
+        />
+      </head>
       <body className="bg-[#07090E] text-[#F3F4F6] min-h-screen antialiased selection:bg-blue-600 selection:text-white">
-        <PwaRegister />
         {children}
       </body>
     </html>
