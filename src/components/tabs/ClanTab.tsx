@@ -15,6 +15,8 @@ import {
   Key,
   Smartphone,
   ExternalLink,
+  MessageSquare,
+  Send,
 } from "lucide-react";
 
 interface ClanTabProps {
@@ -29,7 +31,37 @@ export function ClanTab({ currentProfile, onSelectProfile, onRefreshData }: Clan
   const [tuyaClientId, setTuyaClientId] = useState<string>("");
   const [tuyaSecret, setTuyaSecret] = useState<string>("");
   const [geminiKey, setGeminiKey] = useState<string>("");
+  const [whatsappInstance, setWhatsappInstance] = useState<string>("ecostone");
+  const [whatsappApiKey, setWhatsappApiKey] = useState<string>("Gabriel2006");
+  const [whatsappStatus, setWhatsappStatus] = useState<string | null>(null);
+  const [isTestingWhatsApp, setIsTestingWhatsApp] = useState<boolean>(false);
   const [savedSuccess, setSavedSuccess] = useState<boolean>(false);
+
+  const handleTestWhatsApp = async () => {
+    setIsTestingWhatsApp(true);
+    setWhatsappStatus(null);
+    try {
+      const res = await fetch("/api/whatsapp/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "ECLUSA_1830",
+          workoutSummary: "Rodagem Z2 45min + Musculação Ficha A (Ombro Seguro)",
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setWhatsappStatus("✅ Mensagem disparada com sucesso via Evolution API!");
+      } else {
+        setWhatsappStatus(`⚠️ ${data.error || data.diagnostic || "Aguardando leitura QR/Auth"}`);
+      }
+    } catch (e: any) {
+      setWhatsappStatus(`❌ Erro de conexão: ${e?.message}`);
+    } finally {
+      setIsTestingWhatsApp(false);
+    }
+  };
+
 
   const handleSaveConfigs = (e: React.FormEvent) => {
     e.preventDefault();
@@ -236,8 +268,68 @@ export function ClanTab({ currentProfile, onSelectProfile, onRefreshData }: Clan
             />
           </div>
 
-          {/* Ecosystem Status Grid (Strava, Telegram, Weather, UptimeRobot) */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+          {/* Evolution API WhatsApp Integration */}
+          <div className="p-4 rounded-xl bg-[#090D16] border border-emerald-900/40 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                <MessageSquare className="h-4 w-4 text-emerald-400" />
+                Evolution API v2 (WhatsApp Multi-Channel Clã Lopes)
+              </span>
+              <span className="text-[10px] text-emerald-300 font-semibold px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-800">
+                Instância: {whatsappInstance}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-[11px] text-gray-400 block mb-1">
+                  Nome da Instância
+                </label>
+                <input
+                  type="text"
+                  value={whatsappInstance}
+                  onChange={(e) => setWhatsappInstance(e.target.value)}
+                  className="w-full bg-[#111827] border border-gray-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] text-gray-400 block mb-1">
+                  Global API Key (apikey header)
+                </label>
+                <input
+                  type="password"
+                  value={whatsappApiKey}
+                  onChange={(e) => setWhatsappApiKey(e.target.value)}
+                  className="w-full bg-[#111827] border border-gray-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-1 border-t border-gray-800/60">
+              <span className="text-[11px] text-gray-400">
+                Servidor: <code className="text-emerald-400 text-[10px]">https://whatsapp-ecostone.onrender.com</code>
+              </span>
+              <button
+                type="button"
+                onClick={handleTestWhatsApp}
+                disabled={isTestingWhatsApp}
+                className="px-3 py-1.5 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/50 text-emerald-300 text-xs font-bold flex items-center gap-1.5 transition-all disabled:opacity-50"
+              >
+                <Send className="h-3.5 w-3.5" />
+                <span>{isTestingWhatsApp ? "Disparando..." : "Disparar Alerta WhatsApp Teste"}</span>
+              </button>
+            </div>
+
+            {whatsappStatus && (
+              <div className="text-xs p-2.5 rounded-lg bg-black/40 border border-gray-800 text-gray-200">
+                {whatsappStatus}
+              </div>
+            )}
+          </div>
+
+          {/* Ecosystem Status Grid (Strava, Telegram, WhatsApp, Weather, UptimeRobot) */}
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-2">
             <div className="p-3 rounded-xl bg-[#090D16] border border-gray-800 text-xs">
               <span className="text-gray-400 block text-[10px]">Strava V3 API</span>
               <span className="font-bold text-emerald-400 flex items-center gap-1 mt-0.5">
@@ -254,6 +346,15 @@ export function ClanTab({ currentProfile, onSelectProfile, onRefreshData }: Clan
                 @Coach_Pro_Alertas_bot
               </span>
               <span className="text-[10px] text-gray-500 block mt-1">Chat: 6315130099</span>
+            </div>
+
+            <div className="p-3 rounded-xl bg-[#090D16] border border-emerald-900/30 text-xs">
+              <span className="text-gray-400 block text-[10px]">Evolution WhatsApp</span>
+              <span className="font-bold text-emerald-400 flex items-center gap-1 mt-0.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
+                Instância Ativa
+              </span>
+              <span className="text-[10px] text-gray-400 block mt-1">ecostone (v2.3)</span>
             </div>
 
             <div className="p-3 rounded-xl bg-[#090D16] border border-gray-800 text-xs">

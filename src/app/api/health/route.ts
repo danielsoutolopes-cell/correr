@@ -20,6 +20,8 @@ export async function GET() {
       openWeather: Boolean(process.env.OPENWEATHER_API_KEY),
       stravaV3: Boolean(process.env.STRAVA_CLIENT_ID),
       telegramBot: Boolean(process.env.TELEGRAM_BOT_TOKEN),
+      evolutionWhatsApp: Boolean(process.env.EVOLUTION_API_KEY),
+      evolutionInstance: process.env.EVOLUTION_INSTANCE_NAME || "ecostone",
       uptimeRobotMonitorId: process.env.UPTIMEROBOT_MONITOR_ID || "803014115",
     },
   });
