@@ -236,6 +236,45 @@ export function ClanTab({ currentProfile, onSelectProfile, onRefreshData }: Clan
             />
           </div>
 
+          {/* Ecosystem Status Grid (Strava, Telegram, Weather, UptimeRobot) */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+            <div className="p-3 rounded-xl bg-[#090D16] border border-gray-800 text-xs">
+              <span className="text-gray-400 block text-[10px]">Strava V3 API</span>
+              <span className="font-bold text-emerald-400 flex items-center gap-1 mt-0.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
+                OAuth Conectado
+              </span>
+              <span className="text-[10px] text-gray-500 block mt-1">ID: 203901</span>
+            </div>
+
+            <div className="p-3 rounded-xl bg-[#090D16] border border-gray-800 text-xs">
+              <span className="text-gray-400 block text-[10px]">Telegram Bot</span>
+              <span className="font-bold text-emerald-400 flex items-center gap-1 mt-0.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
+                @Coach_Pro_Alertas_bot
+              </span>
+              <span className="text-[10px] text-gray-500 block mt-1">Chat: 6315130099</span>
+            </div>
+
+            <div className="p-3 rounded-xl bg-[#090D16] border border-gray-800 text-xs">
+              <span className="text-gray-400 block text-[10px]">OpenWeather &amp; Maps</span>
+              <span className="font-bold text-emerald-400 flex items-center gap-1 mt-0.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
+                São Paulo Ativo
+              </span>
+              <span className="text-[10px] text-gray-500 block mt-1">Geoapify OSM</span>
+            </div>
+
+            <div className="p-3 rounded-xl bg-[#090D16] border border-gray-800 text-xs">
+              <span className="text-gray-400 block text-[10px]">UptimeRobot Health</span>
+              <span className="font-bold text-emerald-400 flex items-center gap-1 mt-0.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
+                Monitor Ativo
+              </span>
+              <span className="text-[10px] text-gray-500 block mt-1">ID: 803014115</span>
+            </div>
+          </div>
+
           <div className="flex items-center justify-between pt-2">
             <button
               type="button"

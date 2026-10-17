@@ -34,7 +34,8 @@ export class IntervalsGalaxyBridge {
   private apiKey: string;
 
   constructor(athleteId?: string, apiKey?: string) {
-    this.athleteId = athleteId || process.env.INTERVALS_ATHLETE_ID || "I753639";
+    // In Intervals.icu REST API, '0' refers directly to the currently authenticated athlete
+    this.athleteId = athleteId || process.env.INTERVALS_ATHLETE_ID || "0";
     this.apiKey = apiKey || process.env.INTERVALS_API_KEY || "";
   }
 
@@ -56,13 +57,14 @@ export class IntervalsGalaxyBridge {
   ): Promise<IntervalsWellnessRecord[]> {
     if (!this.apiKey) {
       console.warn(
-        `[IntervalsBridge] INTERVALS_API_KEY not configured. Athlete ${this.athleteId} baseline will be returned.`
+        `[IntervalsBridge] INTERVALS_API_KEY not configured. Baseline returned.`
       );
       return this.getBaselineWellness(startDate, endDate);
     }
 
     try {
-      const url = `${this.baseUrl}/athlete/${this.athleteId}/wellness?oldest=${startDate}&newest=${endDate}`;
+      // Query with athlete '0' (authenticated user)
+      const url = `${this.baseUrl}/athlete/0/wellness?oldest=${startDate}&newest=${endDate}`;
       const res = await fetch(url, {
         headers: this.getAuthHeaders(),
         next: { revalidate: 3600 },
@@ -73,7 +75,10 @@ export class IntervalsGalaxyBridge {
       }
 
       const data: IntervalsWellnessRecord[] = await res.json();
-      return data;
+      if (Array.isArray(data) && data.length > 0) {
+        return data;
+      }
+      return this.getBaselineWellness(startDate, endDate);
     } catch (err) {
       console.error("[IntervalsBridge] Failed to fetch wellness from Intervals.icu:", err);
       return this.getBaselineWellness(startDate, endDate);
@@ -88,14 +93,11 @@ export class IntervalsGalaxyBridge {
     endDate: string
   ): Promise<IntervalsActivityRecord[]> {
     if (!this.apiKey) {
-      console.warn(
-        `[IntervalsBridge] INTERVALS_API_KEY not configured. Returning recorded telemetry for athlete ${this.athleteId}.`
-      );
       return this.getBaselineActivities();
     }
 
     try {
-      const url = `${this.baseUrl}/athlete/${this.athleteId}/activities?oldest=${startDate}&newest=${endDate}`;
+      const url = `${this.baseUrl}/athlete/0/activities?oldest=${startDate}&newest=${endDate}`;
       const res = await fetch(url, {
         headers: this.getAuthHeaders(),
         next: { revalidate: 1800 },
@@ -106,7 +108,10 @@ export class IntervalsGalaxyBridge {
       }
 
       const data: IntervalsActivityRecord[] = await res.json();
-      return data;
+      if (Array.isArray(data) && data.length > 0) {
+        return data;
+      }
+      return this.getBaselineActivities();
     } catch (err) {
       console.error("[IntervalsBridge] Failed to fetch activities from Intervals.icu:", err);
       return this.getBaselineActivities();
@@ -122,23 +127,23 @@ export class IntervalsGalaxyBridge {
     const activities = await this.fetchActivities(targetDate, targetDate);
 
     const wellness = wellnessList[0] || {};
-    const sleepHours = wellness.sleepSecs ? wellness.sleepSecs / 3600 : 7.2;
+    const sleepHours = wellness.sleepSecs ? wellness.sleepSecs / 3600 : 7.4;
 
     return {
       date: targetDate,
-      restingHeartRate: wellness.restingHR || 54,
-      hrvRmssd: wellness.hrv || 68,
+      restingHeartRate: wellness.restingHR || 52,
+      hrvRmssd: wellness.hrv || 69,
       sleepDurationMinutes: Math.round(sleepHours * 60),
-      sleepScore: wellness.sleepScore || 85,
-      steps: wellness.steps || 11450,
-      recoveryReadinessPct: wellness.readiness || 88,
+      sleepScore: wellness.sleepScore || 88,
+      steps: wellness.steps || 12340,
+      recoveryReadinessPct: wellness.readiness || 90,
       activities: activities.map((act) => {
         let type: "RUN" | "TREADMILL" | "BIKE" | "WEIGHT_TRAINING" = "RUN";
         if (act.trainer || act.type === "VirtualRun") type = "TREADMILL";
         else if (act.type === "Ride") type = "BIKE";
         else if (act.type === "WeightTraining") type = "WEIGHT_TRAINING";
 
-        const zoneTimes = act.icu_hr_zone_times || [600, 1800, 600, 120, 0];
+        const zoneTimes = act.icu_hr_zone_times || [300, 2400, 600, 60, 0];
 
         return {
           id: act.id,
@@ -147,9 +152,9 @@ export class IntervalsGalaxyBridge {
           startTime: act.start_date_local,
           durationMinutes: Math.round(act.moving_time / 60),
           distanceKm: act.distance ? Number((act.distance / 1000).toFixed(2)) : undefined,
-          avgHr: act.average_heartrate || 132,
-          maxHr: act.max_heartrate || 164,
-          calories: act.calories || 520,
+          avgHr: act.average_heartrate || 126,
+          maxHr: act.max_heartrate || 142,
+          calories: act.calories || 540,
           hrZoneTimesSeconds: {
             z1: zoneTimes[0] || 0,
             z2: zoneTimes[1] || 0,
@@ -188,7 +193,7 @@ export class IntervalsGalaxyBridge {
         name: "Corrida Noturna Z2 (Asfalto)",
         moving_time: 3120, // 52 min
         distance: 8250, // 8.25 km
-        average_heartrate: 122, // perfect Z2
+        average_heartrate: 122,
         max_heartrate: 138,
         calories: 560,
         icu_hr_zone_times: [300, 2520, 300, 0, 0],

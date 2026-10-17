@@ -19,6 +19,9 @@ import {
   RotateCcw,
   Sparkles,
   Info,
+  CloudSun,
+  MapPin,
+  Send,
 } from "lucide-react";
 import {
   BodyMetrics,
@@ -26,6 +29,7 @@ import {
   GalaxyWatchTelemetry,
   WeekendLayoutMode,
 } from "@/lib/types";
+import { WeatherPacingData } from "@/lib/weather-service";
 
 interface CockpitTabProps {
   currentProfile: "DANIEL" | "PATRICIA" | "CLAN";
@@ -53,6 +57,41 @@ export function CockpitTab({
 
   const isDaniel = currentProfile !== "PATRICIA";
   const teamData = isDaniel ? footballData.flamengo : footballData.gremio;
+
+  const [weatherData, setWeatherData] = useState<WeatherPacingData | null>(null);
+  const [telegramStatus, setTelegramStatus] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    fetch("/api/weather/live?city=Sao%20Paulo,BR")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data.error) setWeatherData(data);
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleSendTelegramBriefing = async () => {
+    setTelegramStatus("Enviando...");
+    try {
+      const res = await fetch("/api/telegram/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "ECLUSA_1830",
+          message: `Missão: Corrida Z2 (55 min) • Clima em SP: ${weatherData?.tempC || 18}°C (${weatherData?.condition || "Ameno"}) • Prontidão Galaxy Watch: ${telemetry.recoveryReadinessPct}%`,
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setTelegramStatus("Alerta enviado ao Telegram!");
+        setTimeout(() => setTelegramStatus(null), 4000);
+      } else {
+        setTelegramStatus("Erro ao enviar.");
+      }
+    } catch {
+      setTelegramStatus("Erro de rede.");
+    }
+  };
 
   const handleSceneClick = (sceneName: string, label: string) => {
     onTriggerTuyaScene(sceneName);
@@ -419,6 +458,66 @@ export function CockpitTab({
               </button>
             </div>
           </div>
+
+          {/* Real-time Weather-Pacing & Telegram Proactive Hub */}
+          {weatherData && (
+            <div className="rounded-2xl bg-[#111827] border border-[#1F2937] p-4 shadow-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CloudSun className="h-4 w-4 text-cyan-400" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-white">
+                    Weather-Pacing em Tempo Real ({weatherData.city})
+                  </h4>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleSendTelegramBriefing}
+                    className="px-2.5 py-1 rounded-lg bg-blue-600/30 border border-blue-500/50 hover:bg-blue-600/50 text-[11px] font-bold text-blue-300 flex items-center gap-1 transition-all"
+                  >
+                    <Send className="h-3 w-3" />
+                    <span>{telegramStatus || "Enviar p/ Telegram"}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+                <div className="p-2 rounded-xl bg-[#090D16] border border-gray-800">
+                  <span className="text-[10px] text-gray-400 block">Temperatura</span>
+                  <span className="font-extrabold text-white text-sm">{weatherData.tempC}°C</span>
+                  <span className="text-[9px] text-gray-500 block">Sensação {weatherData.feelsLikeC}°C</span>
+                </div>
+
+                <div className="p-2 rounded-xl bg-[#090D16] border border-gray-800">
+                  <span className="text-[10px] text-gray-400 block">Umidade</span>
+                  <span className="font-extrabold text-cyan-400 text-sm">{weatherData.humidityPct}%</span>
+                  <span className="text-[9px] text-gray-500 block">Vento {weatherData.windSpeedKmh}km/h</span>
+                </div>
+
+                <div className="p-2 rounded-xl bg-[#090D16] border border-gray-800">
+                  <span className="text-[10px] text-gray-400 block">Ajuste de Pace</span>
+                  <span className={`font-extrabold text-sm ${weatherData.paceAdjustmentSec > 5 ? "text-amber-400" : "text-emerald-400"}`}>
+                    +{weatherData.paceAdjustmentSec}s/km
+                  </span>
+                  <span className="text-[9px] text-gray-500 block">Custo térmico</span>
+                </div>
+
+                <div className="p-2 rounded-xl bg-[#090D16] border border-gray-800">
+                  <span className="text-[10px] text-gray-400 block">Condição</span>
+                  <span className="font-bold text-gray-200 text-xs truncate capitalize block">
+                    {weatherData.condition}
+                  </span>
+                  <span className="text-[9px] text-emerald-400 font-semibold block">
+                    {weatherData.environmentalRisk === "OPTIMAL" ? "Ideal p/ Rua" : "Moderado"}
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-[11px] text-gray-300 italic bg-[#090D16]/60 p-2 rounded-lg border border-gray-800/60">
+                Diretriz de Pacing: {weatherData.tacticalRecommendation}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 

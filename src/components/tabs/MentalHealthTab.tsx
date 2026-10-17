@@ -63,9 +63,23 @@ export function MentalHealthTab({ currentProfile, onTriggerTuyaScene }: MentalHe
     return () => clearInterval(timer);
   }, [isBreathingActive, breathPhase]);
 
-  const handleSaveBrainDump = () => {
+  const handleSaveBrainDump = async () => {
     if (!brainDumpText.trim()) return;
     setBrainDumpSaved(true);
+
+    try {
+      await fetch("/api/telegram/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "ECLUSA_1830",
+          message: `Eclusa 18h30 Travada com Sucesso!\nBrain Dump arquivado: "${brainDumpText.substring(0, 100)}..."\nMente limpa e focada para a corrida das 19h.`,
+        }),
+      });
+    } catch (err) {
+      console.warn("Failed to notify telegram:", err);
+    }
+
     setTimeout(() => setBrainDumpSaved(false), 4000);
   };
 
