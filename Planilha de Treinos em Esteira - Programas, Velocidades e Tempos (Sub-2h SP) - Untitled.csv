@@ -1,0 +1,102 @@
+Semana,Fase,Dia da Semana,Tipo de Sessão,Programa na Esteira,Inclinação (%),Aquecimento / Base,Bloco Principal (km/h e tempo),Recuperação / Arrefecimento,Distância Estimada (km),Tempo Estimado (min)
+Sem. 01,Fase 1 (Olga Kos),Terça,Regeneração,Manual Livre (Bike Recumbent),0.0%,05 min @ Nível 1,20 min giro constante (70 rpm / carga mínima),05 min desaceleração,0.0,30
+Sem. 01,Fase 1 (Olga Kos),Quinta,Regeneração,Manual Livre (Bike Recumbent),0.0%,05 min @ Nível 1,20 min giro constante (70 rpm / carga mínima),05 min desaceleração,0.0,30
+Sem. 01,Fase 1 (Olga Kos),Domingo,Teste Funcional,Manual Contínuo,0.0%,05 min caminhada @ 5.5 km/h,15 min trote @ 8.0 km/h (07:30/km),05 min caminhada @ 5.0 km/h,3.0,25
+Sem. 02,Fase 1 (Olga Kos),Terça,Fluidez / Strides,Intervalado Manual,0.0%,08 min @ 8.0 km/h,4x (30s @ 11.0 km/h + 90s @ 7.5 km/h),06 min @ 7.5 km/h,4.0,28
+Sem. 02,Fase 1 (Olga Kos),Quinta,Rodagem Easy,Contínuo / Fat Burn,0.0%,05 min @ 7.5 km/h,30 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.5 km/h,5.0,40
+Sem. 02,Fase 1 (Olga Kos),Domingo,Longão Base,Contínuo / Endurance,0.0%,05 min @ 8.0 km/h,35 min contínuo @ 9.2 km/h (06:31/km),05 min @ 6.5 km/h,6.0,45
+Sem. 03,Fase 1 (Olga Kos),Terça,Intervalado Curto,HIIT / Interval Training,0.0%,1.5 km @ 8.5 km/h,5x (500m @ 10.9 km/h + 90s caminhada @ 5.5 km/h),1.0 km @ 7.5 km/h,5.5,35
+Sem. 03,Fase 1 (Olga Kos),Quinta,Rodagem Easy,Contínuo / Fat Burn,0.0%,05 min @ 7.5 km/h,30 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.5 km/h,5.0,40
+Sem. 03,Fase 1 (Olga Kos),Domingo,Progressivo,Speed Interval / Pirâmide,0.0%,1.0 km @ 8.5 km/h,2k @ 9.2 km/h + 2k @ 9.6 km/h + 2k @ 10.0 km/h,1.0 km @ 7.0 km/h,7.0,46
+Sem. 04,Fase 1 (Olga Kos),Terça,Intervalado Médio,HIIT / Interval Training,0.0%,1.5 km @ 8.5 km/h,3x (1.000m @ 11.1 km/h + 2 min trote @ 7.0 km/h),1.0 km @ 7.5 km/h,6.0,38
+Sem. 04,Fase 1 (Olga Kos),Quinta,Rodagem Easy,Contínuo / Endurance,0.0%,05 min @ 8.0 km/h,35 min contínuo @ 9.0 km/h (06:40/km),05 min @ 6.5 km/h,6.0,45
+Sem. 04,Fase 1 (Olga Kos),Domingo,Ritmo Estável,Tempo Run Manual,0.0%,1.0 km @ 8.5 km/h,6.0 km contínuo @ 9.7 km/h (06:11/km),1.0 km @ 7.0 km/h,8.0,52
+Sem. 05,Fase 1 (Olga Kos),Terça,Limiar Anaeróbico,Tempo Run / Limiar,0.0%,2.0 km @ 8.5 km/h,4.0 km contínuo cravado @ 10.7 km/h (05:36/km),1.0 km @ 7.0 km/h,7.0,43
+Sem. 05,Fase 1 (Olga Kos),Quinta,Regenerativo,Contínuo / Recovery,0.0%,05 min @ 7.5 km/h,30 min contínuo @ 8.5 km/h (07:03/km),05 min @ 6.0 km/h,5.0,40
+Sem. 05,Fase 1 (Olga Kos),Domingo,Simulado 9K,Progressivo / Target,0.0%,1.0 km @ 8.5 km/h,5.0 km @ 9.7 km/h + 3.0 km @ 10.6 km/h,0.0 km (corte direto),9.0,55
+Sem. 06,Fase 1 (Olga Kos),Terça,Potência Neuromuscular,HIIT / Interval Training,0.0%,1.5 km @ 8.5 km/h,4x (400m @ 11.3 km/h + 90s trote @ 7.0 km/h),1.0 km @ 7.5 km/h,4.5,30
+Sem. 06,Fase 1 (Olga Kos),Quinta,Rodagem Easy,Contínuo / Fat Burn,0.0%,05 min @ 7.5 km/h,25 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.5 km/h,4.0,35
+Sem. 06,Fase 1 (Olga Kos),Domingo,Polimento,Contínuo / Endurance,0.0%,05 min @ 8.0 km/h,35 min contínuo @ 9.2 km/h (06:31/km),05 min @ 6.5 km/h,6.0,45
+Sem. 07,Fase 1 (Olga Kos),Terça,Ativação,Manual / Speed Strides,0.0%,1.5 km @ 8.0 km/h,3x (60s @ 11.0 km/h + 90s caminhada @ 5.5 km/h),0.5 km @ 7.0 km/h,3.0,22
+Sem. 07,Fase 1 (Olga Kos),Quinta,Ativação Final,Manual / Recovery,0.0%,05 min @ 6.0 km/h,10 min @ 8.2 km/h + 15 min Bike horizontal Z1,05 min alongamento solo,2.0,20
+Sem. 07,Fase 1 (Olga Kos),Domingo,PROVA OLGA KOS 9K,RUA / COMPETIÇÃO,-,Aquecimento dinâmico solo,Ritmo de prova @ 10.6 km/h (05:39/km alvo),Caminhada livre,9.0,51
+Sem. 01,Fase 2 (Sub-2h SP),Terça,Tiros Curtos,HIIT / Interval Training,0.0%,1.0 km @ 8.5 km/h,3x (500m @ 10.9 km/h + 90s trote @ 7.0 km/h),1.5 km @ 8.0 km/h,5.0,33
+Sem. 01,Fase 2 (Sub-2h SP),Quarta,Rodagem Easy,Contínuo / Fat Burn,0.0%,05 min @ 7.5 km/h,30 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.5 km/h,5.0,40
+Sem. 01,Fase 2 (Sub-2h SP),Quinta,Ritmo Estável,Tempo Run Manual,0.0%,1.0 km @ 8.5 km/h,3.5 km contínuo @ 9.7 km/h (06:11/km),0.5 km @ 7.0 km/h,5.0,33
+Sem. 01,Fase 2 (Sub-2h SP),Sábado,Soltura Pré-Longo,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,25 min contínuo @ 8.5 km/h (07:03/km),05 min @ 6.0 km/h,4.0,35
+Sem. 01,Fase 2 (Sub-2h SP),Domingo,Longão Base,Contínuo / Endurance,0.0%,1.0 km @ 8.0 km/h,7.0 km contínuo @ 9.2 km/h (06:31/km),1.0 km @ 7.0 km/h,9.0,60
+Sem. 02,Fase 2 (Sub-2h SP),Terça,Tiros Curtos,HIIT / Interval Training,0.0%,1.0 km @ 8.5 km/h,4x (500m @ 11.1 km/h + 90s trote @ 7.0 km/h),1.5 km @ 8.0 km/h,6.0,38
+Sem. 02,Fase 2 (Sub-2h SP),Quarta,Rodagem Easy,Contínuo / Fat Burn,0.0%,05 min @ 7.5 km/h,30 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.5 km/h,5.0,40
+Sem. 02,Fase 2 (Sub-2h SP),Quinta,Tempo Run,Tempo Run Manual,0.0%,1.0 km @ 8.5 km/h,4.0 km contínuo @ 9.9 km/h (06:03/km),1.0 km @ 7.0 km/h,6.0,38
+Sem. 02,Fase 2 (Sub-2h SP),Sábado,Soltura Pré-Longo,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,25 min contínuo @ 8.6 km/h (06:58/km),05 min @ 6.0 km/h,4.0,35
+Sem. 02,Fase 2 (Sub-2h SP),Domingo,Longão Progressivo,Progressivo / Target,0.0%,1.0 km @ 8.5 km/h,7.0 km @ 9.2 km/h + 2.0 km @ 9.8 km/h,0.0 km (corte direto),10.0,65
+Sem. 03,Fase 2 (Sub-2h SP),Terça,Tiros de 1.000m,HIIT / Interval Training,0.0%,1.5 km @ 8.5 km/h,3x (1.000m @ 10.9 km/h + 2 min trote @ 7.0 km/h),1.5 km @ 7.5 km/h,6.0,39
+Sem. 03,Fase 2 (Sub-2h SP),Quarta,Rodagem Easy,Contínuo / Fat Burn,0.0%,05 min @ 7.5 km/h,30 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.5 km/h,5.0,40
+Sem. 03,Fase 2 (Sub-2h SP),Quinta,Ritmo Sustentado,Tempo Run Manual,0.0%,1.0 km @ 8.5 km/h,4.0 km contínuo @ 10.1 km/h (05:56/km),1.0 km @ 7.0 km/h,6.0,37
+Sem. 03,Fase 2 (Sub-2h SP),Sábado,Soltura Pré-Longo,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,25 min contínuo @ 8.6 km/h (06:58/km),05 min @ 6.0 km/h,4.0,35
+Sem. 03,Fase 2 (Sub-2h SP),Domingo,Longão Contínuo,Contínuo / Endurance,0.0%,1.0 km @ 8.5 km/h,10.0 km contínuo @ 9.5 km/h (06:19/km),1.0 km @ 7.0 km/h,12.0,78
+Sem. 04,Fase 2 (Sub-2h SP),Terça,Deload / Cadência,Manual / Speed Strides,0.0%,1.5 km @ 8.0 km/h,4x (30s @ 11.5 km/h + 90s trote @ 7.0 km/h),1.5 km @ 7.5 km/h,5.0,33
+Sem. 04,Fase 2 (Sub-2h SP),Quarta,Regenerativo,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,25 min contínuo @ 8.2 km/h (07:19/km),05 min @ 6.0 km/h,4.0,35
+Sem. 04,Fase 2 (Sub-2h SP),Quinta,Rodagem Easy,Contínuo / Fat Burn,0.0%,05 min @ 7.5 km/h,30 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.5 km/h,5.0,40
+Sem. 04,Fase 2 (Sub-2h SP),Sábado,Soltura,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,25 min contínuo @ 8.5 km/h (07:03/km),05 min @ 6.0 km/h,4.0,35
+Sem. 04,Fase 2 (Sub-2h SP),Domingo,Longão Deload,Contínuo / Endurance,0.0%,1.0 km @ 8.0 km/h,6.0 km contínuo @ 9.2 km/h (06:31/km),1.0 km @ 7.0 km/h,8.0,54
+Sem. 05,Fase 2 (Sub-2h SP),Terça,Intervalado Médio,HIIT / Interval Training,0.0%,1.5 km @ 8.5 km/h,4x (800m @ 11.3 km/h + 90s trote @ 7.0 km/h),1.5 km @ 7.5 km/h,7.0,43
+Sem. 05,Fase 2 (Sub-2h SP),Quarta,Rodagem Easy,Contínuo / Fat Burn,0.0%,05 min @ 7.5 km/h,35 min contínuo @ 9.0 km/h (06:40/km),05 min @ 6.5 km/h,6.0,45
+Sem. 05,Fase 2 (Sub-2h SP),Quinta,Bloco Ritmo Sub-2h,Tempo Run Manual,0.0%,1.5 km @ 8.5 km/h,3.0 km contínuo @ 10.6 km/h (05:40/km),1.5 km @ 7.5 km/h,6.0,38
+Sem. 05,Fase 2 (Sub-2h SP),Sábado,Soltura Pré-Longo,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,30 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.0 km/h,5.0,40
+Sem. 05,Fase 2 (Sub-2h SP),Domingo,Longão Progressivo,Progressivo / Target,0.0%,1.0 km @ 8.5 km/h,8.0 km @ 9.5 km/h + 3.0 km @ 10.3 km/h,0.0 km (corte direto),12.0,76
+Sem. 06,Fase 2 (Sub-2h SP),Terça,Tiros de 1.000m,HIIT / Interval Training,0.0%,1.5 km @ 8.5 km/h,4x (1.000m @ 11.1 km/h + 2 min trote @ 7.0 km/h),1.5 km @ 7.5 km/h,8.0,50
+Sem. 06,Fase 2 (Sub-2h SP),Quarta,Rodagem Easy,Contínuo / Fat Burn,0.0%,05 min @ 7.5 km/h,35 min contínuo @ 9.0 km/h (06:40/km),05 min @ 6.5 km/h,6.0,45
+Sem. 06,Fase 2 (Sub-2h SP),Quinta,Bloco Ritmo Sub-2h,Tempo Run Manual,0.0%,1.5 km @ 8.5 km/h,4.0 km contínuo @ 10.6 km/h (05:40/km),1.5 km @ 7.5 km/h,7.0,43
+Sem. 06,Fase 2 (Sub-2h SP),Sábado,Soltura Pré-Longo,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,30 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.0 km/h,5.0,40
+Sem. 06,Fase 2 (Sub-2h SP),Domingo,Longão Específico,Contínuo / Endurance,0.0%,1.0 km @ 8.5 km/h,12.0 km contínuo @ 9.7 km/h (06:11/km),1.0 km @ 7.0 km/h,14.0,89
+Sem. 07,Fase 2 (Sub-2h SP),Terça,Intervalado Curto/Forte,HIIT / Interval Training,0.0%,2.0 km @ 8.5 km/h,5x (800m @ 11.4 km/h + 90s trote @ 7.0 km/h),1.5 km @ 7.5 km/h,8.0,49
+Sem. 07,Fase 2 (Sub-2h SP),Quarta,Rodagem Easy,Contínuo / Fat Burn,0.0%,05 min @ 7.5 km/h,35 min contínuo @ 9.2 km/h (06:31/km),05 min @ 6.5 km/h,6.0,45
+Sem. 07,Fase 2 (Sub-2h SP),Quinta,Limiar Sub-2h Expandido,Tempo Run Manual,0.0%,1.5 km @ 8.5 km/h,5.0 km contínuo @ 10.6 km/h (05:38/km),1.5 km @ 7.5 km/h,8.0,49
+Sem. 07,Fase 2 (Sub-2h SP),Sábado,Soltura Pré-Longo,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,30 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.0 km/h,5.0,40
+Sem. 07,Fase 2 (Sub-2h SP),Domingo,Longão com Bloco,Progressivo / Target,0.0%,1.0 km @ 8.5 km/h,8.0 km @ 9.5 km/h + 6.0 km @ 10.3 km/h + 1k @ 7k,0.0 km,16.0,100
+Sem. 08,Fase 2 (Sub-2h SP),Terça,Deload / Strides,Manual / Speed Strides,0.0%,1.5 km @ 8.0 km/h,5x (30s @ 11.5 km/h + 90s trote @ 7.0 km/h),1.5 km @ 7.5 km/h,6.0,40
+Sem. 08,Fase 2 (Sub-2h SP),Quarta,Regenerativo,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,30 min contínuo @ 8.2 km/h (07:19/km),05 min @ 6.0 km/h,5.0,40
+Sem. 08,Fase 2 (Sub-2h SP),Quinta,Rodagem Easy,Contínuo / Fat Burn,0.0%,05 min @ 7.5 km/h,35 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.5 km/h,6.0,45
+Sem. 08,Fase 2 (Sub-2h SP),Sábado,Soltura,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,25 min contínuo @ 8.5 km/h (07:03/km),05 min @ 6.0 km/h,4.0,35
+Sem. 08,Fase 2 (Sub-2h SP),Domingo,Longão Deload,Contínuo / Endurance,0.0%,1.0 km @ 8.0 km/h,7.0 km contínuo @ 9.2 km/h (06:31/km),1.0 km @ 7.0 km/h,9.0,60
+Sem. 09,Fase 2 (Sub-2h SP),Terça,Tiros Longos,HIIT / Interval Training,0.0%,2.0 km @ 8.5 km/h,3x (1.500m @ 11.1 km/h + 2 min trote @ 7.0 km/h),1.5 km @ 7.5 km/h,8.0,49
+Sem. 09,Fase 2 (Sub-2h SP),Quarta,Rodagem Easy,Contínuo / Fat Burn,0.0%,05 min @ 7.5 km/h,35 min contínuo @ 9.2 km/h (06:31/km),05 min @ 6.5 km/h,6.0,45
+Sem. 09,Fase 2 (Sub-2h SP),Quinta,Tempo Run Específico,Tempo Run Manual,0.0%,1.5 km @ 8.5 km/h,5.0 km contínuo @ 10.7 km/h (05:35/km),1.5 km @ 7.5 km/h,8.0,48
+Sem. 09,Fase 2 (Sub-2h SP),Sábado,Soltura Pré-Longo,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,30 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.0 km/h,5.0,40
+Sem. 09,Fase 2 (Sub-2h SP),Domingo,Longão Progressivo,Progressivo / Target,0.0%,1.0 km @ 8.5 km/h,10.0 km @ 9.5 km/h + 4.0 km @ 10.6 km/h,0.0 km (corte direto),15.0,92
+Sem. 10,Fase 2 (Sub-2h SP),Terça,Intervalado de Carga,HIIT / Interval Training,0.0%,2.0 km @ 8.5 km/h,4x (1.200m @ 11.3 km/h + 2 min trote @ 7.0 km/h),1.5 km @ 7.5 km/h,9.0,55
+Sem. 10,Fase 2 (Sub-2h SP),Quarta,Rodagem Easy,Contínuo / Fat Burn,0.0%,05 min @ 7.5 km/h,35 min contínuo @ 9.2 km/h (06:31/km),05 min @ 6.5 km/h,6.0,45
+Sem. 10,Fase 2 (Sub-2h SP),Quinta,Tempo Run Alvo,Tempo Run Manual,0.0%,1.0 km @ 8.5 km/h,6.0 km contínuo @ 10.7 km/h (05:35/km),1.0 km @ 7.5 km/h,8.0,48
+Sem. 10,Fase 2 (Sub-2h SP),Sábado,Soltura Pré-Longo,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,30 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.0 km/h,5.0,40
+Sem. 10,Fase 2 (Sub-2h SP),Domingo,Longão Estratégico,Contínuo / Endurance,0.0%,1.0 km @ 8.5 km/h,15.0 km contínuo @ 9.7 km/h (06:11/km) + Géis,1.0 km @ 7.0 km/h,17.0,107
+Sem. 11,Fase 2 (Sub-2h SP),Terça,Pico de Intervalado,HIIT / Interval Training,0.0%,2.0 km @ 8.5 km/h,5x (1.000m @ 11.4 km/h + 90s trote @ 7.0 km/h),1.5 km @ 7.5 km/h,9.0,54
+Sem. 11,Fase 2 (Sub-2h SP),Quarta,Rodagem Easy,Contínuo / Fat Burn,0.0%,05 min @ 7.5 km/h,40 min contínuo @ 9.2 km/h (06:31/km),05 min @ 6.5 km/h,7.0,50
+Sem. 11,Fase 2 (Sub-2h SP),Quinta,Pico de Tempo Run,Tempo Run Manual,0.0%,1.5 km @ 8.5 km/h,6.0 km contínuo @ 10.9 km/h (05:30/km),1.5 km @ 7.5 km/h,9.0,53
+Sem. 11,Fase 2 (Sub-2h SP),Sábado,Soltura Pré-Longo,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,30 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.0 km/h,5.0,40
+Sem. 11,Fase 2 (Sub-2h SP),Domingo,Pico de Longão,Progressivo / Target,0.0%,1.0 km @ 8.5 km/h,12.0 km @ 9.5 km/h + 5.0 km @ 10.6 km/h,0.0 km (corte direto),18.0,110
+Sem. 12,Fase 2 (Sub-2h SP),Terça,Deload Pré-Pico,Manual / Speed Strides,0.0%,1.5 km @ 8.0 km/h,4x (60s @ 11.5 km/h + 90s trote @ 7.0 km/h),1.5 km @ 7.5 km/h,6.0,38
+Sem. 12,Fase 2 (Sub-2h SP),Quarta,Regenerativo,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,30 min contínuo @ 8.2 km/h (07:19/km),05 min @ 6.0 km/h,5.0,40
+Sem. 12,Fase 2 (Sub-2h SP),Quinta,Rodagem Easy,Contínuo / Fat Burn,0.0%,05 min @ 7.5 km/h,35 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.5 km/h,6.0,45
+Sem. 12,Fase 2 (Sub-2h SP),Sábado,Soltura,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,25 min contínuo @ 8.5 km/h (07:03/km),05 min @ 6.0 km/h,4.0,35
+Sem. 12,Fase 2 (Sub-2h SP),Domingo,Longão Deload,Contínuo / Endurance,0.0%,1.0 km @ 8.0 km/h,9.0 km contínuo @ 9.2 km/h (06:31/km),1.0 km @ 7.0 km/h,11.0,73
+Sem. 13,Fase 2 (Sub-2h SP),Terça,Intervalado de Sustentação,HIIT / Interval Training,0.0%,2.0 km @ 8.5 km/h,4x (1.000m @ 11.3 km/h + 2 min trote @ 7.0 km/h),1.5 km @ 7.5 km/h,8.0,49
+Sem. 13,Fase 2 (Sub-2h SP),Quarta,Rodagem Easy,Contínuo / Fat Burn,0.0%,05 min @ 7.5 km/h,35 min contínuo @ 9.2 km/h (06:31/km),05 min @ 6.5 km/h,6.0,45
+Sem. 13,Fase 2 (Sub-2h SP),Quinta,Tempo Run Curto,Tempo Run Manual,0.0%,1.5 km @ 8.5 km/h,4.0 km contínuo @ 10.7 km/h (05:35/km),1.5 km @ 7.5 km/h,7.0,42
+Sem. 13,Fase 2 (Sub-2h SP),Sábado,Simulado Combo 5K,Contínuo / Target Test,0.0%,05 min @ 7.5 km/h,25 min contínuo @ 9.5 km/h (06:19/km),05 min @ 6.5 km/h,5.0,35
+Sem. 13,Fase 2 (Sub-2h SP),Domingo,Longão Combo 18K,Contínuo / Endurance,0.0%,1.0 km @ 8.5 km/h,16.0 km contínuo @ 9.7 km/h (06:11/km) + Géis,1.0 km @ 7.0 km/h,18.0,111
+Sem. 14,Fase 2 (Sub-2h SP),Terça,Tapering / Ritmo,HIIT / Interval Training,0.0%,2.0 km @ 8.5 km/h,4x (600m @ 11.4 km/h + 90s trote @ 7.0 km/h),1.0 km @ 7.5 km/h,7.0,43
+Sem. 14,Fase 2 (Sub-2h SP),Quarta,Rodagem Easy,Contínuo / Fat Burn,0.0%,05 min @ 7.5 km/h,30 min contínuo @ 9.0 km/h (06:40/km),05 min @ 6.5 km/h,5.0,40
+Sem. 14,Fase 2 (Sub-2h SP),Quinta,Tempo Run Reduzido,Tempo Run Manual,0.0%,1.5 km @ 8.5 km/h,3.0 km contínuo @ 10.7 km/h (05:35/km),1.5 km @ 7.5 km/h,6.0,37
+Sem. 14,Fase 2 (Sub-2h SP),Sábado,Soltura,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,25 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.0 km/h,4.0,35
+Sem. 14,Fase 2 (Sub-2h SP),Domingo,Longão Polimento,Contínuo / Endurance,0.0%,1.0 km @ 8.5 km/h,11.0 km contínuo @ 9.5 km/h (06:19/km),1.0 km @ 7.0 km/h,13.0,81
+Sem. 15,Fase 2 (Sub-2h SP),Terça,Tapering Agudo,HIIT / Interval Training,0.0%,2.0 km @ 8.5 km/h,3x (500m @ 11.1 km/h + 90s trote @ 7.0 km/h),1.0 km @ 7.5 km/h,5.0,33
+Sem. 15,Fase 2 (Sub-2h SP),Quarta,Rodagem Leve,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,25 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.0 km/h,4.0,35
+Sem. 15,Fase 2 (Sub-2h SP),Quinta,Toque de Prova,Manual / Touch Target,0.0%,2.0 km @ 8.5 km/h,1.0 km cravado @ 10.7 km/h (05:35/km),2.0 km @ 7.5 km/h,5.0,33
+Sem. 15,Fase 2 (Sub-2h SP),Sábado,Soltura Curta,Contínuo / Recovery,0.0%,05 min @ 7.0 km/h,15 min contínuo @ 8.5 km/h (07:03/km),05 min @ 6.0 km/h,3.0,25
+Sem. 15,Fase 2 (Sub-2h SP),Domingo,Regenerativo Solto,Contínuo / Recovery,0.0%,05 min @ 7.5 km/h,45 min contínuo @ 8.8 km/h (06:49/km),05 min @ 6.5 km/h,8.0,55
+Sem. 16,Fase 2 (Sub-2h SP),Terça,Ativação da Prova,Manual / Speed Strides,0.0%,2.0 km @ 8.0 km/h,3x (60s @ 11.0 km/h + 90s trote @ 7.0 km/h),1.0 km @ 7.5 km/h,4.0,27
+Sem. 16,Fase 2 (Sub-2h SP),Quarta,Soltura Opcional,Bike Recumbent / Giro Z1,0.0%,05 min @ Nível 1,15 min giro constante (70 rpm atrito zero),05 min desaceleração,0.0,25
+Sem. 16,Fase 2 (Sub-2h SP),Quinta,Trote Mecânico,Manual / Recovery,0.0%,05 min @ 6.5 km/h,15 min contínuo @ 8.2 km/h (07:19/km),05 min @ 6.0 km/h,3.0,25
+Sem. 16,Fase 2 (Sub-2h SP),Sábado,DESAFIO 5K SP,RUA / COMPETIÇÃO,-,Aquecimento dinâmico solo,Ritmo de soltura @ 9.2 km/h (06:31/km) sem sprint,Caminhada livre,5.0,33
+Sem. 16,Fase 2 (Sub-2h SP),Domingo,MEIA DE SP 21.1K,RUA / COMPETIÇÃO,-,Aquecimento dinâmico solo,Meta Sub-2h @ 10.6 km/h (05:39/km alvo com géis),Caminhada / Celebração,21.1,119

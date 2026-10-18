@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { ProfileId, TargetRaceItem } from "@/lib/types";
 import { getProfileSpecs, getStrengthFicha } from "@/lib/physiology";
+import { DEFAULT_RACES } from "@/components/RaceManagerModal";
 
 interface ExecutiveReportModalProps {
   isOpen: boolean;
@@ -53,10 +54,26 @@ export function ExecutiveReportModal({
     try {
       const stored = localStorage.getItem("BIO_TRIAD_RACES_V3");
       if (stored) {
-        setRaces(JSON.parse(stored));
+        const parsed: TargetRaceItem[] = JSON.parse(stored);
+        const filtered = parsed.filter((r) => r.id !== "patricia-circuito-athenas-2026");
+        const merged = [...filtered];
+        for (const dr of DEFAULT_RACES) {
+          const idx = merged.findIndex((r) => r.id === dr.id);
+          if (idx === -1) {
+            merged.push(dr);
+          } else if (dr.id === "daniel-meia-sp-2026" && merged[idx].actualFinishTime !== "02:22:05") {
+            merged[idx] = dr;
+          } else if (dr.isCompleted && !merged[idx].isCompleted) {
+            merged[idx] = dr;
+          }
+        }
+        setRaces(merged);
+      } else {
+        setRaces(DEFAULT_RACES);
       }
     } catch (e) {
       console.warn("Storage read error", e);
+      setRaces(DEFAULT_RACES);
     }
   }, [isOpen]);
 

@@ -26,6 +26,7 @@ import { TrophyCardGeneratorModal } from "@/components/TrophyCardGeneratorModal"
 import { ClanHallOfFameModal } from "@/components/ClanHallOfFameModal";
 import { SetupManagerModal } from "@/components/SetupManagerModal";
 import { RaceMorningDispatchModal } from "@/components/RaceMorningDispatchModal";
+import { DanielTrainingPlanModal } from "@/components/DanielTrainingPlanModal";
 import { BodyMetrics, FootballTeamData, GalaxyWatchTelemetry, ProfileId } from "@/lib/types";
 import { calculateBodyMetrics } from "@/lib/physiology";
 
@@ -44,6 +45,7 @@ export default function BioTriadApp() {
   const [isClanHallOfFameOpen, setIsClanHallOfFameOpen] = useState<boolean>(false);
   const [isSetupOpen, setIsSetupOpen] = useState<boolean>(false);
   const [isRaceMorningOpen, setIsRaceMorningOpen] = useState<boolean>(false);
+  const [isDanielTrainingPlanOpen, setIsDanielTrainingPlanOpen] = useState<boolean>(false);
   const [selectedRaceForMorning, setSelectedRaceForMorning] = useState<string | undefined>(undefined);
 
   const handleOpenRaceMorning = (raceId?: string) => {
@@ -173,6 +175,7 @@ export default function BioTriadApp() {
         onOpenClanHallOfFame={() => setIsClanHallOfFameOpen(true)}
         onOpenSetup={() => setIsSetupOpen(true)}
         onOpenRaceMorning={handleOpenRaceMorning}
+        onOpenDanielTrainingPlan={() => setIsDanielTrainingPlanOpen(true)}
       />
 
       {/* 2. Main Content Area */}
@@ -190,6 +193,7 @@ export default function BioTriadApp() {
             onOpenTrophyCardGenerator={() => setIsTrophyCardGeneratorOpen(true)}
             onOpenClanHallOfFame={() => setIsClanHallOfFameOpen(true)}
             onOpenRaceMorning={handleOpenRaceMorning}
+            onOpenDanielTrainingPlan={() => setIsDanielTrainingPlanOpen(true)}
           />
         )}
 
@@ -197,6 +201,7 @@ export default function BioTriadApp() {
           <CoachTab
             currentProfile={currentProfile}
             onTriggerTuyaScene={handleTriggerTuyaScene}
+            onOpenDanielTrainingPlan={() => setIsDanielTrainingPlanOpen(true)}
           />
         )}
 
@@ -334,6 +339,10 @@ export default function BioTriadApp() {
         isOpen={isRaceManagerOpen}
         onClose={() => setIsRaceManagerOpen(false)}
         activeProfile={currentProfile}
+        onOpenTrophyCardGenerator={() => {
+          setIsRaceManagerOpen(false);
+          setIsTrophyCardGeneratorOpen(true);
+        }}
       />
 
       <ExecutiveReportModal
@@ -360,6 +369,10 @@ export default function BioTriadApp() {
         isOpen={isClanHallOfFameOpen}
         onClose={() => setIsClanHallOfFameOpen(false)}
         onSelectProfile={(p) => setCurrentProfile(p)}
+        onOpenTrophyCardGenerator={() => {
+          setIsClanHallOfFameOpen(false);
+          setIsTrophyCardGeneratorOpen(true);
+        }}
       />
 
       <SetupManagerModal
@@ -377,6 +390,11 @@ export default function BioTriadApp() {
         onClose={() => setIsRaceMorningOpen(false)}
         currentProfile={currentProfile}
         initialRaceId={selectedRaceForMorning}
+      />
+
+      <DanielTrainingPlanModal
+        isOpen={isDanielTrainingPlanOpen}
+        onClose={() => setIsDanielTrainingPlanOpen(false)}
       />
     </div>
   );

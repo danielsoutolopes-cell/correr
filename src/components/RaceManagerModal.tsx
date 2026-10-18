@@ -36,33 +36,82 @@ interface RaceManagerModalProps {
   isOpen: boolean;
   onClose: () => void;
   activeProfile: ProfileId;
+  onOpenTrophyCardGenerator?: () => void;
 }
 
-const DEFAULT_RACES: TargetRaceItem[] = [
+export const DEFAULT_RACES: TargetRaceItem[] = [
   // DANIEL
   {
     id: "daniel-meia-sp-2026",
     athleteId: "DANIEL",
-    name: "Meia Maratona Internacional de SP 2026 (21k) • OFICIAL CONCLUÍDA",
+    name: "30ª Maratona Internacional de SP 2026 (Meia 21k) • OFICIAL CONCLUÍDA",
     raceDate: "2026-04-12",
     distanceKm: 21.097,
     location: "São Paulo, SP - Ibirapuera",
     priority: "P1_TARGET",
-    targetPaceMinKm: "5:30",
-    targetFinishTime: "01:56:00",
+    targetPaceMinKm: "6:46",
+    targetFinishTime: "02:22:05",
     taperingWeeksCount: 3,
     carbLoadingDaysBefore: 3,
     isCompleted: true,
-    actualFinishTime: "01:54:12",
-    actualGunTime: "01:56:45",
-    actualPaceMinKm: "5:25",
-    overallRank: "389º / 4.250",
-    categoryRank: "24º / 512",
-    genderRank: "330º / 2.820",
+    actualFinishTime: "02:22:05",
+    actualGunTime: "02:49:28",
+    actualPaceMinKm: "6:46",
+    overallRank: "3.824º",
+    categoryRank: "332º / M5054",
+    genderRank: "Masculino",
     ageGroupCategory: "M50-54",
-    podiumAward: "🥈 Top 5% Categoria (M50-54) • Recorde Pessoal (RP)",
-    percentileRankPct: 95,
-    raceNotes: "Excelente cadência 178 spm, ombro direito protegido sem balanço lesivo, Z3 mantida na subida da 23 de Maio.",
+    podiumAward: "🏅 Finisher Oficial 30 Anos Maratona Intl de SP (Nº 17503)",
+    percentileRankPct: 65,
+    raceNotes: "30ª Maratona Internacional de São Paulo realizada em 12/04/2026 (Chiptiming / Abbott World Marathon Majors). Número de Peito #17503. Tempo Líquido: 02:22:05, Tempo Bruto: 02:49:28, Pace Médio: 06:46 min/km. Colocação Geral: 3.824º, Faixa Etária M50-54: 332º. Largada e chegada no Ibirapuera com passagem pelo Túnel Ayrton Senna.",
+  },
+  {
+    id: "daniel-sp-city-2026",
+    athleteId: "DANIEL",
+    name: "Nike SP City Marathon 2026 (21.1k) • OFICIAL CONCLUÍDA",
+    raceDate: "2026-07-26",
+    distanceKm: 21.097,
+    location: "São Paulo, SP - Pacaembu / Jockey Club",
+    priority: "P1_TARGET",
+    targetPaceMinKm: "6:12",
+    targetFinishTime: "02:10:58",
+    taperingWeeksCount: 3,
+    carbLoadingDaysBefore: 3,
+    isCompleted: true,
+    actualFinishTime: "02:10:58",
+    actualGunTime: "03:31:10",
+    actualPaceMinKm: "6:12",
+    overallRank: "12.213º / 21.487",
+    categoryRank: "674º / 1.174",
+    genderRank: "8.035º / 11.901",
+    ageGroupCategory: "M50-59",
+    podiumAward: "🏅 Finisher Oficial Meia Maratona SP City (Nº 33765)",
+    percentileRankPct: 57,
+    raceNotes: "Largada na Praça Charles Miller (Pacaembu), Minhocão, 23 de Maio e chegada no Jockey Club de SP. Número de Peito #33765, Tempo Líquido 02:10:58, Tempo Bruto 03:31:10, Pace Médio 06:12 min/km.",
+  },
+  {
+    id: "daniel-praia-grande-2026",
+    athleteId: "DANIEL",
+    name: "14ª Meia Maratona Tribuna Praia Grande (21k) • CAMPEÃO ACD 🏆",
+    raceDate: "2026-09-27",
+    distanceKm: 21.097,
+    location: "Praia Grande, SP - Litoral",
+    priority: "P1_TARGET",
+    targetPaceMinKm: "7:05",
+    targetFinishTime: "02:29:38",
+    taperingWeeksCount: 2,
+    carbLoadingDaysBefore: 3,
+    isCompleted: true,
+    actualFinishTime: "02:29:38",
+    actualGunTime: "02:29:42",
+    actualPaceMinKm: "7:05",
+    overallRank: "17º / 22 (ACD Geral)",
+    categoryRank: "1º / 1 (CAMPEÃO ACD DMS 🏆)",
+    genderRank: "15º / 17",
+    ageGroupCategory: "ACD DMS (Membro Superior)",
+    podiumAward: "🏆 1º LUGAR NO PÓDIO - CAMPEÃO CATEGORIA ACD DMS (Nº 115)",
+    percentileRankPct: 100,
+    raceNotes: "14ª Meia Maratona Tribuna Praia Grande realizada em 27/09/2026. Conquista histórica de 1º Lugar / Campeão no Pódio da categoria ACD DMS (Deficiência Membro Superior / Lesão de Plexo Braquial). Número de Peito #115, Tempo Líquido: 02:29:38, Tempo Bruto: 02:29:42, Pace Médio: 07:05 min/km. Braço e ombro direito 100% blindados biomecanicamente com cadência constante!",
   },
   {
     id: "daniel-athenas-2026",
@@ -77,6 +126,7 @@ const DEFAULT_RACES: TargetRaceItem[] = [
     taperingWeeksCount: 2,
     carbLoadingDaysBefore: 3,
     isCalibrationBase: true,
+    raceStartTime: "05:30",
   },
   {
     id: "daniel-olga-kos-2026",
@@ -120,42 +170,78 @@ const DEFAULT_RACES: TargetRaceItem[] = [
 
   // PATRICIA
   {
-    id: "patricia-circuito-athenas-2026",
+    id: "patricia-sp-city-2026",
     athleteId: "PATRICIA",
-    name: "Circuito Athenas SP 2026 - Etapa 1 (10k) • OFICIAL CONCLUÍDA",
-    raceDate: "2026-05-17",
-    distanceKm: 10.0,
-    location: "São Paulo, SP - Marginal Pinheiros",
+    name: "Nike SP City Marathon 2026 (Meia 21.1k) • OFICIAL CONCLUÍDA",
+    raceDate: "2026-07-26",
+    distanceKm: 21.097,
+    location: "São Paulo, SP - Pacaembu / Jockey Club",
     priority: "P1_TARGET",
-    targetPaceMinKm: "5:50",
-    targetFinishTime: "00:58:20",
-    taperingWeeksCount: 2,
+    targetPaceMinKm: "8:11",
+    targetFinishTime: "02:53:00",
+    taperingWeeksCount: 3,
     carbLoadingDaysBefore: 3,
     isCompleted: true,
-    actualFinishTime: "00:57:40",
-    actualGunTime: "00:59:15",
-    actualPaceMinKm: "5:46",
-    overallRank: "198ª / 3.400",
-    categoryRank: "12ª / 380",
-    genderRank: "84ª / 1.650",
-    ageGroupCategory: "F55-59",
-    podiumAward: "👑 Top 3% Faixa Etária (F55-59) • Recorde Pessoal (RP)",
-    percentileRankPct: 97,
-    raceNotes: "Estabilidade glútea exemplar, sem valgo dinâmico de joelho, hidratação tática perfeita.",
+    actualFinishTime: "02:53:00",
+    actualGunTime: "04:13:12",
+    actualPaceMinKm: "8:11",
+    overallRank: "20.579ª / 21.487",
+    categoryRank: "933ª / 1.020",
+    genderRank: "9.020ª / 9.586",
+    ageGroupCategory: "F50-59",
+    podiumAward: "👑 Finisher Oficial Meia Maratona SP City (Nº 34798)",
+    percentileRankPct: 40,
+    raceNotes: "Largada na Praça Charles Miller (Pacaembu), Minhocão, 23 de Maio e chegada no Jockey Club de SP. Número de Peito #34798, Tempo Líquido 02:53:00, Tempo Bruto 04:13:12, Pace Médio 08:11 min/km. Conquista histórica de meia maratonista!",
+  },
+  {
+    id: "patricia-tribuna-santos-2026",
+    athleteId: "PATRICIA",
+    name: "40º 10 KM Tribuna Terracom Santos (2026) • OFICIAL CONCLUÍDA",
+    raceDate: "2026-05-17",
+    distanceKm: 10.0,
+    location: "Santos, SP - Centro ao Gonzaga",
+    priority: "P1_TARGET",
+    targetPaceMinKm: "7:01",
+    targetFinishTime: "01:10:12",
+    taperingWeeksCount: 2,
+    carbLoadingDaysBefore: 2,
+    isCompleted: true,
+    actualFinishTime: "01:10:12",
+    actualGunTime: "01:12:34",
+    actualPaceMinKm: "7:01",
+    overallRank: "9.739ª / 20.697",
+    categoryRank: "430ª / 1.214",
+    genderRank: "3.009ª / 8.856",
+    ageGroupCategory: "F50-59",
+    podiumAward: "🏅 Finisher Oficial 40 Anos 10 KM Tribuna (Nº 9773)",
+    percentileRankPct: 70,
+    raceNotes: "Edição comemorativa de 40 Anos dos 10 KM Tribuna Terracom em Santos (17/05/2026). Atleta Patrícia Grubel da Rocha, Nº 9773. Tempo Líquido: 01:10:12, Tempo Bruto: 01:12:34, Pace Médio: 07:01 min/km. Superou 70.36% dos competidores (Top 30% geral)! Trajeto plano e veloz do Centro ao Gonzaga.",
   },
   {
     id: "patricia-athenas-2026",
     athleteId: "PATRICIA",
-    name: "Athenas Mizuno Run Longer 14k • AMANHÃ!",
+    name: "Athenas Mizuno Run Longer 14k • OFICIAL CONCLUÍDA HOJE",
     raceDate: "2026-10-18",
     distanceKm: 14.0,
     location: "São Paulo, SP - Marginal Pinheiros",
     priority: "P1_TARGET",
-    targetPaceMinKm: "5:55",
-    targetFinishTime: "01:22:50",
+    targetPaceMinKm: "7:21",
+    targetFinishTime: "01:43:02",
     taperingWeeksCount: 1,
     carbLoadingDaysBefore: 3,
     isCalibrationBase: true,
+    raceStartTime: "06:30",
+    isCompleted: true,
+    actualFinishTime: "01:43:02",
+    actualGunTime: "01:48:44",
+    actualPaceMinKm: "7:21",
+    overallRank: "1.827º / 2.066",
+    categoryRank: "26ª / 33",
+    genderRank: "950ª / 1.127",
+    ageGroupCategory: "F55-59",
+    podiumAward: "🏅 Finisher 14k Athenas Mizuno Run Longer (Nº 10967)",
+    percentileRankPct: 34,
+    raceNotes: "Prova concluída com louvor hoje (18/10/2026) na Marginal Pinheiros! Largada às 06:30hs. Número de Peito #10967. Tempo Líquido Oficial: 01:43:02, Tempo Bruto: 01:48:44, Pace Médio: 07:21 min/km. Faixa Etária F55-59: 26ª/33. Classificação Geral Feminina: 950ª/1127. Classificação Geral: 1827ª/2066. Superou 33.68% dos competidores. Marco zero calibrado com sucesso para a Meia Vênus 21k!",
   },
   {
     id: "patricia-venus-2026",
@@ -280,6 +366,7 @@ export function RaceManagerModal({
   isOpen,
   onClose,
   activeProfile,
+  onOpenTrophyCardGenerator,
 }: RaceManagerModalProps) {
   const [selectedAthlete, setSelectedAthlete] = useState<"DANIEL" | "PATRICIA" | "GABRIEL">(
     activeProfile === "PATRICIA" ? "PATRICIA" : activeProfile === "GABRIEL" ? "GABRIEL" : "DANIEL"
@@ -331,7 +418,24 @@ export function RaceManagerModal({
     try {
       const stored = localStorage.getItem("BIO_TRIAD_RACES_V3");
       if (stored) {
-        setRaces(JSON.parse(stored));
+        const parsed: TargetRaceItem[] = JSON.parse(stored);
+        const filtered = parsed.filter((r) => r.id !== "patricia-circuito-athenas-2026");
+        const merged = [...filtered];
+        for (const dr of DEFAULT_RACES) {
+          const idx = merged.findIndex((r) => r.id === dr.id);
+          if (idx === -1) {
+            merged.push(dr);
+          } else if (dr.id === "daniel-meia-sp-2026" && merged[idx].actualFinishTime !== "02:22:05") {
+            merged[idx] = dr;
+          } else if (dr.isCompleted && !merged[idx].isCompleted) {
+            merged[idx] = dr;
+          }
+        }
+        setRaces(merged);
+        localStorage.setItem("BIO_TRIAD_RACES_V3", JSON.stringify(merged));
+      } else {
+        setRaces(DEFAULT_RACES);
+        localStorage.setItem("BIO_TRIAD_RACES_V3", JSON.stringify(DEFAULT_RACES));
       }
     } catch (e) {
       console.warn("Could not read races from localStorage", e);
@@ -343,8 +447,8 @@ export function RaceManagerModal({
     if (selectedAthlete === "PATRICIA") {
       setCalibDistanceKm(14.0);
       setCalibHours(1);
-      setCalibMinutes(22);
-      setCalibSeconds(50);
+      setCalibMinutes(43);
+      setCalibSeconds(2);
       setResAgeGroup("F55-59");
     } else if (selectedAthlete === "GABRIEL") {
       setCalibDistanceKm(10.0);
@@ -372,6 +476,16 @@ export function RaceManagerModal({
       localStorage.setItem("BIO_TRIAD_RACES_V3", JSON.stringify(updated));
     } catch (e) {
       console.warn("Storage error", e);
+    }
+  };
+
+  const handleUpdateRaceTime = (raceId: string, newTime: string) => {
+    const updated = races.map((r) => (r.id === raceId ? { ...r, raceStartTime: newTime } : r));
+    saveRacesToStorage(updated);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem(`RACE_START_TIME_${raceId}`, newTime);
+      } catch {}
     }
   };
 
@@ -791,8 +905,18 @@ export function RaceManagerModal({
                             </div>
                           </div>
 
-                          {/* Action Button */}
+                          {/* Action Buttons */}
                           <div className="flex items-center gap-2">
+                            {onOpenTrophyCardGenerator && (
+                              <button
+                                onClick={onOpenTrophyCardGenerator}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition-all shadow-md shadow-amber-500/10"
+                                title="Gerar Cartão de Troféu Oficial para Compartilhar"
+                              >
+                                <Trophy className="h-3.5 w-3.5 text-amber-400" />
+                                <span>Cartão de Troféu</span>
+                              </button>
+                            )}
                             <button
                               onClick={() => handleOpenResultEditor(race)}
                               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all"
@@ -1098,10 +1222,19 @@ export function RaceManagerModal({
                             <Calendar className="h-3 w-3 text-amber-400" />
                             {race.raceDate}
                           </span>
-                          <span className="flex items-center gap-1 text-amber-300 font-bold">
+                          <label
+                            className="flex items-center gap-1.5 text-amber-300 font-bold bg-black/40 px-2 py-0.5 rounded-lg border border-amber-500/30 hover:border-amber-400 transition-colors"
+                            title="Alterar horário oficial da largada desta prova"
+                          >
                             <Clock className="h-3 w-3 text-amber-400" />
-                            Largada: {race.raceStartTime || "06:30"}
-                          </span>
+                            <span>Largada:</span>
+                            <input
+                              type="time"
+                              value={race.raceStartTime || (race.distanceKm >= 21 && race.name.toLowerCase().includes("athenas") ? "05:30" : "06:30")}
+                              onChange={(e) => handleUpdateRaceTime(race.id, e.target.value)}
+                              className="bg-transparent text-amber-300 font-mono font-bold focus:outline-none cursor-pointer"
+                            />
+                          </label>
                           <span className="flex items-center gap-1">
                             <MapPin className="h-3 w-3 text-emerald-400" />
                             {race.location}

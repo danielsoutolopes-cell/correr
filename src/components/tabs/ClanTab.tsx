@@ -208,7 +208,7 @@ export function ClanTab({
               </div>
               <div className="flex justify-between py-1 border-b border-white/5">
                 <span className="text-gray-400">Categoria & Palmarés:</span>
-                <span className="font-bold text-amber-400">M50-54 • 24º Meia SP (01:54:12)</span>
+                <span className="font-bold text-amber-400">3x Meias 21k • RP 02:10:58 • 🏆 1º ACD</span>
               </div>
               <div className="flex justify-between py-1 border-b border-white/5">
                 <span className="text-gray-400">Hardware & WhatsApp:</span>

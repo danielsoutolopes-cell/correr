@@ -174,6 +174,10 @@ export function resolveRaceDefaultStartTime(distanceKm: number, raceName: string
   const name = (raceName || "").toLowerCase();
   if (name.includes("silvestre")) return "07:30";
   if (name.includes("noturna") || name.includes("night")) return "19:00";
+  if (name.includes("athenas") || name.includes("mizuno")) {
+    if (distanceKm >= 21) return "05:30";
+    return "06:30";
+  }
   if (distanceKm >= 42) return "06:00"; // Marathon early morning
   if (distanceKm >= 21) return "06:30"; // Half marathon standard
   if (distanceKm <= 10) return "07:00"; // 5k/10k races typically start at 07h00

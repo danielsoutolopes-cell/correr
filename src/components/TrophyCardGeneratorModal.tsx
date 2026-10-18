@@ -70,12 +70,14 @@ export function TrophyCardGeneratorModal({
     } else if (selectedProfile === "PATRICIA") {
       setRaceName("ATHENAS MIZUNO RUN LONGER 14K");
       setDistanceKm("14.000");
-      setChipTime("01:23:45");
-      setPace("5:59");
-      setCadenceSpm("180");
+      setChipTime("01:43:02");
+      setGunTime("01:48:44");
+      setPace("7:21");
+      setCadenceSpm("168");
       setAvgHrBpm("152");
-      setRankingCategory("Top 5.1% • 12ª F55-59");
-      setPodiumTitle("RAINHA DO PÓDIO • GLÚTEO BLINDADO");
+      setRankingCategory("26ª F55-59 • 950ª Geral Fem • Nº 10967");
+      setPodiumTitle("FINISHER OFICIAL 14K • ATHENAS MIZUNO");
+      setRaceDate("18 OUT 2026");
     } else if (selectedProfile === "GABRIEL") {
       setRaceName("CORRIDA OLGA KOS 10K SPEED");
       setDistanceKm("10.000");
@@ -427,6 +429,169 @@ _Certificado com precisão Haute Horlogerie pelo Bio-Triad OS_ ✨`;
                 </button>
               </div>
             </div>
+
+            {/* Quick Preset Selector */}
+            {selectedProfile === "DANIEL" && (
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-mono">
+                <span className="text-[10px] text-gray-400 uppercase font-bold shrink-0">Predefinir:</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRaceName("14ª MEIA MARATONA TRIBUNA PRAIA GRANDE");
+                    setDistanceKm("21.097");
+                    setChipTime("02:29:38");
+                    setGunTime("02:29:42");
+                    setPace("7:05");
+                    setCadenceSpm("170");
+                    setAvgHrBpm("150");
+                    setRankingCategory("1º LUGAR Categoria ACD DMS • Nº 115");
+                    setPodiumTitle("🏆 CAMPEÃO 21K • 1º LUGAR NO PÓDIO");
+                    setRaceDate("27 SET 2026");
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/40 text-amber-300 font-bold shrink-0"
+                >
+                  Praia Grande 21k • 🏆 1º LUGAR ACD (02:29:38)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRaceName("SP CITY MARATHON 2026");
+                    setDistanceKm("21.097");
+                    setChipTime("02:10:58");
+                    setGunTime("03:31:10");
+                    setPace("6:12");
+                    setCadenceSpm("172");
+                    setAvgHrBpm("154");
+                    setRankingCategory("Top 57% • 674º M50-59 • Nº 33765");
+                    setPodiumTitle("FINISHER OFICIAL 21.1K • MEIA SP CITY");
+                    setRaceDate("26 JUL 2026");
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-red-600/20 hover:bg-red-600/30 border border-red-500/40 text-red-300 font-bold shrink-0"
+                >
+                  SP City Marathon 21k (02:10:58)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRaceName("30ª MARATONA INTL DE SÃO PAULO 2026");
+                    setDistanceKm("21.097");
+                    setChipTime("02:22:05");
+                    setGunTime("02:49:28");
+                    setPace("6:46");
+                    setCadenceSpm("174");
+                    setAvgHrBpm("154");
+                    setRankingCategory("332º M50-54 • 3824º Geral • Nº 17503");
+                    setPodiumTitle("FINISHER OFICIAL 21K • 30 ANOS SP");
+                    setRaceDate("12 ABR 2026");
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 font-bold shrink-0"
+                >
+                  30ª Maratona Intl SP 21k (02:22:05)
+                </button>
+              </div>
+            )}
+
+            {selectedProfile === "PATRICIA" && (
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-mono">
+                <span className="text-[10px] text-gray-400 uppercase font-bold shrink-0">Predefinir:</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRaceName("ATHENAS MIZUNO RUN LONGER 14K");
+                    setDistanceKm("14.000");
+                    setChipTime("01:43:02");
+                    setGunTime("01:48:44");
+                    setPace("7:21");
+                    setCadenceSpm("168");
+                    setAvgHrBpm("152");
+                    setRankingCategory("26ª F55-59 • 950ª Geral Fem • Nº 10967");
+                    setPodiumTitle("FINISHER OFICIAL 14K • ATHENAS MIZUNO");
+                    setRaceDate("18 OUT 2026");
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/40 text-amber-300 font-bold shrink-0"
+                >
+                  Athenas Mizuno 14k (01:43:02) • HOJE!
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRaceName("SP CITY MARATHON 2026");
+                    setDistanceKm("21.097");
+                    setChipTime("02:53:00");
+                    setGunTime("04:13:12");
+                    setPace("8:11");
+                    setCadenceSpm("166");
+                    setAvgHrBpm("148");
+                    setRankingCategory("933ª F50-59 • 9020ª Geral Fem • Nº 34798");
+                    setPodiumTitle("FINISHER OFICIAL 21.1K • MEIA SP CITY");
+                    setRaceDate("26 JUL 2026");
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-sky-600/20 hover:bg-sky-600/30 border border-sky-500/40 text-sky-300 font-bold shrink-0"
+                >
+                  SP City Marathon 21k (02:53:00)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRaceName("40º 10 KM TRIBUNA TERRACOM SANTOS");
+                    setDistanceKm("10.000");
+                    setChipTime("01:10:12");
+                    setGunTime("01:12:34");
+                    setPace("7:01");
+                    setCadenceSpm("174");
+                    setAvgHrBpm("154");
+                    setRankingCategory("Top 30% Geral • 430ª F50-59 • Nº 9773");
+                    setPodiumTitle("FINISHER OFICIAL 10K • 40 ANOS TRIBUNA");
+                    setRaceDate("17 MAI 2026");
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-orange-600/20 hover:bg-orange-600/30 border border-orange-500/40 text-orange-300 font-bold shrink-0"
+                >
+                  10 KM Tribuna Santos (01:10:12)
+                </button>
+              </div>
+            )}
+
+            {selectedProfile === "GABRIEL" && (
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-mono">
+                <span className="text-[10px] text-gray-400 uppercase font-bold shrink-0">Predefinir:</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRaceName("CORRIDA SARGENTO GONZAGUINHA 5K");
+                    setDistanceKm("5.000");
+                    setChipTime("00:21:15");
+                    setGunTime("00:21:40");
+                    setPace("4:15");
+                    setCadenceSpm("186");
+                    setAvgHrBpm("168");
+                    setRankingCategory("Top 3% • 6º M20-24");
+                    setPodiumTitle("EXPLOSÃO ALVIVERDE • PACE 4:15");
+                    setRaceDate("21 JUN 2026");
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-bold shrink-0"
+                >
+                  Gonzaguinha 5k (00:21:15 • Pace 4:15)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRaceName("CORRIDA OLGA KOS 10K SPEED");
+                    setDistanceKm("10.000");
+                    setChipTime("00:44:20");
+                    setGunTime("00:45:00");
+                    setPace("4:26");
+                    setCadenceSpm("185");
+                    setAvgHrBpm("166");
+                    setRankingCategory("Top 2.5% • 8º M20-24");
+                    setPodiumTitle("SUB-45 ALCANÇADO • 10K SPEED");
+                    setRaceDate("20 DEZ 2026");
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 font-bold shrink-0"
+                >
+                  Olga Kos 10k (00:44:20 • Sub-45)
+                </button>
+              </div>
+            )}
 
             {/* Editable Stats Inputs */}
             <div className="grid grid-cols-2 gap-3 text-xs font-mono">

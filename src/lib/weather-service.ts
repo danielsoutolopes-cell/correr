@@ -55,7 +55,7 @@ export class WeatherPacingService {
   private buildCalibratedTomorrowForecast(): TomorrowWeatherForecast {
     return {
       dateFormatted: "18 de Outubro de 2026 (Domingo)",
-      raceTimeFormatted: "06:30 - Largada Athenas Mizuno Run Longer",
+      raceTimeFormatted: "05:30 (21k Daniel) / 06:30 (14k Patrícia) - Largada Athenas Mizuno",
       tempStartC: 16.5,
       tempFinishC: 20.2,
       feelsLikeC: 16.0,

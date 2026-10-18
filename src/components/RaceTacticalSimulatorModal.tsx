@@ -1041,7 +1041,7 @@ Gerado com precisão Haute Sports pelo Bio-Triad OS • Clã Lopes 2026`;
               <div className="text-gray-400 flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span>
-                  Athenas Mizuno Run Longer 2026: Largada 06:30 na Marginal Pinheiros!
+                  Athenas Mizuno Run Longer 2026: Largada {selectedPresetId === "daniel-athenas-21k" ? "05:30" : "06:30"} na Marginal Pinheiros!
                 </span>
               </div>
               <div className="flex items-center gap-2">

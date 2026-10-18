@@ -39,9 +39,14 @@ import { ProfileId } from "@/lib/types";
 interface CoachTabProps {
   currentProfile: ProfileId;
   onTriggerTuyaScene: (scene: string) => void;
+  onOpenDanielTrainingPlan?: () => void;
 }
 
-export function CoachTab({ currentProfile, onTriggerTuyaScene }: CoachTabProps) {
+export function CoachTab({
+  currentProfile,
+  onTriggerTuyaScene,
+  onOpenDanielTrainingPlan,
+}: CoachTabProps) {
   const [weekendMode, setWeekendMode] = useState<WeekendLayoutMode>("CLASSIC_SUNDAY_LONG");
   const [selectedDayIndex, setSelectedDayIndex] = useState<number>(1); // Tuesday by default
   const [activeFicha, setActiveFicha] = useState<"A" | "B" | "C">("A");
@@ -137,6 +142,16 @@ export function CoachTab({ currentProfile, onTriggerTuyaScene }: CoachTabProps) 
 
           {/* Action Triggers */}
           <div className="flex items-center gap-2 flex-wrap">
+            {isDaniel && onOpenDanielTrainingPlan && (
+              <button
+                onClick={onOpenDanielTrainingPlan}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-red-600/30 font-mono"
+              >
+                <Calendar className="h-3.5 w-3.5 text-white" />
+                <span>Planilha 23 Semanas (Rua & Esteira)</span>
+              </button>
+            )}
+
             <button
               onClick={() => setIsActiveWorkoutOpen(true)}
               className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-emerald-600/30 font-mono"

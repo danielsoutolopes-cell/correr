@@ -13,9 +13,9 @@ export interface TuyaCommandResult {
 }
 
 export class TuyaSmartHomeService {
-  private endpoint: string;
-  private clientId: string;
-  private clientSecret: string;
+  private endpoint: string = process.env.TUYA_ENDPOINT || "https://openapi.tuyaus.com";
+  private clientId: string = process.env.TUYA_CLIENT_ID || "nv87mm7ck7nkhuwt57xr";
+  private clientSecret: string = process.env.TUYA_CLIENT_SECRET || "b2e82f81d1564d9ab5a843178290f858";
   private accessToken: string | null = null;
   private tokenExpiresAt: number = 0;
 

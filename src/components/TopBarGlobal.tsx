@@ -46,6 +46,7 @@ interface TopBarGlobalProps {
   onOpenClanHallOfFame?: () => void;
   onOpenSetup?: () => void;
   onOpenRaceMorning?: () => void;
+  onOpenDanielTrainingPlan?: () => void;
 }
 
 export function TopBarGlobal({
@@ -62,6 +63,7 @@ export function TopBarGlobal({
   onOpenClanHallOfFame,
   onOpenSetup,
   onOpenRaceMorning,
+  onOpenDanielTrainingPlan,
 }: TopBarGlobalProps) {
   const [daysToSpInter, setDaysToSpInter] = useState<number>(176);
   const [daysToNike, setDaysToNike] = useState<number>(281);
@@ -297,6 +299,18 @@ export function TopBarGlobal({
           </button>
 
           {/* Executive Reports Trigger */}
+          {/* Daniel Future Training Plan */}
+          {currentProfile === "DANIEL" && (
+            <button
+              onClick={onOpenDanielTrainingPlan}
+              title="Planilha Oficial de Treinos Futuros de Daniel (Fases 1 & 2 • 23 Semanas • Rua & Esteira)"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-red-500/40 bg-red-950/30 text-red-300 hover:text-white hover:bg-red-900/40 text-xs font-semibold transition-all shadow-md"
+            >
+              <Calendar className="h-3.5 w-3.5 text-red-400" />
+              <span className="font-mono">Planilha 23 Sem.</span>
+            </button>
+          )}
+
           <button
             onClick={onOpenReports}
             title="Abrir Central de Relatórios Executivos & Dossiê"

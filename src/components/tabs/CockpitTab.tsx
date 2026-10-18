@@ -93,6 +93,7 @@ interface CockpitTabProps {
   onOpenTrophyCardGenerator?: () => void;
   onOpenClanHallOfFame?: () => void;
   onOpenRaceMorning?: (raceId?: string) => void;
+  onOpenDanielTrainingPlan?: () => void;
 }
 
 export function CockpitTab({
@@ -107,6 +108,7 @@ export function CockpitTab({
   onOpenTrophyCardGenerator,
   onOpenClanHallOfFame,
   onOpenRaceMorning,
+  onOpenDanielTrainingPlan,
 }: CockpitTabProps) {
   const isDaniel = currentProfile === "DANIEL";
   const specs = getProfileSpecs(currentProfile);
@@ -1214,6 +1216,33 @@ export function CockpitTab({
               </div>
             </div>
 
+            {/* Daniel 23-Week Future Plan Link */}
+            {isDaniel && (
+              <div className="mb-4 p-3 rounded-2xl bg-gradient-to-r from-red-950/40 via-[#160B0F] to-black/60 border border-red-500/40 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-8 w-8 rounded-xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-400">
+                    <Calendar className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-white">Planilha Oficial Futura de Treinos</span>
+                      <span className="text-[10px] px-1.5 py-0.2 rounded bg-red-500/20 text-red-300 font-bold">23 Semanas</span>
+                    </div>
+                    <span className="text-[11px] text-gray-400 block mt-0.5">
+                      Fase 1 (Olga Kos 9K) • Fase 2 (Meia de SP Sub-2h) • Versões Rua & Esteira
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={onOpenDanielTrainingPlan}
+                  className="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold transition-all shadow-md shadow-red-600/30 flex items-center gap-1.5"
+                >
+                  <span>Ver Planilha Completa</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            )}
+
             {/* 7-Day Quick Day Switcher Bar (Always keeping TODAY prominent) */}
             <div className="mb-4 bg-black/50 p-1.5 rounded-2xl border border-white/10 flex items-center justify-between gap-1 overflow-x-auto text-xs font-mono">
               {[
@@ -1294,7 +1323,7 @@ export function CockpitTab({
                     <span>🏆 DIA DA PROVA OFICIAL: ATHENAS MIZUNO RUN LONGER</span>
                   </div>
                   <p className="text-gray-300 text-[11px] leading-relaxed">
-                    Marginal Pinheiros • Largada 06:30. {isDaniel ? "Daniel 21k (Pace 5:26)" : currentProfile === "PATRICIA" ? "Patrícia 14k (Pace 5:55)" : "Gabriel 10k"}.
+                    Marginal Pinheiros • Largada {isDaniel ? "05:30 (21k)" : currentProfile === "PATRICIA" ? "06:30 (14k)" : "06:30"}. {isDaniel ? "Daniel 21k (Pace 5:26)" : currentProfile === "PATRICIA" ? "Patrícia 14k (Pace 5:55)" : "Gabriel 10k"}.
                     Ao terminar, use o botão de Lançar Resultados para registrar o Chip Time oficial!
                   </p>
                 </div>
@@ -1885,18 +1914,18 @@ export function CockpitTab({
                 </span>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-800 font-bold">
                   {isDaniel
-                    ? "🥈 Top 5% Categoria (M50-54)"
+                    ? "🏅 Finisher 30 Anos Intl SP"
                     : currentProfile === "PATRICIA"
-                    ? "👑 Top 3% Faixa Etária (F55-59)"
+                    ? "🏅 40 Anos Tribuna Santos"
                     : "⚡ Top 3% Jovens (M20-24)"}
                 </span>
               </div>
 
               <h4 className="text-sm font-black text-white mt-1">
                 {isDaniel
-                  ? "Meia Maratona Internacional de SP 2026 (21k)"
+                  ? "30ª Maratona Internacional de SP 2026 (21k)"
                   : currentProfile === "PATRICIA"
-                  ? "Circuito Athenas SP 2026 - Etapa 1 (10k)"
+                  ? "40º 10 KM Tribuna Terracom Santos"
                   : "Corrida Sargento Gonzaguinha 2026 (5k)"}
               </h4>
             </div>
@@ -1905,17 +1934,17 @@ export function CockpitTab({
               <div className="p-2 rounded-xl bg-white/5 border border-white/5">
                 <span className="text-[8px] text-gray-400 uppercase block">Chip Time</span>
                 <span className="text-xs font-black text-emerald-400 block mt-0.5">
-                  {isDaniel ? "01:54:12" : currentProfile === "PATRICIA" ? "00:57:40" : "00:21:15"}
+                  {isDaniel ? "02:22:05" : currentProfile === "PATRICIA" ? "01:10:12" : "00:21:15"}
                 </span>
                 <span className="text-[8px] text-gray-500 block">
-                  {isDaniel ? "5:25/km" : currentProfile === "PATRICIA" ? "5:46/km" : "4:15/km"}
+                  {isDaniel ? "6:46/km" : currentProfile === "PATRICIA" ? "7:01/km" : "4:15/km"}
                 </span>
               </div>
 
               <div className="p-2 rounded-xl bg-white/5 border border-white/5">
                 <span className="text-[8px] text-gray-400 uppercase block">Gun Time</span>
                 <span className="text-xs font-bold text-gray-300 block mt-0.5">
-                  {isDaniel ? "01:56:45" : currentProfile === "PATRICIA" ? "00:59:15" : "00:21:40"}
+                  {isDaniel ? "02:49:28" : currentProfile === "PATRICIA" ? "01:12:34" : "00:21:40"}
                 </span>
                 <span className="text-[8px] text-gray-500 block">Bruto</span>
               </div>
@@ -1923,35 +1952,35 @@ export function CockpitTab({
               <div className="p-2 rounded-xl bg-white/5 border border-white/5">
                 <span className="text-[8px] text-gray-400 uppercase block">Faixa Etária</span>
                 <span className="text-xs font-black text-amber-400 block mt-0.5">
-                  {isDaniel ? "24º / 512" : currentProfile === "PATRICIA" ? "12ª / 380" : "6º / 220"}
+                  {isDaniel ? "332º" : currentProfile === "PATRICIA" ? "430ª" : "6º / 220"}
                 </span>
                 <span className="text-[8px] text-amber-300/80 block">
-                  {isDaniel ? "M50-54" : currentProfile === "PATRICIA" ? "F55-59" : "M20-24"}
+                  {isDaniel ? "M50-54" : currentProfile === "PATRICIA" ? "F50-59" : "M20-24"}
                 </span>
               </div>
 
               <div className="p-2 rounded-xl bg-white/5 border border-white/5">
                 <span className="text-[8px] text-gray-400 uppercase block">Geral / Sexo</span>
                 <span className="text-xs font-bold text-white block mt-0.5">
-                  {isDaniel ? "389º" : currentProfile === "PATRICIA" ? "198ª" : "78º"}
+                  {isDaniel ? "3.824º" : currentProfile === "PATRICIA" ? "9.739ª" : "78º"}
                 </span>
                 <span className="text-[8px] text-cyan-400 block">
-                  {isDaniel ? "330º Masc" : currentProfile === "PATRICIA" ? "84ª Fem" : "65º Masc"}
+                  {isDaniel ? "Masc" : currentProfile === "PATRICIA" ? "3.009ª Fem" : "65º Masc"}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Tomorrow's Race Countdown & Launch Call */}
+          {/* Race Countdown & Launch Call */}
           <div className="p-4 rounded-2xl bg-gradient-to-r from-red-950/30 to-black/40 border border-red-500/40 flex flex-col justify-between space-y-3 font-mono">
             <div>
               <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase font-bold text-red-400 flex items-center gap-1 animate-pulse">
+                <span className={`text-[10px] uppercase font-bold flex items-center gap-1 ${currentProfile === "PATRICIA" ? "text-emerald-400" : "text-red-400 animate-pulse"}`}>
                   <Flame className="h-3 w-3" />
-                  Próxima Prova • AMANHÃ (18/10/2026)!
+                  {currentProfile === "PATRICIA" ? "PROVA CONCLUÍDA HOJE (18/10/2026)!" : "Próxima Prova • HOJE (18/10/2026)!"}
                 </span>
-                <span className="text-[9px] bg-red-600 text-white px-2 py-0.5 rounded font-black uppercase">
-                  Alvo P1
+                <span className={`text-[9px] text-white px-2 py-0.5 rounded font-black uppercase ${currentProfile === "PATRICIA" ? "bg-emerald-600" : "bg-red-600"}`}>
+                  {currentProfile === "PATRICIA" ? "OFICIAL HOMOLOGADO" : "Alvo P1"}
                 </span>
               </div>
 
@@ -1959,20 +1988,26 @@ export function CockpitTab({
                 Athenas Mizuno Run Longer {isDaniel ? "21k" : currentProfile === "PATRICIA" ? "14k" : "10k"}
               </h4>
               <p className="text-[11px] text-gray-300 mt-1">
-                Marginal Pinheiros • Largada 06:30 • {isDaniel ? "21.097 km" : currentProfile === "PATRICIA" ? "14.0 km" : "10.0 km"}
+                {currentProfile === "PATRICIA"
+                  ? "Marginal Pinheiros • Nº 10967 • Tempo Líquido Oficial: 01:43:02 (Pace 07:21 min/km)"
+                  : `Marginal Pinheiros • Largada ${isDaniel ? "05:30" : "06:30"} • ${isDaniel ? "21.097 km" : "10.0 km"}`}
               </p>
             </div>
 
             <div className="flex items-center justify-between pt-2 border-t border-white/5">
               <span className="text-[11px] text-gray-400">
-                Meta: <strong className="text-amber-400">{isDaniel ? "01:54:40 (5:26/km)" : currentProfile === "PATRICIA" ? "01:22:50 (5:55/km)" : "00:44:10 (4:25/km)"}</strong>
+                {currentProfile === "PATRICIA" ? (
+                  <>Oficial: <strong className="text-emerald-400">01:43:02 (26ª F55-59)</strong></>
+                ) : (
+                  <>Meta: <strong className="text-amber-400">{isDaniel ? "01:54:40 (5:26/km)" : "00:44:10 (4:25/km)"}</strong></>
+                )}
               </span>
 
               <button
                 onClick={onOpenRaceManager}
                 className="px-3 py-1.5 rounded-xl bg-red-600/30 border border-red-500/50 hover:bg-red-600/50 text-white text-[11px] font-bold transition-all shadow"
               >
-                Registrar Tempo Oficial →
+                {currentProfile === "PATRICIA" ? "Ver Palmarés & Calibrador →" : "Registrar Tempo Oficial →"}
               </button>
             </div>
           </div>

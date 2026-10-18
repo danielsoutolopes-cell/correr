@@ -555,7 +555,7 @@ export function RaceMorningDispatchModal({
                     className="w-full bg-[#080B11] border border-white/15 rounded-xl px-3 py-2 text-sm text-amber-300 font-mono font-bold focus:border-amber-400 focus:outline-none"
                   />
                   <div className="flex flex-wrap items-center gap-1">
-                    {["06:00", "06:15", "06:30", "07:00", "07:30", "08:00"].map((t) => (
+                    {["05:30", "06:00", "06:15", "06:30", "07:00", "07:30", "08:00"].map((t) => (
                       <button
                         key={t}
                         onClick={() => handleUpdateRaceStartTime(t)}
